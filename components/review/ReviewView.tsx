@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Finding, Review } from "@/lib/review/engine";
 import { AskPanel } from "./AskPanel";
+import { MobileRounds } from "./MobileRounds";
 import { RoundInspector } from "./RoundInspector";
 import { Timeline } from "./Timeline";
 
@@ -87,7 +88,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
       <section className="mt-6 rounded-2xl border border-[var(--line)] bg-[var(--panel)] px-3 pb-3 pt-4 md:px-5">
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2 px-2 md:px-0">
           <h2 className="text-[15px] font-medium">Every round</h2>
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-[var(--muted)]">
+          <div className="hidden flex-wrap gap-x-4 gap-y-1 text-[12px] text-[var(--muted)] md:flex">
             <Key color="var(--good)">Won fight</Key>
             <Key color="var(--hp)">Lost fight</Key>
             <Key color="var(--line-2)" solid>Monster round</Key>
@@ -100,9 +101,8 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
         <div className="hidden md:block">
           <Timeline series={series} selected={round} highlight={activeFinding?.stages} onSelect={openRound} />
         </div>
-        <div className="md:hidden">
-          <Timeline series={series} selected={round} highlight={activeFinding?.stages} onSelect={openRound} compact width={420} />
-          <p className="mt-1 px-2 text-[12px] text-[var(--muted)]">Tap a round to open it.</p>
+        <div className="px-1 md:hidden">
+          <MobileRounds series={series} selected={round} highlight={activeFinding?.stages} onSelect={openRound} />
         </div>
       </section>
 
