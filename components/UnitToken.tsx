@@ -31,7 +31,8 @@ export function UnitToken({
           width: size,
           height: size,
           borderRadius: Math.max(6, size * 0.18),
-          boxShadow: `0 0 0 ${small ? 1.5 : 2}px ${state === "missed" ? "var(--hp)" : color}`,
+          marginBottom: piece?.items.length ? Math.round(size * 0.18) : 0,
+          boxShadow: state === "bought" ? `0 0 0 2px var(--panel-2), 0 0 0 4px var(--ink)` : `0 0 0 ${small ? 1.5 : 2}px ${state === "missed" ? "var(--hp)" : color}`,
         }}
         title={`${u.name} · ${u.cost}-cost · ${u.traits.join(", ")}`}
       >
@@ -57,9 +58,9 @@ export function UnitToken({
         {state === "missed" && <Badge color="var(--hp)">2★</Badge>}
 
         {piece && piece.items.length > 0 && (
-          <span className="absolute -bottom-[6px] left-1/2 flex -translate-x-1/2 gap-[2px] rounded-[4px] bg-[var(--bg)] p-[2px]">
-            {piece.items.map((it) => (
-              <span key={it} title={ITEMS[it]} className="block h-[8px] w-[8px] rounded-[2px]" style={{ background: itemColor(it) }} />
+          <span className="absolute left-1/2 flex -translate-x-1/2 gap-[2px]" style={{ bottom: -Math.round(size * 0.16) }}>
+            {piece.items.map((it, k) => (
+              <ItemIcon key={k} id={it} size={Math.max(12, Math.round(size * 0.36))} />
             ))}
           </span>
         )}
@@ -77,19 +78,25 @@ function Badge({ color, children }: { color: string; children: React.ReactNode }
   );
 }
 
-const ITEM_COLORS: Record<string, string> = {
-  edge: "#e8e2d4", bow: "#f2a65a", rod: "#e8605a", tear: "#5aa9f2", vest: "#9aa3af",
-  cloak: "#7cc4c0", belt: "#d47a5a", glove: "#e6c95a", staff: "#a68af0", guard: "#8fb3a0", hunter: "#d4d46a",
-};
-
-export function itemColor(id: string) {
-  return ITEM_COLORS[id] ?? "#888";
+export function ItemIcon({ id, size = 14 }: { id: string; size?: number }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`/items/${id}.png`}
+      alt={ITEMS[id]}
+      title={ITEMS[id]}
+      width={size}
+      height={size}
+      className="block rounded-[3px]"
+      style={{ width: size, height: size, boxShadow: "0 0 0 1.5px var(--bg)" }}
+    />
+  );
 }
 
 export function ItemChip({ id }: { id: string }) {
   return (
-    <span className="inline-flex items-center gap-2 rounded-md border border-[var(--line)] bg-[var(--panel-2)] px-2 py-1 text-[12px] text-[var(--ink-2)]">
-      <span className="block h-[10px] w-[10px] rounded-[3px]" style={{ background: itemColor(id) }} />
+    <span className="inline-flex items-center gap-2 rounded-md border border-[var(--line)] bg-[var(--panel-2)] py-1 pl-1 pr-2 text-[12px] text-[var(--ink-2)]">
+      <ItemIcon id={id} size={18} />
       {ITEMS[id]}
     </span>
   );

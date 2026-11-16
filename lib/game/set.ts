@@ -40,19 +40,43 @@ export const UNIT_BY_ID: Record<string, UnitDef> = Object.fromEntries(
   UNITS.map((u) => [u.id, u]),
 );
 
+// Real item names. Components sit on the bench or a unit; two components on one
+// unit combine into a completed item, as in the game.
 export const ITEMS: Record<string, string> = {
-  edge: "Keen Edge",
-  bow: "Quickbow",
-  rod: "Ember Rod",
-  tear: "Mana Tear",
-  vest: "Iron Vest",
-  cloak: "Warded Cloak",
+  edge: "B.F. Sword",
+  bow: "Recurve Bow",
+  rod: "Needlessly Large Rod",
+  tear: "Tear of the Goddess",
+  vest: "Chain Vest",
+  cloak: "Negatron Cloak",
   belt: "Giant's Belt",
-  glove: "Lucky Glove",
-  staff: "Runic Staff",
-  guard: "Bastion Guard",
-  hunter: "Hunter's Mark",
+  glove: "Sparring Gloves",
+  sunfire: "Sunfire Cape",
+  archangel: "Archangel's Staff",
+  ie: "Infinity Edge",
 };
+
+export const RECIPES: Record<string, [string, string]> = {
+  sunfire: ["vest", "belt"],
+  archangel: ["rod", "tear"],
+  ie: ["edge", "glove"],
+};
+
+// Combine component pairs on one unit into their completed items.
+export function combineItems(items: string[]): string[] {
+  const left = [...items];
+  const out: string[] = [];
+  for (const [done, [a, b]] of Object.entries(RECIPES)) {
+    const i = left.indexOf(a);
+    const j = left.indexOf(b);
+    if (i >= 0 && j >= 0 && i !== j) {
+      out.push(done);
+      left.splice(Math.max(i, j), 1);
+      left.splice(Math.min(i, j), 1);
+    }
+  }
+  return [...out, ...left];
+}
 
 // Shop odds by level, per cost (percent). Same idea every set; the numbers come
 // from the live set's config.

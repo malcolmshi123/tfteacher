@@ -3,13 +3,28 @@ import { SiteFooter, SiteNav } from "@/components/SiteChrome";
 import { UnitToken } from "@/components/UnitToken";
 import { Timeline } from "@/components/review/Timeline";
 import { buildSampleGame } from "@/lib/game/sample";
-import { analyze } from "@/lib/review/engine";
+import { analyze, boardValue } from "@/lib/review/engine";
+import { UNIT_BY_ID } from "@/lib/game/set";
 import { MY_COMPS } from "@/lib/patch/radar";
 
 export default function Home() {
   const review = analyze(buildSampleGame());
   const top = review.findings[0];
   const r42 = review.game.rounds.find((r) => r.stage === "4-2")!;
+  // which shop slots the 4-2 buys came from: each bought unit takes the first unused slot showing it
+  const boughtAt = new Set<string>();
+  for (const u of r42.bought) {
+    outer: for (let si = 0; si < r42.shops.length; si++)
+      for (let k = 0; k < r42.shops[si].length; k++)
+        if (r42.shops[si][k] === u && !boughtAt.has(`${si}:${k}`)) {
+          boughtAt.add(`${si}:${k}`);
+          break outer;
+        }
+  }
+  const rollCost = r42.rerolls * 2;
+  const buyCost = r42.bought.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0);
+  const soldFor = r42.sold.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0);
+  const soldNames = [...new Set(r42.sold.map((u) => UNIT_BY_ID[u].name))].join(", ");
   const last = review.game.rounds[review.game.rounds.length - 1];
   const r32 = review.game.rounds.find((r) => r.stage === "3-2")!;
   const r43 = review.game.rounds.find((r) => r.stage === "4-3")!;
@@ -104,8 +119,10 @@ export default function Home() {
                     <dd className="text-[18px] font-semibold">{last.level}</dd>
                   </div>
                   <div>
-                    <dt className="text-[var(--muted)]">Units</dt>
-                    <dd className="text-[18px] font-semibold">{last.board.length}</dd>
+                    <dt className="text-[var(--muted)]">Board value</dt>
+                    <dd className="text-[18px] font-semibold">
+                      {boardValue(last.board)} <span className="text-[13px] font-normal text-[var(--muted)]">gold</span>
+                    </dd>
                   </div>
                 </dl>
                 <div className="mt-5 rounded-xl border border-dashed border-[var(--line-2)] px-4 py-6 text-center text-[13px] text-[var(--muted)]">
@@ -119,9 +136,9 @@ export default function Home() {
                   {r42.shops.map((shop, si) => (
                     <div key={si} className="flex items-center gap-3">
                       <span className="w-12 text-[11px] text-[var(--muted)]">{si === 0 ? "Free" : `Roll ${si}`}</span>
-                      <div className="flex gap-1.5">
+                      <div className="flex gap-2">
                         {shop.map((u, k) => (
-                          <UnitToken key={k} unitId={u} size={28} showName={false} />
+                          <UnitToken key={k} unitId={u} size={28} showName={false} state={boughtAt.has(`${si}:${k}`) ? "bought" : "dim"} />
                         ))}
                       </div>
                     </div>
@@ -143,7 +160,11 @@ export default function Home() {
                     <dd className="text-[18px] font-semibold">{r42.rerolls}</dd>
                   </div>
                 </dl>
-                <p className="mt-5 text-[14px] leading-relaxed text-[var(--ink-2)]">
+                <p className="tnum mt-4 text-[13px] text-[var(--muted)]">
+                  {r42.gold} gold, minus {rollCost} on {r42.rerolls} rerolls and {buyCost} on the {r42.bought.length} outlined units,
+                  plus {soldFor} for selling {soldNames}: {r42.goldEnd} left.
+                </p>
+                <p className="mt-4 text-[14px] leading-relaxed text-[var(--ink-2)]">
                   Every shop, every reroll, gold and HP at the start of each round, your bench and the lobby around you.
                 </p>
               </div>
@@ -173,8 +194,8 @@ export default function Home() {
               title="Read the review when you die"
               visual={
                 <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--line)] bg-[var(--panel)] px-4 py-3 text-[13px]">
-                  <span className="truncate text-[var(--ink)]">Eliminated at 5-1 holding 50 gold</span>
-                  <span className="tnum shrink-0 rounded-full bg-[color-mix(in_oklab,var(--hp)_13%,transparent)] px-2 py-0.5 text-[12px] text-[var(--hp)]">50 gold</span>
+                  <span className="truncate text-[var(--ink)]">Eliminated at {last.stage} holding {last.goldEnd} gold</span>
+                  <span className="tnum shrink-0 rounded-full bg-[color-mix(in_oklab,var(--hp)_13%,transparent)] px-2 py-0.5 text-[12px] text-[var(--hp)]">{review.game.placement}th</span>
                 </div>
               }
             >

@@ -1,4 +1,4 @@
-import { SHOP_ODDS, UNITS, UNIT_BY_ID, XP_TO_NEXT, copiesOf } from "./set";
+import { SHOP_ODDS, UNITS, UNIT_BY_ID, XP_TO_NEXT, combineItems, copiesOf } from "./set";
 import type {
   GameRecord,
   Opponent,
@@ -34,7 +34,7 @@ function parse(spec: string): Piece[] {
     .map((tok) => {
       const [unit, star, items] = tok.split(":");
       if (!UNIT_BY_ID[unit]) throw new Error(`unknown unit ${unit}`);
-      return { unit, star: Number(star) as Star, items: items ? items.split(",") : [] };
+      return { unit, star: Number(star) as Star, items: items ? combineItems(items.split(",")) : [] };
     });
 }
 
@@ -72,13 +72,13 @@ const SCRIPT: Step[] = [
   { stage: "3-6", kind: "pvp", outcome: "loss", dmg: 10, xp: 3, board: "leona:2:edge sejuani:2:vest yunara:1:bow kayle:1 vi:1 masteryi:1", bench: "vi:1", itemBench: "rod,tear,belt" },
   { stage: "3-7", kind: "pve", outcome: "win", dmg: 0, board: "leona:2:edge sejuani:2:vest yunara:1:bow kayle:1 vi:1 masteryi:1", bench: "vi:1", itemBench: "rod,tear,belt,glove", goldDrop: 4 },
   { stage: "4-1", kind: "pvp", outcome: "loss", dmg: 12, xp: 4, board: "leona:2:edge sejuani:2:vest,belt yunara:1:bow kayle:1 vi:1 masteryi:1:rod,tear aphelios:1", bench: "vi:1", itemBench: "glove" },
-  { stage: "4-2", kind: "pvp", outcome: "win", dmg: 0, rerolls: 4, board: "sejuani:2:vest,belt yunara:2:bow kayle:2 vi:2 masteryi:2:rod,tear aphelios:1:glove ahri:1", bench: "aphelios:1 amumu:1", forceShop: { 2: ["aphelios"] } },
-  { stage: "4-3", kind: "pvp", outcome: "loss", dmg: 11, rerolls: 2, board: "sejuani:2:vest,belt yunara:2:bow kayle:2 vi:2 masteryi:2:rod,tear aphelios:1:glove ahri:1", bench: "aphelios:1 amumu:1" },
-  { stage: "4-4", kind: "carousel", outcome: "none", dmg: 0, board: "sejuani:2:vest,belt yunara:2:bow kayle:2 vi:2 masteryi:2:rod,tear aphelios:1:glove ahri:1", bench: "aphelios:1 amumu:1", itemBench: "staff" },
-  { stage: "4-5", kind: "pvp", outcome: "loss", dmg: 13, rerolls: 3, board: "sejuani:2:vest,belt yunara:2:bow kayle:2 vi:2 masteryi:2:rod,tear aphelios:1:glove ahri:1", bench: "aphelios:1 amumu:1", itemBench: "staff" },
-  { stage: "4-6", kind: "pvp", outcome: "win", dmg: 0, rerolls: 2, board: "sejuani:2:vest,belt yunara:2:bow kayle:2 vi:2 masteryi:2:rod,tear aphelios:1:glove ahri:1", bench: "aphelios:1 amumu:1", itemBench: "staff" },
-  { stage: "4-7", kind: "pve", outcome: "win", dmg: 0, board: "sejuani:2:vest,belt yunara:2:bow kayle:2 vi:2 masteryi:2:rod,tear aphelios:1:glove ahri:1", bench: "aphelios:1 amumu:1", itemBench: "staff,cloak", goldDrop: 3 },
-  { stage: "5-1", kind: "pvp", outcome: "loss", dmg: 15, rerolls: 4, board: "sejuani:2:vest,belt yunara:2:bow kayle:2 vi:2 masteryi:2:rod,tear aphelios:1:glove ahri:1", bench: "aphelios:1 amumu:1", itemBench: "staff,cloak" },
+  { stage: "4-2", kind: "pvp", outcome: "win", dmg: 0, rerolls: 4, board: "sejuani:2:vest,belt yunara:1:bow kayle:1 vi:2 masteryi:1:rod,tear aphelios:1:glove,edge ahri:1", bench: "masteryi:1 yunara:1" },
+  { stage: "4-3", kind: "pvp", outcome: "loss", dmg: 11, rerolls: 2, board: "sejuani:2:vest,belt yunara:1:bow kayle:2 vi:2 masteryi:1:rod,tear aphelios:1:glove,edge ahri:1", bench: "masteryi:1 yunara:1" },
+  { stage: "4-4", kind: "carousel", outcome: "none", dmg: 0, board: "sejuani:2:vest,belt yunara:1:bow kayle:2 vi:2 masteryi:1:rod,tear aphelios:1:glove,edge ahri:1", bench: "masteryi:1 yunara:1", itemBench: "cloak" },
+  { stage: "4-5", kind: "pvp", outcome: "loss", dmg: 13, rerolls: 3, board: "sejuani:2:vest,belt yunara:2:bow kayle:2 vi:2 masteryi:2:rod,tear aphelios:1:glove,edge ahri:1", bench: "aphelios:1", itemBench: "cloak" },
+  { stage: "4-6", kind: "pvp", outcome: "win", dmg: 0, rerolls: 2, board: "sejuani:2:vest,belt yunara:2:bow kayle:2 vi:2 masteryi:2:rod,tear aphelios:1:glove,edge ahri:1", bench: "aphelios:1", itemBench: "cloak" },
+  { stage: "4-7", kind: "pve", outcome: "win", dmg: 0, board: "sejuani:2:vest,belt yunara:2:bow kayle:2 vi:2 masteryi:2:rod,tear aphelios:1:glove,edge ahri:1", bench: "aphelios:1", itemBench: "cloak,bow", goldDrop: 3 },
+  { stage: "5-1", kind: "pvp", outcome: "loss", dmg: 15, rerolls: 4, board: "sejuani:2:vest,belt yunara:2:bow kayle:2 vi:2 masteryi:2:rod,tear aphelios:1:glove,edge ahri:1", bench: "aphelios:1", itemBench: "cloak,bow" },
 ];
 
 const OPPONENTS: { id: string; name: string; place: number; strength: number }[] = [
