@@ -342,18 +342,42 @@ export function analyze(game: GameRecord): Review {
 
   findings.sort((a, b) => Number(!!a.positive) - Number(!!b.positive) || RANK[a.severity] - RANK[b.severity] || (b.hpCost ?? 0) - (a.hpCost ?? 0));
 
-  const top = findings.filter((f) => !f.positive && f.severity === "high");
   const peakHpLoss = findings.find((f) => f.kind === "loss-streak");
   const streak = findings.find((f) => f.kind === "loss-streak");
   const streakEndHp = streak ? Math.max(0, R.find((r) => r.stage === streak.focus)!.hp - R.find((r) => r.stage === streak.focus)!.damageTaken) : undefined;
-  const headline =
-    game.placement <= 4
-      ? `Top 4. Here is what kept it from being a win.`
-      : streak && streakEndHp !== undefined && last.goldEnd >= 10
-        ? `You placed ${ordinal(game.placement)}: a loss streak left you at ${streakEndHp} HP after ${streak.focus}, and you went out at ${last.stage} holding ${last.goldEnd} gold.`
-        : top.length
-          ? `You placed ${ordinal(game.placement)}. ${top[0].title}.`
-          : `You placed ${ordinal(game.placement)}. Here is what made the difference.`;
+  const place = ordinal(game.placement);
+  const streakStory = !!streak && streakEndHp !== undefined && last.goldEnd >= 10;
+
+  // Every other game: what went well (a strong opening), then the costliest mistake,
+  // both said in the player's own numbers.
+  const worst = findings.find((f) => !f.positive);
+  const opener = findings.find((f) => f.kind === "early-strength");
+  const listStages = (xs: string[]) => (xs.length <= 1 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
+  const mistake = (f: Finding): string => {
+    switch (f.kind) {
+      case "held-gold-low-hp":
+        return `lost at ${listStages(f.stages)} under 40 HP with ${listStages(f.stages.map((s) => String(R.find((r) => r.stage === s)!.goldEnd)))} gold unspent`;
+      case "unspent-gold":
+        return `went out at ${last.stage} holding ${last.goldEnd} gold`;
+      case "missed-upgrade":
+        return `passed on ${f.stages.length} upgrade${f.stages.length === 1 ? "" : "s"} the shop offered`;
+      case "idle-items":
+        return `left ${f.lines?.length ?? 0} item components on your bench, one for ${f.title.match(/for (\d+) rounds/)?.[1] ?? "several"} rounds`;
+      case "level-tempo":
+        return `fell a level behind the lobby in ${f.stages.length} fights`;
+      case "loss-streak":
+        return `lost ${f.title.match(/^(\d+)/)?.[1]} fights in a row for ${f.hpCost} HP`;
+      default:
+        return f.title.charAt(0).toLowerCase() + f.title.slice(1);
+    }
+  };
+  const good = opener ? `won your first ${opener.stages.length} fights` : "";
+  const bad = worst ? mistake(worst) : `went out at ${last.stage}`;
+  const story = good ? `${good}, but ${bad}` : bad;
+
+  const headline = streakStory
+    ? `You placed ${place}: a loss streak left you at ${streakEndHp} HP after ${streak!.focus}, and you went out at ${last.stage} holding ${last.goldEnd} gold.`
+    : `You placed ${place}: you ${story}.`;
 
   const totalRolls = R.reduce((a, r) => a + r.rerolls, 0);
   const r41 = R.find((r) => r.stage === "4-1");
@@ -368,7 +392,13 @@ export function analyze(game: GameRecord): Review {
     const allRolls = rolls === totalRolls ? `all ${rolls} of your rerolls came in the last ${after.length} rounds` : `you rolled ${rolls} times in the last ${after.length} rounds`;
     summary = `The streak took ${peakHpLoss.hpCost} HP for ${gold} gold. After it, ${allRolls}, and you lost ${losses} of the ${after.filter((r) => r.kind === "pvp").length} fights that were left.`;
   } else {
-    summary = `You rolled ${totalRolls} times and went out with ${last.goldEnd} gold.`;
+    const fights = R.filter((r) => r.kind === "pvp");
+    const lost = fights.filter((r) => r.outcome === "loss").length;
+    const by = last.kind === "pvp" && last.opponent ? ` to ${last.opponent}` : "";
+    summary =
+      game.placement > 1
+        ? `You lost ${lost} of ${fights.length} player fights and went out at ${last.stage}${by}${last.goldEnd >= 10 ? ` holding ${last.goldEnd} gold` : ""}.`
+        : `You lost ${lost} of ${fights.length} player fights and won the lobby.`;
   }
 
   return {
@@ -376,10 +406,9 @@ export function analyze(game: GameRecord): Review {
     findings,
     series,
     headline,
-    shortHeadline:
-      streak && streakEndHp !== undefined && last.goldEnd >= 10
-        ? `${ordinal(game.placement)}: down to ${streakEndHp} HP after a loss streak, out holding ${last.goldEnd} gold.`
-        : headline,
+    shortHeadline: streakStory
+      ? `${place}: down to ${streakEndHp} HP after a loss streak, out holding ${last.goldEnd} gold.`
+      : `${place}: ${bad}.`,
     summary,
     stats: [
       { label: "Fights lost", value: `${R.filter((r) => r.kind === "pvp" && r.outcome === "loss").length} of ${R.filter((r) => r.kind === "pvp").length}`, note: "player fights" },

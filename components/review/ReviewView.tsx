@@ -14,6 +14,11 @@ const SOURCE_LABEL = {
   "match-api": "Final board only (no recording)",
 } as const;
 
+// round numbers like 6-1 never split across lines
+function keepRounds(s: string) {
+  return s.replace(/(\d)-(\d)/g, "$1‑$2");
+}
+
 export function ReviewView({ review, initialRound }: { review: Review; initialRound?: string }) {
   const { game, findings, series } = review;
   const first = findings[0];
@@ -63,10 +68,10 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
             </span>
           </div>
           <h1 className="mt-3 text-[28px] font-semibold leading-[1.15] tracking-[-0.02em] text-balance md:text-[36px]">
-            <span className="md:hidden">{review.shortHeadline}</span>
-            <span className="hidden md:inline">{review.headline}</span>
+            <span className="md:hidden">{keepRounds(review.shortHeadline)}</span>
+            <span className="hidden md:inline">{keepRounds(review.headline)}</span>
           </h1>
-          <p className="mt-3 max-w-[640px] text-[15px] leading-relaxed text-[var(--ink-2)]">{review.summary}</p>
+          <p className="mt-3 max-w-[640px] text-[15px] leading-relaxed text-[var(--ink-2)]">{keepRounds(review.summary)}</p>
         </div>
         <div className="hidden shrink-0 items-center gap-3 rounded-2xl border md:flex border-[var(--line)] bg-[var(--panel)] py-3 pl-3 pr-5">
           <span className="tnum flex h-14 w-14 items-center justify-center rounded-xl bg-[color-mix(in_oklab,var(--place)_16%,var(--panel-2))] font-semibold text-[var(--place)]">

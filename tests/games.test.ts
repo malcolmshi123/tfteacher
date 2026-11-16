@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { allGames, gameById } from "../lib/game/games";
 import { MY_COMPS } from "../lib/patch/radar";
 import { analyze } from "../lib/review/engine";
+import { buildFacts } from "../lib/ask/facts";
+import { checkAnswer } from "../lib/ask/check";
 
 // The same invariants the sample game is held to, for every game in the account.
 describe.each(allGames().map((g) => [g.game.id, g] as const))("game %s", (_id, { game, comp }) => {
@@ -39,6 +41,11 @@ describe.each(allGames().map((g) => [g.game.id, g] as const))("game %s", (_id, {
     const last = R[R.length - 1];
     expect(last.roster.filter((o) => o.hp > 0).length).toBe(game.placement - 1);
     for (let i = 1; i < R.length; i++) R[i].roster.forEach((o, j) => expect(o.hp).toBeLessThanOrEqual(R[i - 1].roster[j].hp));
+  });
+  it("states only numbers the recording backs, in its headline and summary", () => {
+    const review = analyze(game);
+    const facts = buildFacts(review);
+    for (const s of checkAnswer(`${review.headline} ${review.shortHeadline} ${review.summary}`, facts)) expect(s.unsupported, s.text).toEqual([]);
   });
   it("never shows the lobby median HP going up", () => {
     const s = analyze(game).series;
