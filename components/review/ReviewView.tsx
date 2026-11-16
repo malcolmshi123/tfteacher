@@ -99,26 +99,22 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
       <section className="mt-6 rounded-2xl border border-[var(--line)] bg-[var(--panel)] px-3 pb-3 pt-4 md:px-5">
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2 px-2 md:px-0">
           <h2 className="text-[15px] font-medium">Every round</h2>
-          <div className="hidden flex-wrap gap-x-4 gap-y-1 text-[12px] text-[var(--muted)] md:flex">
-            <Key line="var(--hp)">You</Key>
-            <Key line="var(--ink-2)" dashed>
-              Lobby median
-            </Key>
-            <Key color="var(--gold)">Gold into combat</Key>
-            <Key color="transparent" spent>
-              Spent that round
-            </Key>
-            <span className="mx-1 h-3 w-px self-center bg-[var(--line-2)]" aria-hidden />
+        </div>
+        <div className="hidden md:block">
+          <Timeline series={series} selected={round} highlight={activeFinding?.stages} onSelect={openRound} />
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-[var(--line)] pt-3 text-[12px] text-[var(--ink-2)]">
+            <span className="text-[var(--muted)]">Round result</span>
             <Key color="var(--good)">Won</Key>
             <Key color="var(--hp)">Lost</Key>
             <Key color="var(--line-2)" solid>Monster round</Key>
             <Key color="transparent" dashed>
               Shared draft
             </Key>
+            <span className="ml-auto flex items-center gap-1.5">
+              <span className="block h-3 w-3 rounded-[3px] bg-[color-mix(in_oklab,var(--brand)_18%,transparent)]" />
+              Rounds in the selected finding
+            </span>
           </div>
-        </div>
-        <div className="hidden md:block">
-          <Timeline series={series} selected={round} highlight={activeFinding?.stages} onSelect={openRound} />
         </div>
         <div className="px-1 md:hidden">
           <MobileRounds series={series} selected={round} highlight={activeFinding?.stages} onSelect={openRound} />

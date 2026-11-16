@@ -273,7 +273,7 @@ export function analyze(game: GameRecord): Review {
     findings.push({
       id: "idle-items",
       kind: "idle-items",
-      severity: total >= 15 ? "medium" : "low",
+      severity: "medium",
       title: `${idleReport.length} item components sat unused, one for ${Math.max(...idleReport.map((x) => x.rounds))} rounds`,
       detail: "Components only help once they are on a unit.",
       lines: idleReport.map((x) => `${x.from}: ${ITEMS[x.item]} sat on the bench until ${x.to}, ${x.rounds} rounds`),
@@ -375,7 +375,7 @@ export function analyze(game: GameRecord): Review {
         return f.title.charAt(0).toLowerCase() + f.title.slice(1);
     }
   };
-  const good = opener ? `won your first ${opener.stages.length} fights` : "";
+  const good = opener ? `won your first ${opener.stages.length} player fights` : "";
   const bad = worst ? mistake(worst) : `died on ${last.stage}`;
   const story = good ? `${good}, but ${bad}` : bad;
 
@@ -422,7 +422,7 @@ export function analyze(game: GameRecord): Review {
         return {
           label: `HP after ${keyStage}`,
           value: String(Math.max(0, R[k].hp - R[k].damageTaken)),
-          note: pt.lobbyAlive >= 4 ? `lobby median ${pt.lobbyHp}` : `${pt.lobbyAlive} others left`,
+          note: pt.lobbyAlive >= 4 ? `lobby median ${pt.lobbyHp}` : `${pt.lobbyAlive} opponents left`,
         };
       })(),
       { label: "Rerolls", value: String(totalRolls), note: "whole game" },

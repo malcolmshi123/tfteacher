@@ -66,8 +66,8 @@ export function RoundInspector({
 
       {takeaway && <p className="text-pretty border-b border-[var(--line)] px-4 py-3 text-[14px] leading-snug text-[var(--ink)] sm:px-5">{takeaway}</p>}
 
-      <dl className="grid grid-cols-2 border-b border-[var(--line)] sm:grid-cols-4">
-        <Stat k="HP entering" v={`${r.hp}`} sub={pt.lobbyAliveEntering >= 4 ? `lobby ${pt.lobbyHpEntering}` : `${pt.lobbyAliveEntering} others left`} tone={pt.lobbyAliveEntering < 4 ? undefined : r.hp < pt.lobbyHpEntering ? "hp" : "good"} />
+      <dl className="grid grid-cols-2 border-b border-[var(--line)]">
+        <Stat k="HP entering" v={`${r.hp}`} sub={pt.lobbyAliveEntering >= 4 ? `lobby ${pt.lobbyHpEntering}` : `${pt.lobbyAliveEntering} opponents left`} tone={pt.lobbyAliveEntering < 4 ? undefined : r.hp < pt.lobbyHpEntering ? "hp" : "good"} />
         <Stat k="Gold" v={`${r.gold}`} sub={`${r.goldEnd} into combat`} />
         <Stat k="Level" v={`${r.level}`} sub={`lobby ${pt.lobbyLevel}`} tone={r.level < pt.lobbyLevel ? "hp" : r.level > pt.lobbyLevel ? "good" : undefined} />
         <Stat k="Board" v={`${pt.boardValue}`} sub={`lobby ${pt.lobbyBoardValue}`} tone={pt.boardValue < pt.lobbyBoardValue ? "hp" : "good"} />
@@ -201,7 +201,7 @@ function NavBtn({ children, onClick, disabled, label }: { children: React.ReactN
 
 function Stat({ k, v, sub, tone }: { k: string; v: string; sub?: string; tone?: "hp" | "good" }) {
   return (
-    <div className="border-b border-r border-[var(--line)] px-4 py-3.5 even:border-r-0 sm:border-b-0 sm:px-5 sm:even:border-r sm:last:border-r-0 [&:nth-child(n+3)]:border-b-0">
+    <div className="border-b border-r border-[var(--line)] px-4 py-3.5 even:border-r-0 sm:px-5 [&:nth-child(n+3)]:border-b-0">
       <dt className="text-[12px] text-[var(--muted)]">{k}</dt>
       <dd className="tnum mt-0.5 text-[20px] font-semibold tracking-tight" style={{ color: tone === "hp" ? "var(--hp)" : tone === "good" ? "var(--good)" : undefined }}>
         {v}

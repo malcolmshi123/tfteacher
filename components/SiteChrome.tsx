@@ -19,8 +19,16 @@ const NAV = [
   { href: "/pricing", label: "Pricing" },
 ];
 
+const SAMPLE_PAGES = ["/reviews", "/patch"];
+
 export function SiteNav({ active }: { active?: string }) {
   return (
+    <>
+    {active && SAMPLE_PAGES.includes(active) && (
+      <div className="border-b border-[var(--line)] bg-[color-mix(in_oklab,var(--brand)_8%,var(--bg))] px-4 py-2 text-center text-[13px] text-[var(--ink-2)]">
+        You&apos;re looking at a sample account. Install the app and sign in to see your own games.
+      </div>
+    )}
     <header className="sticky top-0 z-30 border-b border-[var(--line)] bg-[var(--bg)]">
       <div className="mx-auto flex h-14 max-w-[1240px] items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-8">
@@ -69,6 +77,7 @@ export function SiteNav({ active }: { active?: string }) {
         </div>
       </div>
     </header>
+    </>
   );
 }
 

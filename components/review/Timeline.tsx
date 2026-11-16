@@ -8,9 +8,9 @@ function layout(compact: boolean) {
   const FS = 12; // label size
   const PAD_L = compact ? 30 : 34;
   const PAD_R = 12;
-  const HP_TOP = compact ? 34 : 30; // the lane label sits in its own row above the plot
+  const HP_TOP = compact ? 34 : 42; // the lane label and its key sit in their own row above the plot
   const HP_H = compact ? 136 : 128;
-  const GOLD_TOP = HP_TOP + HP_H + (compact ? 40 : 34);
+  const GOLD_TOP = HP_TOP + HP_H + (compact ? 40 : 48);
   const GOLD_H = compact ? 56 : 64;
   const STRIP_TOP = GOLD_TOP + GOLD_H + 14;
   const STRIP_H = compact ? 14 : 18;
@@ -85,10 +85,10 @@ export function Timeline({
           </text>
         </g>
       ))}
-      <text x={PAD_L} y={compact ? 14 : HP_TOP - 6} fontSize={FS} fill="var(--ink-2)">
+      <text x={PAD_L} y={compact ? 14 : HP_TOP - 18} fontSize={FS} fill="var(--ink-2)">
         HP after combat
       </text>
-      {compact && <g transform={`translate(${W - PAD_R - 170}, 4)`}>
+      {<g transform={`translate(${W - PAD_R - 170}, ${compact ? 4 : HP_TOP - 27})`}>
         <line x1={0} x2={16} y1={0} y2={0} stroke="var(--hp)" strokeWidth={2} transform="translate(0,4)" />
         <text x={22} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">You</text>
         <line x1={compact ? 66 : 58} x2={compact ? 84 : 74} y1={4} y2={4} stroke="var(--ink-2)" strokeWidth={1.5} strokeDasharray="3 3" />
@@ -102,7 +102,7 @@ export function Timeline({
         if (compact || lastLive < 0 || lastLive === series.length - 1) return null;
         return (
           <text x={cx(lastLive)} y={HP_TOP + HP_H + 15} textAnchor="end" fontSize={FS - 1} fill="var(--muted)">
-            Lobby median ends here: {series[lastLive + 1].lobbyAlive} opponents left
+            Lobby median ends here: only {series[lastLive + 1].lobbyAlive} opponents left
           </text>
         );
       })()}
@@ -113,10 +113,10 @@ export function Timeline({
       )}
 
       {/* gold: solid is what you took into combat, the faint cap is what you spent that round */}
-      <text x={PAD_L} y={GOLD_TOP - (compact ? 14 : 8)} fontSize={FS} fill="var(--ink-2)">
+      <text x={PAD_L} y={GOLD_TOP - (compact ? 14 : 18)} fontSize={FS} fill="var(--ink-2)">
         Gold into combat
       </text>
-      {compact && <g transform={`translate(${PAD_L + 150}, ${GOLD_TOP - 14 - FS * 0.75})`}>
+      {<g transform={`translate(${PAD_L + 150}, ${compact ? GOLD_TOP - 14 - FS * 0.75 : GOLD_TOP - 27})`}>
         <rect x={0} y={0} width={10} height={10} rx={2} fill="var(--gold)" fillOpacity={0.14} stroke="var(--gold)" strokeOpacity={0.6} strokeDasharray="2 2" />
         <text x={16} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">Spent that round</text>
       </g>}

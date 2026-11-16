@@ -23,7 +23,8 @@ export default function PatchPage() {
   const [main, ...others] = verdicts;
   const word = (x: CompVerdict) => (x.verdict === "weaker" ? "nerfed" : x.verdict === "stronger" ? "buffed" : x.verdict === "mixed" ? "mixed" : "unchanged");
   const same = others.every((o) => word(o) === word(others[0]));
-  const headline = `Your most played comp got ${word(main)}.${others.length ? (same ? ` Your other ${others.length === 2 ? "two" : others.length} got ${word(others[0])}.` : "") : ""}`;
+  const net = (x: CompVerdict) => (x.verdict === "weaker" ? "came out weaker" : x.verdict === "stronger" ? "came out stronger" : x.verdict === "mixed" ? "came out about even" : "didn't change");
+  const headline = `Your most played comp got ${word(main)}.${others.length ? (same ? ` Your other ${others.length === 2 ? "two" : others.length} ${net(others[0])} overall.` : "") : ""}`;
 
   return (
     <>
@@ -41,9 +42,11 @@ export default function PatchPage() {
               {headline}
             </h1>
             <p className="mt-3 text-[15px] leading-relaxed text-[var(--ink-2)]">
-              We checked every trait and champion change in patch {PATCH.to} against the {games} ranked games you played on {PATCH.from}.
-              A trait change only counts if your board reaches that breakpoint. This is the Pro view; Free shows your most played comp.
-              Augments, items and the mid-patch updates aren&apos;t included. Changes with a value per star level show the average.
+              Every trait and champion change in {PATCH.to}, checked against the {games} ranked games you played on {PATCH.from}.
+            </p>
+            <p className="mt-2 text-[13px] leading-relaxed text-[var(--muted)]">
+              Trait changes count only at breakpoints your board reaches. Values per star level are averaged. Augments, items and
+              mid-patch updates aren&apos;t included. Pro view; Free shows your most played comp.
             </p>
           </div>
           <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-4">
@@ -89,8 +92,8 @@ export default function PatchPage() {
           ))}
         </div>
 
-        <section id="rest" className="mt-12 scroll-mt-20">
-          <h2 className="text-[20px] font-semibold tracking-tight">The rest of {PATCH.to}</h2>
+        <section id="rest" className="mt-20 scroll-mt-20 border-t border-[var(--line)] pt-12">
+          <h2 className="text-[28px] font-semibold tracking-[-0.02em]">The rest of {PATCH.to}</h2>
           <p className="mt-2 max-w-[760px] text-[15px] leading-relaxed text-[var(--ink-2)]">{PATCH_SUMMARY.lead}</p>
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <PickList title="Worth trying" tone="var(--good)" picks={PATCH_SUMMARY.tryThese} />
