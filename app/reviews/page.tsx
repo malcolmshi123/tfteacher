@@ -32,7 +32,7 @@ export default function ReviewsPage() {
             <h1 className="text-[28px] font-semibold leading-tight tracking-[-0.02em] md:text-[36px]">Reviews</h1>
             <p className="mt-3 text-[15px] leading-relaxed text-[var(--ink-2)]">
               Every game you play with the app open shows up here when it ends. Open one to see what cost you placements,
-              round by round. This sample account is on Pro, so every game gets a full review.
+              round by round. This list shows patch 18.5; the 19 games on 18.4 are the ones Patch Radar read. This sample account is on Pro, so every game gets a full review.
             </p>
           </div>
           <dl className="tnum grid grid-cols-3 gap-6 rounded-2xl border border-[var(--line)] bg-[var(--panel)] px-5 py-4 text-[13px]">
@@ -53,7 +53,14 @@ export default function ReviewsPage() {
           </dl>
         </div>
 
-        <ul className="mt-8 space-y-3">
+        <div className="mt-8 hidden grid-cols-[56px_220px_320px_minmax(0,1fr)_16px] gap-6 px-5 pb-2 text-[12px] text-[var(--muted)] md:grid">
+          <span>Place</span>
+          <span>Comp</span>
+          <span>Final board</span>
+          <span>Costliest mistake</span>
+          <span />
+        </div>
+        <ul className="space-y-3 md:mt-0 mt-8">
           {rows.map(({ game, comp, top, board }) => {
             const good = game.placement <= 4;
             const color = good ? "var(--good)" : "var(--hp)";
@@ -62,7 +69,7 @@ export default function ReviewsPage() {
               <li key={game.id}>
                 <Link
                   href={`/review/${game.id}`}
-                  className="group grid grid-cols-[48px_minmax(0,1fr)] items-center gap-x-4 gap-y-3 rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-4 transition-colors hover:border-[var(--line-2)] hover:bg-[var(--panel-2)] md:grid-cols-[56px_220px_minmax(0,1fr)_minmax(0,1.1fr)_16px] md:items-center md:gap-6 md:p-5"
+                  className="group grid grid-cols-[48px_minmax(0,1fr)] items-center gap-x-4 gap-y-3 rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-4 transition-colors hover:border-[var(--line-2)] hover:bg-[var(--panel-2)] md:grid-cols-[56px_220px_320px_minmax(0,1fr)_16px] md:items-center md:gap-6 md:p-5"
                 >
                   <span
                     className="tnum flex h-12 w-12 items-center justify-center rounded-xl font-semibold md:h-14 md:w-14"

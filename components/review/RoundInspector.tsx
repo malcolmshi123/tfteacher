@@ -31,7 +31,7 @@ export function RoundInspector({
   const prevPt = series[idx - 1];
   const takeaway =
     r.bought.length >= 5
-      ? `Rolldown: ${r.rerolls} rerolls and ${r.bought.length} units bought took your board from ${prevPt?.boardValue ?? 0} to ${pt.boardValue}.`
+      ? `Rolldown: your board went from ${prevPt?.boardValue ?? 0} to ${pt.boardValue} gold of units.`
       : r.kind === "pvp" && r.outcome === "loss" && r.hp <= 40 && r.goldEnd >= 20
         ? `Lost at ${r.hp} HP while holding ${r.goldEnd} gold.`
         : r.xpBought >= 3
@@ -68,16 +68,10 @@ export function RoundInspector({
 
       <dl className="grid grid-cols-2 border-b border-[var(--line)] sm:grid-cols-4">
         <Stat k="HP entering" v={`${r.hp}`} sub={pt.lobbyAliveEntering >= 4 ? `lobby ${pt.lobbyHpEntering}` : `${pt.lobbyAliveEntering} others left`} tone={pt.lobbyAliveEntering < 4 ? undefined : r.hp < pt.lobbyHpEntering ? "hp" : "good"} />
-        <Stat k="Gold" v={`${r.gold}`} sub={`${r.goldEnd} at fight`} />
+        <Stat k="Gold" v={`${r.gold}`} sub={`${r.goldEnd} into combat`} />
         <Stat k="Level" v={`${r.level}`} sub={`lobby ${pt.lobbyLevel}`} tone={r.level < pt.lobbyLevel ? "hp" : r.level > pt.lobbyLevel ? "good" : undefined} />
         <Stat k="Board" v={`${pt.boardValue}`} sub={`lobby ${pt.lobbyBoardValue}`} tone={pt.boardValue < pt.lobbyBoardValue ? "hp" : "good"} />
       </dl>
-      <p className="flex gap-4 border-b border-[var(--line)] px-4 py-2 text-[12px] text-[var(--muted)] sm:px-5">
-        <span className="flex items-center gap-1.5"><span className="block h-1.5 w-1.5 rounded-full bg-[var(--hp)]" />Behind the lobby</span>
-        {(pt.boardValue > pt.lobbyBoardValue || r.level > pt.lobbyLevel) && (
-          <span className="flex items-center gap-1.5"><span className="block h-1.5 w-1.5 rounded-full bg-[var(--good)]" />Ahead of it</span>
-        )}
-      </p>
 
       <div className="space-y-5 px-4 py-5 sm:px-5">
         <Section title="Board when combat started">
@@ -88,19 +82,25 @@ export function RoundInspector({
           </div>
         </Section>
 
-        {(r.bought.length > 0 || r.sold.length > 0 || r.xpBought > 0) && (
-          <p className="text-[13px] leading-relaxed text-[var(--ink-2)]">
-            {[
-              r.bought.length ? `Bought ${summarize(r.bought)} for ${r.bought.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0)} gold${r.bought.length > 1 ? " total" : ""}` : "",
-              r.sold.length ? `sold ${summarizeSold(r.sold)} (+${r.soldGold} gold)` : "",
-              r.xpBought ? `bought XP ${r.xpBought}× (${r.xpBought * 4} gold)` : "",
-              r.rerolls ? `rerolled ${r.rerolls}× (${r.rerolls * 2} gold)` : "",
-            ]
-              .filter(Boolean)
-              .join(", ")
-              .replace(/^./, (c) => c.toUpperCase())}
-            .
-          </p>
+        {(r.bought.length > 0 || r.sold.length > 0 || r.xpBought > 0 || r.rerolls > 0) && (
+          <Section title="Gold this round">
+            <dl className="tnum mt-2 divide-y divide-[var(--line)] rounded-xl border border-[var(--line)] text-[13px]">
+              {[
+                ["Start of round", "", `${r.gold}`],
+                ...(r.xpBought ? [["XP", `${r.xpBought} buy${r.xpBought === 1 ? "" : "s"}`, `−${r.xpBought * 4}`]] : []),
+                ...(r.rerolls ? [["Rerolls", `${r.rerolls} roll${r.rerolls === 1 ? "" : "s"}`, `−${r.rerolls * 2}`]] : []),
+                ...(r.bought.length ? [["Units", summarize(r.bought), `−${r.bought.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0)}`]] : []),
+                ...(r.sold.length ? [["Sold", summarizeSold(r.sold), `+${r.soldGold}`]] : []),
+                ["Into combat", "", `${r.goldEnd}`],
+              ].map(([k, what, v], i, all) => (
+                <div key={k} className={`grid grid-cols-[96px_minmax(0,1fr)_44px] items-baseline gap-3 px-3 py-2 ${i === 0 || i === all.length - 1 ? "font-medium text-[var(--ink)]" : "text-[var(--ink-2)]"}`}>
+                  <dt>{k}</dt>
+                  <dd className="text-[12px] leading-snug text-[var(--muted)]">{what}</dd>
+                  <dd className="text-right">{v}</dd>
+                </div>
+              ))}
+            </dl>
+          </Section>
         )}
 
         {(r.bench.length > 0 || r.itemBench.length > 0) && (
@@ -130,7 +130,7 @@ export function RoundInspector({
         )}
 
         {r.kind !== "carousel" && r.shops.length > 0 && (
-          <Section title={`Shops seen · ${r.rerolls} reroll${r.rerolls === 1 ? "" : "s"}${r.xpBought ? ` · bought XP ${r.xpBought}×` : ""}`}>
+          <Section title={r.rerolls ? `Shops seen · free shop and ${r.rerolls} roll${r.rerolls === 1 ? "" : "s"}` : "Shop seen"}>
             <div className="space-y-2 pt-1">
               {r.shops.map((shop, si) => (
                 <div key={si} className="flex items-center gap-3">
@@ -200,7 +200,16 @@ function Stat({ k, v, sub, tone }: { k: string; v: string; sub?: string; tone?: 
       <dd className="tnum mt-0.5 text-[20px] font-semibold tracking-tight" style={{ color: tone === "hp" ? "var(--hp)" : tone === "good" ? "var(--good)" : undefined }}>
         {v}
       </dd>
-      {sub && <dd className="tnum text-[12px] text-[var(--muted)]">{sub}</dd>}
+      {sub && (
+        <dd className="tnum text-[12px] text-[var(--muted)]">
+          {tone && (
+            <span className="mr-1" style={{ color: tone === "hp" ? "var(--hp)" : "var(--good)" }} aria-label={tone === "hp" ? "behind" : "ahead"}>
+              {tone === "hp" ? "▼" : "▲"}
+            </span>
+          )}
+          {sub}
+        </dd>
+      )}
     </div>
   );
 }
@@ -208,7 +217,7 @@ function Stat({ k, v, sub, tone }: { k: string; v: string; sub?: string; tone?: 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section>
-      <h4 className="text-[12px] font-medium text-[var(--muted)]">{title}</h4>
+      <h4 className="text-[13px] font-medium text-[var(--ink)]">{title}</h4>
       {children}
     </section>
   );

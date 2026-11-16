@@ -1,5 +1,6 @@
 import { SiteFooter, SiteNav } from "@/components/SiteChrome";
 import { UnitToken } from "@/components/UnitToken";
+import { allGames } from "@/lib/game/games";
 import { NOTES, PATCH, PATCH_SUMMARY, changePct, radar, type CompVerdict, type NoteLine, type PatchPick } from "@/lib/patch/radar";
 
 export const metadata = { title: "Patch Radar · TFTeacher" };
@@ -145,7 +146,7 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
         </div>
         <dl className="tnum mt-6 grid grid-cols-3 gap-4 border-t border-[var(--line)] pt-5 text-[13px]">
           <div>
-            <dt className="text-[var(--muted)]">Games</dt>
+            <dt className="text-[var(--muted)]">Games on {PATCH.from}</dt>
             <dd className="mt-0.5 text-[18px] font-semibold">{v.comp.games}</dd>
           </div>
           <div>
@@ -157,6 +158,19 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
             <dd className="mt-0.5 text-[18px] font-semibold">{v.comp.top4}%</dd>
           </div>
         </dl>
+        {(() => {
+          const since = allGames().filter((g) => g.comp === v.comp.id).map((g) => g.game.placement);
+          if (!since.length) return null;
+          const avg = since.reduce((a, b) => a + b, 0) / since.length;
+          return (
+            <p className="tnum mt-4 rounded-lg bg-[var(--panel-2)] px-3 py-2 text-[13px] text-[var(--ink-2)]">
+              On {PATCH.to} so far: {since.length} game{since.length === 1 ? "" : "s"}, avg place {avg.toFixed(1)}
+              <span style={{ color: avg > v.comp.avgPlace ? "var(--hp)" : "var(--good)" }}>
+                {" "}({avg > v.comp.avgPlace ? "worse" : "better"} than {v.comp.avgPlace.toFixed(1)} on {PATCH.from})
+              </span>
+            </p>
+          );
+        })()}
       </div>
       <div className="p-6">
         <p className="max-w-[620px] text-[16px] font-medium leading-relaxed text-[var(--ink)]">{v.why}</p>

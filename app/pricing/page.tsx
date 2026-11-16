@@ -116,7 +116,7 @@ function TrendsPreview() {
         ))}
       </div>
       <p className="mt-6 border-t border-[var(--line)] pt-4 text-[14px] leading-relaxed text-[var(--ink-2)]">
-        Stage 3 costs this player the most HP per game. Their reviews point at the same habit: staying on loss streaks after HP drops below 40.
+        Stage 3 costs this player the most HP per game. Their reviews point at the same habit: long loss streaks through stage 3 that leave too little HP for stage 4.
       </p>
     </div>
   );

@@ -8,7 +8,7 @@ function layout(compact: boolean) {
   const FS = 12; // label size
   const PAD_L = compact ? 30 : 34;
   const PAD_R = 12;
-  const HP_TOP = compact ? 34 : 18; // compact: legend row sits above the plot
+  const HP_TOP = compact ? 34 : 30; // the lane label sits in its own row above the plot
   const HP_H = compact ? 136 : 128;
   const GOLD_TOP = HP_TOP + HP_H + (compact ? 40 : 34);
   const GOLD_H = compact ? 56 : 64;
@@ -115,6 +115,9 @@ export function Timeline({
       <line x1={PAD_L} x2={W - PAD_R} y1={goldY(50)} y2={goldY(50)} stroke="var(--gold)" strokeOpacity={0.35} strokeDasharray="2 4" />
       <text x={PAD_L - 8} y={goldY(50) + FS / 3} textAnchor="end" fontSize={FS - 0.5} fill="var(--muted)" className="tnum">
         50
+      </text>
+      <text x={PAD_L - 8} y={goldY(0) + FS / 3} textAnchor="end" fontSize={FS - 0.5} fill="var(--muted)" className="tnum">
+        0
       </text>
       {series.map((p, i) => {
         const on = selected === p.stage ? 1 : hl.has(p.stage) ? 0.9 : 0.62;

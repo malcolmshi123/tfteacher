@@ -210,6 +210,10 @@ export function radar(comps = MY_COMPS, notes = NOTES): CompVerdict[] {
                 return `Close call. The biggest single change is a ${big.direction}: ${big.text}. The ${big.direction === "nerf" ? "buffs" : "nerfs"} on this card offset most of it${score < 0 ? ", so it comes out slightly weaker" : score > 0 ? ", so it comes out slightly stronger" : ""}. Play it the same way and watch your first few games.`;
               })()
             : "Nothing in this comp changed.";
-    return { comp, verdict, score, lines, why };
+    const missed = notes.filter((n) => n.section === "Traits" && (counts.get(n.target) ?? 0) > 0 && (counts.get(n.target) ?? 0) < (n.minUnits ?? 1));
+    const note = missed
+      .map((n) => ` ${n.target} (${n.minUnits}) was ${n.direction === "nerf" ? "nerfed" : "buffed"}, but this board runs ${counts.get(n.target)}, so it doesn't count here.`)
+      .join("");
+    return { comp, verdict, score, lines, why: why + note };
   });
 }

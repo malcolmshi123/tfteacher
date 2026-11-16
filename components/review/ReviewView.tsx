@@ -45,6 +45,14 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
   };
 
   const played = new Date(game.playedAt);
+  // suggested questions point at this game's own rounds
+  const suggestions = useMemo(() => {
+    const losses = game.rounds.filter((r) => r.kind === "pvp" && r.outcome === "loss");
+    const held = findings.find((f) => f.kind === "held-gold-low-hp");
+    const rollAt = held?.stages[0] ?? findings.find((f) => !f.positive)?.focus ?? losses[0]?.stage;
+    const lostAt = losses.filter((r) => r.stage !== rollAt).at(-2)?.stage ?? losses.at(-1)?.stage;
+    return [rollAt && `Should I have rolled at ${rollAt}?`, lostAt && `Why did I lose at ${lostAt}?`, "What should I change next game?"].filter(Boolean) as string[];
+  }, [game, findings]);
 
   return (
     <div className="mx-auto max-w-[1240px] px-4 pb-24 pt-6 md:px-6 md:pt-8" style={{ ["--place" as string]: game.placement <= 4 ? "var(--good)" : "var(--hp)" }}>
@@ -69,9 +77,8 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
             <span className="hidden lg:block"><Dot /></span>
             <span className="hidden lg:inline">{SOURCE_LABEL[game.source]}</span>
           </div>
-          <h1 className="mt-3 text-[28px] font-semibold leading-[1.15] tracking-[-0.02em] text-balance md:text-[36px]">
-            <span className="md:hidden">{keepRounds(review.shortHeadline)}</span>
-            <span className="hidden md:inline">{keepRounds(review.headline)}</span>
+          <h1 className="mt-3 text-[24px] font-semibold leading-[1.2] tracking-[-0.02em] text-balance md:text-[36px] md:leading-[1.15]">
+            {keepRounds(review.headline)}
           </h1>
           <p className="mt-3 max-w-[640px] text-[15px] leading-relaxed text-[var(--ink-2)]">{keepRounds(review.summary)}</p>
         </div>
@@ -97,14 +104,14 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
             <Key line="var(--ink-2)" dashed>
               Lobby median
             </Key>
-            <Key color="var(--gold)">Gold held</Key>
+            <Key color="var(--gold)">Gold into combat</Key>
             <Key color="transparent" spent>
               Spent
             </Key>
             <span className="mx-1 h-3 w-px self-center bg-[var(--line-2)]" aria-hidden />
             <Key color="var(--good)">Won</Key>
             <Key color="var(--hp)">Lost</Key>
-            <Key color="var(--line-2)" solid>Monster</Key>
+            <Key color="var(--line-2)" solid>Monster round</Key>
             <Key color="transparent" dashed>
               Shared draft
             </Key>
@@ -137,7 +144,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
             ))}
           </ol>
           <div className="mt-6">
-            <AskPanel gameId={game.id} onCite={openRound} />
+            <AskPanel gameId={game.id} onCite={openRound} suggested={suggestions} />
           </div>
         </section>
         <aside className="hidden lg:sticky lg:top-20 lg:block lg:self-start">
@@ -148,7 +155,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
       {/* phone: the round opens in a bottom sheet */}
       {sheet && (
         <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label={`Round ${round}`}>
-          <button aria-label="Close" className="absolute inset-0 bg-black/80 backdrop-blur-[2px]" onClick={() => setSheet(false)} />
+          <button aria-label="Close" className="absolute inset-0 bg-black/85 backdrop-blur-[6px]" onClick={() => setSheet(false)} />
           <div className="absolute inset-x-0 bottom-0 max-h-[86dvh] overflow-y-auto rounded-t-2xl border-t border-[var(--line-2)] bg-[var(--panel)] pb-6 pt-2 shadow-[0_-20px_60px_rgba(0,0,0,0.6)]">
             <div className="sticky top-0 z-10 flex items-center justify-between bg-[var(--panel)] px-4 pb-1 pt-1">
               <span className="w-9" />

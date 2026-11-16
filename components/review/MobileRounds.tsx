@@ -103,7 +103,7 @@ export function MobileRounds({
           <span className="flex items-center gap-1.5"><span className="block h-2.5 w-2.5 rounded-[2px] bg-[var(--gold)]" />Held</span>
           <span className="flex items-center gap-1.5"><span className="block h-2.5 w-2.5 rounded-[2px] border border-dashed border-[var(--gold)] bg-[color-mix(in_oklab,var(--gold)_14%,transparent)]" />Spent</span>
         </span>
-        {si >= 0 && <span className="tnum text-[var(--gold)]">{series[si].goldEnd} held of {series[si].gold} at {selected}</span>}
+        {si >= 0 && <span className="tnum text-[var(--gold)]">{series[si].goldEnd} of {series[si].gold} into combat at {selected}</span>}
       </div>
       <div className="relative">
       <div ref={strip} className="-mx-3 mt-3 flex snap-x snap-mandatory scroll-pl-3 gap-1.5 overflow-x-auto px-3 pb-1 [scrollbar-width:none]" role="list" aria-label="Rounds">
@@ -140,7 +140,7 @@ export function MobileRounds({
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--hp)]" />Lost</span>
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--line-2)]" />Monster round</span>
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full border border-dashed border-[var(--ink-2)]" />Shared draft</span>
-        <span className="w-full text-[var(--ink-2)]">Chips show HP after combat. Swipe, then tap a round to open it.</span>
+        <span className="w-full text-[var(--ink-2)]">Numbers on chips are HP after combat. Tap one to open it.</span>
       </p>
     </div>
   );

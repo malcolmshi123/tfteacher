@@ -192,7 +192,7 @@ export function analyze(game: GameRecord): Review {
         stages: R.slice(best.from, best.to + 1).map((r) => r.stage),
         focus: span[span.length - 1].stage,
         cites: [
-          { stage: first, label: `at ${span[0].hp} HP` },
+          { stage: first, label: `${span[0].hp} HP before the fight` },
           { stage: lastS, label: `${endHp} HP after combat` },
           { stage: first, label: `to ${lastS}, +${earned} streak gold` },
         ],
@@ -209,7 +209,7 @@ export function analyze(game: GameRecord): Review {
       id: "held-gold-low-hp",
       kind: "held-gold-low-hp",
       severity: held.length >= 2 ? "high" : "medium",
-      title: `Lost at ${held.map((r) => r.stage).join(" and ")} under 40 HP with 20+ gold unspent`,
+      title: `Lost at ${held.map((r) => r.stage).join(" and ")} under 40 HP with ${held.map((r) => r.goldEnd).join(" and ")} gold unspent`,
       detail: "Each of these fights started with gold you could have turned into board strength.",
       lines: held.map((r) => `${r.stage}: ${r.hp} HP, went into combat with ${r.goldEnd} gold, lost ${r.damageTaken} HP`),
       advice: "Under 40 HP, interest is worth less than HP. Roll to stabilize, then rebuild economy only after you win.",
@@ -385,7 +385,7 @@ export function analyze(game: GameRecord): Review {
 
   const totalRolls = R.reduce((a, r) => a + r.rerolls, 0);
   const r41 = R.find((r) => r.stage === "4-1");
-  const lobbyHp41 = r41 ? series[R.indexOf(r41)].lobbyHpEntering : undefined;
+  const lobbyHp41 = r41 ? series[R.indexOf(r41)].lobbyHp : undefined;
   let summary = "";
   if (peakHpLoss) {
     const k = R.findIndex((r) => r.stage === peakHpLoss.focus);
@@ -415,7 +415,7 @@ export function analyze(game: GameRecord): Review {
     summary,
     stats: [
       { label: "Fights lost", value: `${R.filter((r) => r.kind === "pvp" && r.outcome === "loss").length} of ${R.filter((r) => r.kind === "pvp").length}`, note: "player fights" },
-      { label: "HP entering 4-1", value: String(R.find((r) => r.stage === "4-1")?.hp ?? "n/a"), note: lobbyHp41 !== undefined ? `lobby median ${lobbyHp41}` : undefined },
+      { label: "HP after 4-1", value: String(r41 ? Math.max(0, r41.hp - r41.damageTaken) : "n/a"), note: lobbyHp41 !== undefined ? `lobby median ${lobbyHp41}` : undefined },
       { label: "Rerolls", value: String(totalRolls), note: "whole game" },
       { label: "Gold at death", value: String(last.goldEnd), note: `unspent at ${last.stage}` },
     ],

@@ -3,9 +3,8 @@
 import { useState } from "react";
 import type { AskResult } from "@/lib/ask/answer";
 
-const SUGGESTED = ["Should I have rolled at 4-3?", "Why did I lose at 4-5?", "What should I change next game?"];
 
-export function AskPanel({ gameId, onCite }: { gameId: string; onCite: (stage: string) => void }) {
+export function AskPanel({ gameId, onCite, suggested }: { gameId: string; onCite: (stage: string) => void; suggested: string[] }) {
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
   const [res, setRes] = useState<AskResult | null>(null);
@@ -53,7 +52,7 @@ export function AskPanel({ gameId, onCite }: { gameId: string; onCite: (stage: s
       </form>
       {!res && !busy && (
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {SUGGESTED.map((s) => (
+          {suggested.map((s) => (
             <button key={s} onClick={() => ask(s)} className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[13px] text-[var(--ink-2)] hover:border-[var(--line-2)] hover:text-[var(--ink)]">
               {s}
             </button>

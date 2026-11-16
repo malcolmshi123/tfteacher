@@ -241,7 +241,7 @@ export default function Home() {
                 <Cite>{r45.goldEnd} gold</Cite>.&rdquo;
               </p>
               <div className="mt-5 flex items-center gap-2 text-[12px] text-[var(--muted)]">
-                <span className="block h-1.5 w-1.5 rounded-full bg-[var(--good)]" />5 numbers, all match the recording
+                <span className="block h-1.5 w-1.5 rounded-full bg-[var(--good)]" />5 numbers and 2 rounds, all match the recording
               </div>
             </div>
           </div>
