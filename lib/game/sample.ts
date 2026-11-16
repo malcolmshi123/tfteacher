@@ -100,7 +100,7 @@ function opponentAt(o: (typeof OPPONENTS)[number], stage: string, i: number, r: 
   const t = stageIndex(stage);
   // HP drops faster for weaker players; eliminations are scripted by placement.
   const elimAt = o.place === 8 ? 43 : o.place === 7 ? 46 : 99;
-  const lossRate = (1.25 - o.strength) * 3.1;
+  const lossRate = (1.3 - o.strength) * 4.6;
   const progressed = Math.max(0, t - 20);
   let hp = Math.round(100 - lossRate * progressed * (t > 30 ? 1.25 : 1) - r() * 3);
   if (o.place <= 2) hp = Math.max(hp, 52 - (o.place - 1) * 10);
