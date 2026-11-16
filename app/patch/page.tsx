@@ -1,7 +1,6 @@
 import { SiteFooter, SiteNav } from "@/components/SiteChrome";
 import { UnitToken } from "@/components/UnitToken";
 import { allGames } from "@/lib/game/games";
-import { ordinal } from "@/lib/review/engine";
 import { NOTES, PATCH, PATCH_SUMMARY, changePct, radar, type CompVerdict, type NoteLine, type PatchPick } from "@/lib/patch/radar";
 
 export const metadata = { title: "Patch Radar · TFTeacher" };
@@ -34,20 +33,13 @@ export default function PatchPage() {
         <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_300px] md:items-end">
           <div className="max-w-[720px]">
             <p className="text-[13px] text-[var(--muted)]">
-              Patch {PATCH.from} to {PATCH.to} · live {PATCH.date} ·{" "}
-              <a href="#rest" className="text-[var(--ink-2)] underline-offset-2 hover:underline">
-                {NOTES.length} trait and champion changes
-              </a>
+              Patch {PATCH.from} to {PATCH.to} · live {PATCH.date}
             </p>
             <h1 className="mt-3 text-[28px] font-semibold leading-[1.15] tracking-[-0.02em] text-balance md:text-[36px]">
               {headline}
             </h1>
             <p className="mt-3 text-[15px] leading-relaxed text-[var(--ink-2)]">
-              Every trait and champion change in {PATCH.to}, checked against the {games} ranked games you played on {PATCH.from}.
-            </p>
-            <p className="mt-2 text-[13px] leading-relaxed text-[var(--muted)]">
-              Trait changes count only at breakpoints your board reaches. Values per star level are averaged. The bar weighs each change by its size. Augments, items and
-              mid-patch updates aren&apos;t included. Pro view; Free shows your most played comp.
+              Based on your {games} ranked games on {PATCH.from}. Augments and items aren&apos;t included.
             </p>
           </div>
           <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-4">
@@ -149,31 +141,44 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
             <UnitToken key={u} unitId={u} size={44} />
           ))}
         </div>
-        <dl className="tnum mt-6 grid grid-cols-3 gap-4 border-t border-[var(--line)] pt-5 text-[13px]">
-          <div>
-            <dt className="text-[var(--muted)]">Games on {PATCH.from}</dt>
-            <dd className="mt-0.5 text-[18px] font-semibold">{v.comp.games}</dd>
-          </div>
-          <div>
-            <dt className="text-[var(--muted)]">Avg place</dt>
-            <dd className="mt-0.5 text-[18px] font-semibold">{v.comp.avgPlace.toFixed(1)}</dd>
-          </div>
-          <div>
-            <dt className="text-[var(--muted)]">Top 4</dt>
-            <dd className="mt-0.5 text-[18px] font-semibold">{v.comp.top4}%</dd>
-          </div>
-        </dl>
         {(() => {
-          const since = allGames().filter((g) => g.comp === v.comp.id).map((g) => g.game.placement);
-          if (!since.length) return null;
-          const avg = since.reduce((a, b) => a + b, 0) / since.length;
+          // last patch is the baseline the verdict was made from; this patch is how it's going now
+          const now = allGames().filter((g) => g.comp === v.comp.id).map((g) => g.game.placement);
+          const nowAvg = now.length ? now.reduce((x, y) => x + y, 0) / now.length : undefined;
+          const nowTop4 = now.length ? Math.round((now.filter((x) => x <= 4).length / now.length) * 100) : undefined;
+          const better = (was: number, is: number | undefined, lowerIsBetter: boolean) =>
+            is === undefined || is === was ? undefined : lowerIsBetter ? is < was : is > was;
+          const rows: [string, string, string, boolean | undefined][] = [
+            ["Games", String(v.comp.games), String(now.length), undefined],
+            ["Avg place", v.comp.avgPlace.toFixed(1), nowAvg === undefined ? "–" : nowAvg.toFixed(1), better(v.comp.avgPlace, nowAvg, true)],
+            ["Top 4", `${v.comp.top4}%`, nowTop4 === undefined ? "–" : `${nowTop4}%`, better(v.comp.top4, nowTop4, false)],
+          ];
           return (
-            <p className="tnum mt-4 rounded-lg bg-[var(--panel-2)] px-3 py-2 text-[13px] text-[var(--ink-2)]">
-              On {PATCH.to} so far: {since.length === 1 ? `1 game, placed ${ordinal(since[0])}` : `${since.length} games, avg place ${avg.toFixed(1)}`}
-              <span style={{ color: avg > v.comp.avgPlace ? "var(--hp)" : "var(--good)" }}>
-                {" "}({avg > v.comp.avgPlace ? "worse" : "better"} than {v.comp.avgPlace.toFixed(1)} on {PATCH.from})
-              </span>
-            </p>
+            <table className="tnum mt-6 w-full border-t border-[var(--line)] text-[13px]">
+              <thead>
+                <tr className="text-left text-[12px] text-[var(--muted)]">
+                  <th className="pb-2 pt-4 font-normal" />
+                  <th className="pb-2 pt-4 text-right font-normal">{PATCH.from}</th>
+                  <th className="pb-2 pt-4 text-right font-medium text-[var(--ink-2)]">{PATCH.to} so far</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map(([k, was, is, up]) => (
+                  <tr key={k} className="border-t border-[var(--line)]">
+                    <td className="py-2 text-[var(--ink-2)]">{k}</td>
+                    <td className="py-2 text-right text-[var(--ink-2)]">{was}</td>
+                    <td className="py-2 text-right text-[15px] font-semibold text-[var(--ink)]">
+                      {up !== undefined && (
+                        <span className="mr-1 text-[11px]" style={{ color: up ? "var(--good)" : "var(--hp)" }} aria-label={up ? "better" : "worse"}>
+                          {up ? "▲" : "▼"}
+                        </span>
+                      )}
+                      {is}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           );
         })()}
       </div>
