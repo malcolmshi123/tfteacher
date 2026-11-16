@@ -34,7 +34,7 @@ export default function PatchPage() {
             </h1>
             <p className="mt-3 text-[15px] leading-relaxed text-[var(--ink-2)]">
               We matched all {NOTES.length} lines of the patch notes against the {games} games you played last patch. Only
-              the lines that touch your comps are below, each linked to the note it came from.
+              the lines that touch your comps are below, each shown with the size of the change.
             </p>
           </div>
           <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-4">
@@ -99,6 +99,7 @@ function CompCard({ v }: { v: CompVerdict }) {
           {t.label}
         </div>
         <h3 className="mt-2 text-[22px] font-semibold tracking-tight">{v.comp.name}</h3>
+        <Meter score={v.score} />
         <div className="mt-4 flex gap-1">
           {v.comp.core.map((u) => (
             <UnitToken key={u} unitId={u} size={44} />
@@ -138,6 +139,28 @@ function NoteRow({ n }: { n: NoteLine }) {
       <span className="tnum flex-1 text-[var(--ink-2)]">{n.text}</span>
       <Delta n={n} />
     </li>
+  );
+}
+
+// Net size of the patch for this comp: weighted buffs minus nerfs, on a -6..6 scale.
+function Meter({ score }: { score: number }) {
+  const clamped = Math.max(-6, Math.min(6, score));
+  const pct = (Math.abs(clamped) / 6) * 50;
+  const color = score > 0 ? "var(--good)" : score < 0 ? "var(--hp)" : "var(--muted)";
+  return (
+    <div className="mt-3" aria-label={`Net patch effect ${score > 0 ? "+" : ""}${score}`}>
+      <div className="relative h-1.5 rounded-full bg-[var(--panel-2)]">
+        <span className="absolute left-1/2 top-[-3px] block h-3 w-px bg-[var(--line-2)]" />
+        <span
+          className="absolute top-0 block h-full rounded-full"
+          style={{ background: color, width: `${pct}%`, left: clamped < 0 ? `${50 - pct}%` : "50%" }}
+        />
+      </div>
+      <div className="mt-1.5 flex justify-between text-[11px] text-[var(--muted)]">
+        <span>Weaker</span>
+        <span>Stronger</span>
+      </div>
+    </div>
   );
 }
 

@@ -84,7 +84,11 @@ export function radar(comps = MY_COMPS, notes = NOTES): CompVerdict[] {
     const name = (id: string) => UNIT_BY_ID[id]?.name ?? id;
     const why =
       verdict === "weaker"
-        ? `Your main carry ${name(comp.core[0])} lost damage in ${nerfs.length} line${nerfs.length > 1 ? "s" : ""}. This was your best comp; expect it to place lower until you adjust items or the board around it.`
+        ? (() => {
+            const carry = nerfs.filter((x) => x.target === comp.core[0]).length;
+            const other = nerfs.length - carry;
+            return `Your main carry ${name(comp.core[0])} was nerfed in ${carry} line${carry === 1 ? "" : "s"}${other ? `, and ${other} more line${other === 1 ? "" : "s"} hit the comp` : ""}. Expect it to place lower until you adjust items or the board around it.`;
+          })()
         : verdict === "stronger"
           ? `${list(buffs.map((b) => name(b.target)).filter((v, i, a) => a.indexOf(v) === i))} all got stronger.${nerfs.length ? ` The only hit is smaller: ${nerfs.map((x) => x.text.charAt(0).toLowerCase() + x.text.slice(1)).join("; ")}.` : " Nothing in the comp was nerfed."}`
           : verdict === "mixed"
