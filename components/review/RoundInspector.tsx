@@ -1,7 +1,7 @@
 "use client";
 
 import { ItemChip, UnitToken } from "@/components/UnitToken";
-import { copiesOf } from "@/lib/game/set";
+import { UNIT_BY_ID, copiesOf } from "@/lib/game/set";
 import type { GameRecord } from "@/lib/game/types";
 import type { Finding, SeriesPoint } from "@/lib/review/engine";
 
@@ -69,9 +69,9 @@ export function RoundInspector({
 
       <dl className="grid grid-cols-2 border-b border-[var(--line)] sm:grid-cols-4">
         <Stat k="HP" v={`${r.hp}`} sub={r.damageTaken ? `→ ${Math.max(0, r.hp - r.damageTaken)} · lobby ${pt.lobbyHp}` : `lobby ${pt.lobbyHp}`} tone={r.hp < pt.lobbyHp ? "hp" : undefined} />
-        <Stat k="Gold" v={`${r.gold}`} sub={`${r.goldEnd} left at combat`} />
-        <Stat k="Level" v={`${r.level}`} sub={`lobby ${pt.lobbyLevel}`} tone={r.level < pt.lobbyLevel ? "hp" : undefined} />
-        <Stat k="Board" v={`${pt.boardValue}`} sub={`lobby ${pt.lobbyBoardValue}`} tone={pt.boardValue < pt.lobbyBoardValue ? "hp" : undefined} />
+        <Stat k="Gold" v={`${r.gold}`} sub={`${r.goldEnd} at combat`} />
+        <Stat k="Level" v={`${r.level}`} sub={`lobby ${pt.lobbyLevel}`} tone={r.level < pt.lobbyLevel ? "hp" : r.level > pt.lobbyLevel ? "good" : undefined} />
+        <Stat k="Board" v={`${pt.boardValue}`} sub={`lobby ${pt.lobbyBoardValue}`} tone={pt.boardValue < pt.lobbyBoardValue ? "hp" : "good"} />
       </dl>
 
       <div className="space-y-5 px-4 py-5 sm:px-5">
@@ -82,6 +82,21 @@ export function RoundInspector({
             ))}
           </div>
         </Section>
+
+        {(r.bought.length > 0 || r.sold.length > 0 || r.xpBought > 0) && (
+          <p className="text-[13px] leading-relaxed text-[var(--ink-2)]">
+            {[
+              r.bought.length ? `Bought ${summarize(r.bought)}` : "",
+              r.sold.length ? `sold ${summarize(r.sold)}` : "",
+              r.xpBought ? `bought XP ${r.xpBought}× (${r.xpBought * 4} gold)` : "",
+              r.rerolls ? `rerolled ${r.rerolls}× (${r.rerolls * 2} gold)` : "",
+            ]
+              .filter(Boolean)
+              .join(", ")
+              .replace(/^./, (c) => c.toUpperCase())}
+            .
+          </p>
+        )}
 
         {(r.bench.length > 0 || r.itemBench.length > 0) && (
           <Section title="Bench">
@@ -136,6 +151,14 @@ export function RoundInspector({
   );
 }
 
+function summarize(units: string[]) {
+  const n: Record<string, number> = {};
+  for (const u of units) n[u] = (n[u] ?? 0) + 1;
+  return Object.entries(n)
+    .map(([u, c]) => `${UNIT_BY_ID[u].name}${c > 1 ? ` ×${c}` : ""}`)
+    .join(", ");
+}
+
 function NavBtn({ children, onClick, disabled, label }: { children: React.ReactNode; onClick: () => void; disabled?: boolean; label: string }) {
   return (
     <button
@@ -149,11 +172,11 @@ function NavBtn({ children, onClick, disabled, label }: { children: React.ReactN
   );
 }
 
-function Stat({ k, v, sub, tone }: { k: string; v: string; sub?: string; tone?: "hp" | "gold" }) {
+function Stat({ k, v, sub, tone }: { k: string; v: string; sub?: string; tone?: "hp" | "good" }) {
   return (
     <div className="border-b border-r border-[var(--line)] px-4 py-3.5 even:border-r-0 sm:border-b-0 sm:px-5 sm:even:border-r sm:last:border-r-0 [&:nth-child(n+3)]:border-b-0">
       <dt className="text-[12px] text-[var(--muted)]">{k}</dt>
-      <dd className="tnum mt-0.5 text-[20px] font-semibold tracking-tight" style={{ color: tone === "hp" ? "var(--hp)" : tone === "gold" ? "var(--gold)" : undefined }}>
+      <dd className="tnum mt-0.5 text-[20px] font-semibold tracking-tight" style={{ color: tone === "hp" ? "var(--hp)" : tone === "good" ? "var(--good)" : undefined }}>
         {v}
       </dd>
       {sub && <dd className="tnum text-[12px] text-[var(--muted)]">{sub}</dd>}

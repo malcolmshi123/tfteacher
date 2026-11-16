@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Finding, Review } from "@/lib/review/engine";
 import { RoundInspector } from "./RoundInspector";
 import { Timeline } from "./Timeline";
@@ -18,6 +18,19 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
   const [round, setRound] = useState<string>(initialRound ?? first.focus);
   const activeFinding = useMemo(() => findings.find((f) => f.id === active), [findings, active]);
 
+  const [sheet, setSheet] = useState(false);
+  const isNarrow = () => typeof window !== "undefined" && window.matchMedia("(max-width: 1023px)").matches;
+  useEffect(() => {
+    if (!sheet) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setSheet(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [sheet]);
+
+  const openRound = (stage: string) => {
+    setRound(stage);
+    if (isNarrow()) setSheet(true);
+  };
   const pick = (f: Finding) => {
     setActive(f.id);
     setRound(f.focus);
@@ -76,15 +89,18 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
             <Key color="var(--good)">Won fight</Key>
             <Key color="var(--hp)">Lost fight</Key>
             <Key color="var(--line-2)" solid>Monster round</Key>
+            <Key color="transparent" dashed>Shared draft</Key>
             <Key color="var(--brand)" faint>
               Rounds in the selected finding
             </Key>
           </div>
         </div>
-        <div className="-mx-1 overflow-x-auto md:mx-0">
-          <div className="min-w-[900px] md:min-w-0">
-            <Timeline series={series} selected={round} highlight={activeFinding?.stages} onSelect={setRound} />
-          </div>
+        <div className="hidden md:block">
+          <Timeline series={series} selected={round} highlight={activeFinding?.stages} onSelect={openRound} />
+        </div>
+        <div className="md:hidden">
+          <Timeline series={series} selected={round} highlight={activeFinding?.stages} onSelect={openRound} compact width={420} />
+          <p className="mt-1 px-2 text-[12px] text-[var(--muted)]">Tap a round to open it.</p>
         </div>
       </section>
 
@@ -97,11 +113,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
           </div>
           <ol className="space-y-3">
             {findings.map((f, i) => (
-              <FindingCard key={f.id} f={f} lead={i === 0} active={f.id === active} onClick={() => pick(f)} onCite={(s) => { setActive(f.id); setRound(s); }}>
-                <div className="mt-4 lg:hidden" onClick={(e) => e.stopPropagation()}>
-                  <RoundInspector game={game} stage={round} series={series} findings={findings} onPick={setRound} />
-                </div>
-              </FindingCard>
+              <FindingCard key={f.id} f={f} lead={i === 0} active={f.id === active} onClick={() => pick(f)} onCite={(s) => { setActive(f.id); openRound(s); }} />
             ))}
           </ol>
         </section>
@@ -109,14 +121,30 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
           <RoundInspector game={game} stage={round} series={series} findings={findings} onPick={setRound} />
         </aside>
       </div>
+
+      {/* phone: the round opens in a bottom sheet */}
+      {sheet && (
+        <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label={`Round ${round}`}>
+          <button aria-label="Close" className="absolute inset-0 bg-black/60" onClick={() => setSheet(false)} />
+          <div className="absolute inset-x-0 bottom-0 max-h-[82dvh] overflow-y-auto rounded-t-2xl bg-[var(--bg)] px-2 pb-6 pt-2">
+            <div className="sticky top-0 z-10 flex items-center justify-between bg-[var(--bg)] px-2 pb-2">
+              <span className="mx-auto block h-1 w-10 rounded-full bg-[var(--line-2)]" />
+            </div>
+            <RoundInspector game={game} stage={round} series={series} findings={findings} onPick={setRound} />
+            <button onClick={() => setSheet(false)} className="mt-3 w-full rounded-xl border border-[var(--line-2)] py-3 text-[15px] font-medium">
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 function FindingCard({ f, active, lead, onClick, onCite, children }: { f: Finding; active: boolean; lead?: boolean; onClick: () => void; onCite: (stage: string) => void; children?: React.ReactNode }) {
-  const quiet = (f.positive || f.severity === "low") && !active;
+  const quiet = !active && !lead;
   const tone = f.positive ? "var(--good)" : f.severity === "high" ? "var(--hp)" : f.severity === "medium" ? "var(--gold)" : "var(--muted)";
-  const label = f.positive ? "Went well" : f.severity === "high" ? "Cost you most" : f.severity === "medium" ? "Cost you some" : "Minor";
+  const label = f.positive ? "Went well" : lead ? `Biggest cost · ${f.cost}` : f.cost ?? "Minor";
   return (
     <li
       className={`group cursor-pointer rounded-2xl border transition-colors ${lead ? "p-6" : quiet ? "px-5 py-4" : "p-5"} ${
@@ -130,19 +158,30 @@ function FindingCard({ f, active, lead, onClick, onCite, children }: { f: Findin
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
             <h3 className={`${lead ? "text-[20px]" : "text-[16px]"} font-semibold leading-snug tracking-tight`}>{f.title}</h3>
-            <span className="text-[12px]" style={{ color: tone }}>
+            <span className="tnum shrink-0 rounded-full px-2 py-0.5 text-[12px] font-medium" style={{ color: tone, background: `color-mix(in oklab, ${tone} 13%, transparent)` }}>
               {label}
             </span>
           </div>
-          {!quiet && <p className={`mt-2 ${lead ? "text-[15px]" : "text-[14px]"} leading-relaxed text-[var(--ink-2)]`}>{f.detail}</p>}
+          <p className={`mt-2 ${lead ? "text-[15px]" : "text-[14px]"} leading-relaxed text-[var(--ink-2)] ${quiet ? "line-clamp-1" : ""}`}>{f.detail}</p>
           {!quiet && f.lines && (
-            <ul className="tnum mt-2 space-y-1 text-[14px] leading-relaxed text-[var(--ink-2)]">
-              {f.lines.map((l) => (
-                <li key={l} className="flex gap-2">
-                  <span className="mt-[10px] block h-px w-2.5 shrink-0 bg-[var(--line-2)]" />
-                  {l}
-                </li>
-              ))}
+            <ul className="tnum mt-3 space-y-1.5 text-[14px] leading-relaxed text-[var(--ink-2)]">
+              {f.lines.map((l) => {
+                const [stage, ...rest] = l.split(": ");
+                return (
+                  <li key={l}>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCite(stage);
+                      }}
+                      className="flex w-full items-baseline gap-3 rounded-lg px-2 py-1 text-left transition-colors hover:bg-[var(--bg)]"
+                    >
+                      <span className="w-8 shrink-0 font-medium text-[var(--ink)]">{stage}</span>
+                      <span>{rest.join(": ")}</span>
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           )}
           {(active || lead) && (
@@ -151,7 +190,7 @@ function FindingCard({ f, active, lead, onClick, onCite, children }: { f: Findin
               {f.advice}
             </p>
           )}
-          {!quiet && <div className="mt-3 flex flex-wrap gap-1.5">
+          {!quiet && !f.lines && <div className="mt-3 flex flex-wrap gap-1.5">
             {f.cites.map((c, i) => (
               <button
                 key={i}
@@ -177,10 +216,10 @@ function Dot() {
   return <span className="block h-[3px] w-[3px] rounded-full bg-[var(--line-2)]" />;
 }
 
-function Key({ color, children, faint, solid }: { color: string; children: React.ReactNode; faint?: boolean; solid?: boolean }) {
+function Key({ color, children, faint, solid, dashed }: { color: string; children: React.ReactNode; faint?: boolean; solid?: boolean; dashed?: boolean }) {
   return (
     <span className="inline-flex items-center gap-1.5">
-      <span className="block h-2.5 w-2.5 rounded-[3px]" style={{ background: color, opacity: faint ? 0.35 : solid ? 1 : 0.85 }} />
+      <span className={`block h-2.5 w-2.5 rounded-[3px] ${dashed ? "border border-dashed border-[var(--ink-2)]" : ""}`} style={{ background: color, opacity: faint ? 0.35 : solid || dashed ? 1 : 0.85 }} />
       {children}
     </span>
   );

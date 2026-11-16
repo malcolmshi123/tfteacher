@@ -72,13 +72,13 @@ const SCRIPT: Step[] = [
   { stage: "3-6", kind: "pvp", outcome: "loss", dmg: 10, xp: 3, board: "brann:2:edge garrick:2:vest vessa:1:bow noor:1 dax:1 liora:1", bench: "dax:1", itemBench: "rod,tear,belt" },
   { stage: "3-7", kind: "pve", outcome: "win", dmg: 0, board: "brann:2:edge garrick:2:vest vessa:1:bow noor:1 dax:1 liora:1", bench: "dax:1", itemBench: "rod,tear,belt,glove", goldDrop: 4 },
   { stage: "4-1", kind: "pvp", outcome: "loss", dmg: 12, xp: 4, board: "brann:2:edge garrick:2:vest,belt vessa:1:bow noor:1 dax:1 liora:1:rod,tear kestrel:1", bench: "dax:1", itemBench: "glove" },
-  { stage: "4-2", kind: "pvp", outcome: "win", dmg: 0, rerolls: 4, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove thane:1 ysolde:1", bench: "kestrel:1", forceShop: { 2: ["kestrel"] } },
-  { stage: "4-3", kind: "pvp", outcome: "loss", dmg: 11, rerolls: 2, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove thane:1 ysolde:1", bench: "kestrel:1" },
-  { stage: "4-4", kind: "carousel", outcome: "none", dmg: 0, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove thane:1 ysolde:1", bench: "kestrel:1", itemBench: "staff" },
-  { stage: "4-5", kind: "pvp", outcome: "loss", dmg: 13, rerolls: 3, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove thane:1 ysolde:1", bench: "kestrel:1", itemBench: "staff" },
-  { stage: "4-6", kind: "pvp", outcome: "win", dmg: 0, rerolls: 2, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove thane:1 ysolde:1", bench: "kestrel:1", itemBench: "staff" },
-  { stage: "4-7", kind: "pve", outcome: "win", dmg: 0, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove thane:1 ysolde:1", bench: "kestrel:1", itemBench: "staff,cloak", goldDrop: 3 },
-  { stage: "5-1", kind: "pvp", outcome: "loss", dmg: 15, rerolls: 4, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove thane:1 ysolde:1", bench: "kestrel:1", itemBench: "staff,cloak" },
+  { stage: "4-2", kind: "pvp", outcome: "win", dmg: 0, rerolls: 4, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove ysolde:1", bench: "kestrel:1 thane:1", forceShop: { 2: ["kestrel"] } },
+  { stage: "4-3", kind: "pvp", outcome: "loss", dmg: 11, rerolls: 2, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove ysolde:1", bench: "kestrel:1 thane:1" },
+  { stage: "4-4", kind: "carousel", outcome: "none", dmg: 0, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove ysolde:1", bench: "kestrel:1 thane:1", itemBench: "staff" },
+  { stage: "4-5", kind: "pvp", outcome: "loss", dmg: 13, rerolls: 3, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove ysolde:1", bench: "kestrel:1 thane:1", itemBench: "staff" },
+  { stage: "4-6", kind: "pvp", outcome: "win", dmg: 0, rerolls: 2, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove ysolde:1", bench: "kestrel:1 thane:1", itemBench: "staff" },
+  { stage: "4-7", kind: "pve", outcome: "win", dmg: 0, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove ysolde:1", bench: "kestrel:1 thane:1", itemBench: "staff,cloak", goldDrop: 3 },
+  { stage: "5-1", kind: "pvp", outcome: "loss", dmg: 15, rerolls: 4, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove ysolde:1", bench: "kestrel:1 thane:1", itemBench: "staff,cloak" },
 ];
 
 const OPPONENTS: { id: string; name: string; place: number; strength: number }[] = [

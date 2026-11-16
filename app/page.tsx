@@ -112,7 +112,7 @@ export default function Home() {
               <div className="rounded-2xl border border-[var(--line-2)] bg-[var(--panel-2)] p-6">
                 <div className="text-[13px] font-medium text-[var(--brand)]">What TFTeacher sees at 4-2 alone</div>
                 <div className="mt-5 space-y-2">
-                  {r42.shops.slice(0, 3).map((shop, si) => (
+                  {r42.shops.map((shop, si) => (
                     <div key={si} className="flex items-center gap-3">
                       <span className="w-12 text-[11px] text-[var(--muted)]">{si === 0 ? "Free" : `Roll ${si}`}</span>
                       <div className="flex gap-1.5">
@@ -178,11 +178,11 @@ export default function Home() {
             </div>
             <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
               <p className="text-[15px] leading-relaxed text-[var(--ink)]">
-                &ldquo;You went into combat at <Cite stage="4-5">32 gold, 18 HP</Cite> and lost 13. Rolling 20 of that gold at{" "}
-                <Cite stage="4-3">29 HP</Cite> was your last good window to stabilize.&rdquo;
+                &ldquo;At <Cite stage="4-3">29 HP</Cite> you went into combat holding <Cite stage="4-3">23 gold</Cite> and lost 11. Two
+                rounds later you still had <Cite stage="4-5">32 gold</Cite> at <Cite stage="4-5">18 HP</Cite>.&rdquo;
               </p>
               <div className="mt-5 flex items-center gap-2 text-[12px] text-[var(--muted)]">
-                <span className="block h-1.5 w-1.5 rounded-full bg-[var(--good)]" />2 claims, both match the recording
+                <span className="block h-1.5 w-1.5 rounded-full bg-[var(--good)]" />4 numbers, all match the recording
               </div>
             </div>
           </div>

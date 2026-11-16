@@ -33,6 +33,7 @@ export interface Finding {
   cites: Cite[];
   hpCost?: number;
   goldCost?: number;
+  cost?: string; // short, quantified cost shown on the card
 }
 
 export interface SeriesPoint {
@@ -244,7 +245,7 @@ export function analyze(game: GameRecord): Review {
       severity: total >= 15 ? "medium" : "low",
       title: `${idleReport.length} item components sat on your bench for ${total} rounds`,
       detail: "Components only help once they are on a unit.",
-      lines: idleReport.map((x) => `${ITEMS[x.item]}: on the bench from ${x.from} to ${x.to}, ${x.rounds} rounds`),
+      lines: idleReport.map((x) => `${x.from}: ${ITEMS[x.item]} sat on the bench until ${x.to}, ${x.rounds} rounds`),
       advice: "Components on the bench do nothing. While you are losing, slam a strong item on any unit you will keep, even if it is not perfect.",
       stages: idleReport.map((x) => x.from),
       focus: idleReport[0].from,
@@ -292,6 +293,22 @@ export function analyze(game: GameRecord): Review {
     });
   }
 
+  for (const f of findings) {
+    if (f.positive) continue;
+    f.cost =
+      f.hpCost !== undefined
+        ? `${f.hpCost} HP`
+        : f.goldCost !== undefined
+          ? `${f.goldCost} gold unspent`
+          : f.kind === "missed-upgrade"
+            ? `${f.stages.length} upgrades`
+            : f.kind === "idle-items"
+              ? f.title.match(/(\d+) rounds/)?.[1] + " idle rounds"
+              : f.kind === "level-tempo"
+                ? `${f.stages.length} fights behind`
+                : undefined;
+  }
+
   findings.sort((a, b) => Number(!!a.positive) - Number(!!b.positive) || RANK[a.severity] - RANK[b.severity] || (b.hpCost ?? 0) - (a.hpCost ?? 0));
 
   const top = findings.filter((f) => !f.positive && f.severity === "high");
@@ -331,7 +348,7 @@ export function analyze(game: GameRecord): Review {
     summary,
     stats: [
       { label: "Fights lost", value: `${R.filter((r) => r.kind === "pvp" && r.outcome === "loss").length} of ${R.filter((r) => r.kind === "pvp").length}`, note: "player fights" },
-      { label: "HP at 4-1", value: String(R.find((r) => r.stage === "4-1")?.hp ?? "n/a"), note: lobbyHp41 !== undefined ? `lobby median ${lobbyHp41}` : undefined },
+      { label: "HP entering 4-1", value: String(R.find((r) => r.stage === "4-1")?.hp ?? "n/a"), note: lobbyHp41 !== undefined ? `lobby median ${lobbyHp41}` : undefined },
       { label: "Rerolls", value: String(totalRolls), note: "whole game" },
       { label: "Gold at death", value: String(last.goldEnd) },
     ],

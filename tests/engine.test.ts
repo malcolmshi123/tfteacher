@@ -20,6 +20,9 @@ describe("sample game economy", () => {
       }
     }
   });
+  it("never fields more units than the player's level", () => {
+    for (const r of game.rounds) expect(r.board.length, r.stage).toBeLessThanOrEqual(r.level + (r.xpBought ? 1 : 0));
+  });
   it("tracks HP from damage taken", () => {
     for (let i = 1; i < game.rounds.length; i++) {
       expect(game.rounds[i].hp).toBe(game.rounds[i - 1].hp - game.rounds[i - 1].damageTaken);
