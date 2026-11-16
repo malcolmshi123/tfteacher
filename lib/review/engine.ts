@@ -156,7 +156,7 @@ export function analyze(game: GameRecord): Review {
         title: `${span.length}-fight loss streak cost ${hpLost} HP for ${earned} streak gold`,
         detail: `From ${first} to ${lastS} you lost every player fight and fell to ${endHp} HP. The streak paid ${earned} extra gold in total, about ${Math.round(hpLost / Math.max(1, earned))} HP per gold. That left no room to lose a fight while you built your final board.`,
         advice: "A loss streak is worth it while HP stays above about 50. Below that, spend the streak gold on board strength and take the win.",
-        stages: span.map((r) => r.stage),
+        stages: R.slice(best.from, best.to + 1).map((r) => r.stage),
         focus: span[span.length - 1].stage,
         cites: [
           { stage: first, label: `${span[0].hp} HP` },
@@ -296,17 +296,32 @@ export function analyze(game: GameRecord): Review {
 
   const top = findings.filter((f) => !f.positive && f.severity === "high");
   const peakHpLoss = findings.find((f) => f.kind === "loss-streak");
+  const streak = findings.find((f) => f.kind === "loss-streak");
+  const streakEndHp = streak ? Math.max(0, R.find((r) => r.stage === streak.focus)!.hp - R.find((r) => r.stage === streak.focus)!.damageTaken) : undefined;
   const headline =
     game.placement <= 4
       ? `Top 4. Here is what kept it from being a win.`
-      : top.length
-        ? `You placed ${ordinal(game.placement)} because you reached stage 4 too low to build, then didn't spend when it counted.`
-        : `You placed ${ordinal(game.placement)}. Here is what made the difference.`;
+      : streak && streakEndHp !== undefined && last.goldEnd >= 10
+        ? `You placed ${ordinal(game.placement)}: a loss streak left you at ${streakEndHp} HP by ${streak.focus}, and you went out holding ${last.goldEnd} gold.`
+        : top.length
+          ? `You placed ${ordinal(game.placement)}. ${top[0].title}.`
+          : `You placed ${ordinal(game.placement)}. Here is what made the difference.`;
 
   const totalRolls = R.reduce((a, r) => a + r.rerolls, 0);
   const r41 = R.find((r) => r.stage === "4-1");
   const lobbyHp41 = r41 ? Math.round(median(r41.roster.filter((o) => o.hp > 0).map((o) => o.hp))) : undefined;
-  const summary = `${top.length} decisions cost you the most. ${peakHpLoss ? `The stage 3 loss streak took ${peakHpLoss.hpCost} HP. ` : ""}After that you rolled ${totalRolls} times all game and still went out with ${last.goldEnd} gold.`;
+  let summary = "";
+  if (peakHpLoss) {
+    const k = R.findIndex((r) => r.stage === peakHpLoss.focus);
+    const after = R.slice(k + 1);
+    const rolls = after.reduce((a, r) => a + r.rerolls, 0);
+    const losses = after.filter((r) => r.outcome === "loss").length;
+    const peak = Math.max(...after.map((r) => r.hp));
+    const gold = peakHpLoss.title.match(/for (\d+)/)?.[1];
+    summary = `The streak took ${peakHpLoss.hpCost} HP for ${gold} gold. After it you rolled ${rolls} times in ${after.length} rounds, lost ${losses} more fights and never got above ${peak} HP again.`;
+  } else {
+    summary = `You rolled ${totalRolls} times and went out with ${last.goldEnd} gold.`;
+  }
 
   return {
     game,

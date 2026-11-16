@@ -75,13 +75,14 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-[var(--muted)]">
             <Key color="var(--good)">Won fight</Key>
             <Key color="var(--hp)">Lost fight</Key>
+            <Key color="var(--line-2)" solid>Monster round</Key>
             <Key color="var(--brand)" faint>
               Rounds in the selected finding
             </Key>
           </div>
         </div>
         <div className="-mx-1 overflow-x-auto md:mx-0">
-          <div className="min-w-[640px] md:min-w-0">
+          <div className="min-w-[900px] md:min-w-0">
             <Timeline series={series} selected={round} highlight={activeFinding?.stages} onSelect={setRound} />
           </div>
         </div>
@@ -95,12 +96,16 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
             <span className="text-[12px] text-[var(--muted)]">{findings.filter((f) => !f.positive).length} findings, most costly first</span>
           </div>
           <ol className="space-y-3">
-            {findings.map((f) => (
-              <FindingCard key={f.id} f={f} active={f.id === active} onClick={() => pick(f)} onCite={(s) => { setActive(f.id); setRound(s); }} />
+            {findings.map((f, i) => (
+              <FindingCard key={f.id} f={f} lead={i === 0} active={f.id === active} onClick={() => pick(f)} onCite={(s) => { setActive(f.id); setRound(s); }}>
+                <div className="mt-4 lg:hidden" onClick={(e) => e.stopPropagation()}>
+                  <RoundInspector game={game} stage={round} series={series} findings={findings} onPick={setRound} />
+                </div>
+              </FindingCard>
             ))}
           </ol>
         </section>
-        <aside className="lg:sticky lg:top-20 lg:self-start">
+        <aside className="hidden lg:sticky lg:top-20 lg:block lg:self-start">
           <RoundInspector game={game} stage={round} series={series} findings={findings} onPick={setRound} />
         </aside>
       </div>
@@ -108,27 +113,29 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
   );
 }
 
-function FindingCard({ f, active, onClick, onCite }: { f: Finding; active: boolean; onClick: () => void; onCite: (stage: string) => void }) {
+function FindingCard({ f, active, lead, onClick, onCite, children }: { f: Finding; active: boolean; lead?: boolean; onClick: () => void; onCite: (stage: string) => void; children?: React.ReactNode }) {
+  const quiet = (f.positive || f.severity === "low") && !active;
   const tone = f.positive ? "var(--good)" : f.severity === "high" ? "var(--hp)" : f.severity === "medium" ? "var(--gold)" : "var(--muted)";
   const label = f.positive ? "Went well" : f.severity === "high" ? "Cost you most" : f.severity === "medium" ? "Cost you some" : "Minor";
   return (
     <li
-      className={`group cursor-pointer rounded-2xl border bg-[var(--panel)] p-5 transition-colors ${
-        active ? "border-[var(--line-2)] bg-[var(--panel-2)]" : "border-[var(--line)] hover:border-[var(--line-2)]"
+      className={`group cursor-pointer rounded-2xl border transition-colors ${lead ? "p-6" : quiet ? "px-5 py-4" : "p-5"} ${
+        active ? "border-[var(--line-2)] bg-[var(--panel-2)]" : "border-[var(--line)] bg-[var(--panel)] hover:border-[var(--line-2)]"
       }`}
+      style={lead ? { boxShadow: `inset 3px 0 0 ${tone}` } : undefined}
       onClick={onClick}
     >
       <div className="flex items-start gap-3">
         <span className="mt-[7px] block h-2 w-2 shrink-0 rounded-full" style={{ background: tone }} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <h3 className="text-[16px] font-semibold leading-snug tracking-tight">{f.title}</h3>
+            <h3 className={`${lead ? "text-[20px]" : "text-[16px]"} font-semibold leading-snug tracking-tight`}>{f.title}</h3>
             <span className="text-[12px]" style={{ color: tone }}>
               {label}
             </span>
           </div>
-          <p className="mt-2 text-[14px] leading-relaxed text-[var(--ink-2)]">{f.detail}</p>
-          {f.lines && (
+          {!quiet && <p className={`mt-2 ${lead ? "text-[15px]" : "text-[14px]"} leading-relaxed text-[var(--ink-2)]`}>{f.detail}</p>}
+          {!quiet && f.lines && (
             <ul className="tnum mt-2 space-y-1 text-[14px] leading-relaxed text-[var(--ink-2)]">
               {f.lines.map((l) => (
                 <li key={l} className="flex gap-2">
@@ -138,13 +145,13 @@ function FindingCard({ f, active, onClick, onCite }: { f: Finding; active: boole
               ))}
             </ul>
           )}
-          {active && (
+          {(active || lead) && (
             <p className="mt-3 rounded-xl border border-[var(--line)] bg-[var(--bg)] px-4 py-3 text-[14px] leading-relaxed text-[var(--ink)]">
               <span className="font-medium text-[var(--brand)]">Next game: </span>
               {f.advice}
             </p>
           )}
-          <div className="mt-3 flex flex-wrap gap-1.5">
+          {!quiet && <div className="mt-3 flex flex-wrap gap-1.5">
             {f.cites.map((c, i) => (
               <button
                 key={i}
@@ -158,9 +165,10 @@ function FindingCard({ f, active, onClick, onCite }: { f: Finding; active: boole
                 {c.label}
               </button>
             ))}
-          </div>
+          </div>}
         </div>
       </div>
+      {active && children}
     </li>
   );
 }
@@ -169,10 +177,10 @@ function Dot() {
   return <span className="block h-[3px] w-[3px] rounded-full bg-[var(--line-2)]" />;
 }
 
-function Key({ color, children, faint }: { color: string; children: React.ReactNode; faint?: boolean }) {
+function Key({ color, children, faint, solid }: { color: string; children: React.ReactNode; faint?: boolean; solid?: boolean }) {
   return (
     <span className="inline-flex items-center gap-1.5">
-      <span className="block h-2.5 w-2.5 rounded-[3px]" style={{ background: color, opacity: faint ? 0.35 : 0.85 }} />
+      <span className="block h-2.5 w-2.5 rounded-[3px]" style={{ background: color, opacity: faint ? 0.35 : solid ? 1 : 0.85 }} />
       {children}
     </span>
   );

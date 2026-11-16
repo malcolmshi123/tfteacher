@@ -1,10 +1,11 @@
 import { ITEMS, UNIT_BY_ID } from "@/lib/game/set";
 import type { Piece } from "@/lib/game/types";
+import { TraitGlyph } from "./TraitGlyph";
 
 const COST_VAR = ["", "var(--c1)", "var(--c2)", "var(--c3)", "var(--c4)", "var(--c5)"];
 
-// Units are drawn in code: a cost-colored tile with the unit's initials, star
-// pips and item slots. No game art.
+// Units are drawn in code: a cost-colored tile with the unit's main trait crest,
+// its second trait in the corner, star pips and item slots. No game art.
 export function UnitToken({
   piece,
   unitId,
@@ -22,44 +23,64 @@ export function UnitToken({
   const u = UNIT_BY_ID[id];
   const color = COST_VAR[u.cost];
   const star = piece?.star ?? 0;
-  const ring =
-    state === "missed"
-      ? "0 0 0 2px var(--bg), 0 0 0 4px var(--hp)"
-      : state === "bought"
-        ? "0 0 0 2px var(--bg), 0 0 0 4px var(--good)"
-        : undefined;
+  const small = size < 36;
+  const border =
+    state === "missed" ? "inset 0 0 0 2px var(--hp)" : state === "bought" ? "inset 0 0 0 2px var(--good)" : `inset 0 0 0 1.5px color-mix(in oklab, ${color} 75%, transparent)`;
   return (
-    <div className="flex flex-col items-center gap-1.5" style={{ width: size + 8, opacity: state === "dim" ? 0.45 : 1 }}>
+    <div className="flex flex-col items-center gap-1.5" style={{ width: size + (showName ? 10 : 0), opacity: state === "dim" ? 0.55 : 1 }}>
       <div
-        className="relative grid place-items-center rounded-[10px]"
+        className="relative grid place-items-center"
         style={{
           width: size,
           height: size,
-          background: `linear-gradient(160deg, color-mix(in oklab, ${color} 30%, var(--panel-2)) 0%, color-mix(in oklab, ${color} 10%, var(--panel)) 100%)`,
-          boxShadow: `inset 0 0 0 1.5px color-mix(in oklab, ${color} 70%, transparent)${ring ? ", " + ring : ""}`,
+          borderRadius: Math.max(7, size * 0.22),
+          background:
+            state === "missed"
+              ? `linear-gradient(160deg, color-mix(in oklab, var(--hp) 32%, var(--panel-2)), color-mix(in oklab, var(--hp) 12%, var(--panel)))`
+              : `radial-gradient(120% 90% at 30% 15%, color-mix(in oklab, ${color} 38%, var(--panel-2)) 0%, color-mix(in oklab, ${color} 12%, var(--panel)) 70%)`,
+          boxShadow: border,
         }}
         title={`${u.name} · ${u.cost}-cost · ${u.traits.join(", ")}`}
       >
-        <span className="text-[15px] font-semibold tracking-tight" style={{ color: `color-mix(in oklab, ${color} 55%, white)`, fontSize: size * 0.3 }}>
-          {u.name.slice(0, 2)}
-        </span>
+        <TraitGlyph trait={u.traits[0]} size={size * 0.5} color={`color-mix(in oklab, ${color} 62%, white)`} />
+        {!small && (
+          <span className="absolute bottom-[3px] right-[3px] opacity-70">
+            <TraitGlyph trait={u.traits[1]} size={Math.max(9, size * 0.22)} color={`color-mix(in oklab, ${color} 45%, var(--ink-2))`} />
+          </span>
+        )}
         {star > 0 && (
           <span className="absolute -top-[7px] left-1/2 flex -translate-x-1/2 gap-[3px] rounded-full bg-[var(--bg)] px-1 py-[2px]">
             {Array.from({ length: star }).map((_, i) => (
-              <span key={i} className="block h-[5px] w-[5px] rotate-45" style={{ background: star === 3 ? "var(--c5)" : "var(--ink-2)" }} />
+              <span key={i} className="block h-[5px] w-[5px] rotate-45" style={{ background: star === 3 ? "var(--c5)" : "var(--ink)" }} />
             ))}
           </span>
         )}
+        {state === "missed" && <Badge color="var(--hp)">2★</Badge>}
+        {state === "bought" && (
+          <Badge color="var(--good)">
+            <svg width="8" height="8" viewBox="0 0 10 10" aria-hidden>
+              <path d="M2 5.2 4.2 7.4 8.2 2.8" fill="none" stroke="var(--bg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </Badge>
+        )}
         {piece && piece.items.length > 0 && (
-          <span className="absolute -bottom-[5px] left-1/2 flex -translate-x-1/2 gap-[3px]">
+          <span className="absolute -bottom-[6px] left-1/2 flex -translate-x-1/2 gap-[2px] rounded-[4px] bg-[var(--bg)] p-[2px]">
             {piece.items.map((it) => (
-              <span key={it} title={ITEMS[it]} className="block h-[9px] w-[9px] rounded-[3px] border border-[var(--bg)]" style={{ background: itemColor(it) }} />
+              <span key={it} title={ITEMS[it]} className="block h-[8px] w-[8px] rounded-[2px]" style={{ background: itemColor(it) }} />
             ))}
           </span>
         )}
       </div>
-      {showName && <span className="text-[11px] leading-none text-[var(--muted)]">{u.name}</span>}
+      {showName && <span className="mt-0.5 text-[11px] leading-none text-[var(--ink-2)]">{u.name}</span>}
     </div>
+  );
+}
+
+function Badge({ color, children }: { color: string; children: React.ReactNode }) {
+  return (
+    <span className="absolute -right-[6px] -top-[6px] grid h-[15px] min-w-[15px] place-items-center rounded-full px-[3px] text-[8.5px] font-bold leading-none text-[var(--bg)]" style={{ background: color, boxShadow: "0 0 0 2px var(--panel)" }}>
+      {children}
+    </span>
   );
 }
 

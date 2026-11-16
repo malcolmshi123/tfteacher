@@ -2,7 +2,6 @@
 
 import type { SeriesPoint } from "@/lib/review/engine";
 
-const W = 1000;
 const PAD_L = 34;
 const PAD_R = 12;
 const HP_TOP = 18;
@@ -13,6 +12,7 @@ const STRIP_TOP = GOLD_TOP + GOLD_H + 14;
 const STRIP_H = 18;
 const AXIS_Y = STRIP_TOP + STRIP_H + 18;
 const H = AXIS_Y + 8;
+const after = (p: SeriesPoint) => Math.max(0, p.hp - p.damage);
 
 export function Timeline({
   series,
@@ -20,13 +20,16 @@ export function Timeline({
   highlight,
   onSelect,
   compact = false,
+  width = 1000,
 }: {
   series: SeriesPoint[];
   selected?: string;
   highlight?: string[];
   onSelect?: (stage: string) => void;
   compact?: boolean;
+  width?: number;
 }) {
+  const W = width;
   const n = series.length;
   const step = (W - PAD_L - PAD_R) / n;
   const cx = (i: number) => PAD_L + step * i + step / 2;
@@ -34,7 +37,7 @@ export function Timeline({
   const maxGold = Math.max(60, ...series.map((p) => p.gold));
   const goldY = (g: number) => GOLD_TOP + GOLD_H - (g / maxGold) * GOLD_H;
 
-  const hpPath = series.map((p, i) => `${i ? "L" : "M"}${cx(i)},${hpY(p.hp - p.damage)}`).join(" ");
+  const hpPath = series.map((p, i) => `${i ? "L" : "M"}${cx(i)},${hpY(after(p))}`).join(" ");
   const hpArea = `${hpPath} L${cx(n - 1)},${HP_TOP + HP_H} L${cx(0)},${HP_TOP + HP_H} Z`;
   const lobbyPath = series.map((p, i) => `${i ? "L" : "M"}${cx(i)},${hpY(p.lobbyHp)}`).join(" ");
   const hl = new Set(highlight ?? []);
@@ -77,7 +80,7 @@ export function Timeline({
       <text x={PAD_L} y={HP_TOP - 6} fontSize="10.5" fill="var(--ink-2)">
         HP after combat
       </text>
-      <g transform={`translate(${W - PAD_R - 190}, ${HP_TOP - 14})`}>
+      <g transform={`translate(${W - PAD_R - 150}, ${HP_TOP - 14})`}>
         <line x1={0} x2={16} y1={0} y2={0} stroke="var(--hp)" strokeWidth={2} transform="translate(0,4)" />
         <text x={22} y={7.5} fontSize="10.5" fill="var(--ink-2)">You</text>
         <line x1={58} x2={74} y1={4} y2={4} stroke="var(--ink-2)" strokeWidth={1.5} strokeDasharray="3 3" />
@@ -88,7 +91,7 @@ export function Timeline({
       <path d={lobbyPath} fill="none" stroke="var(--ink-2)" strokeOpacity={0.6} strokeWidth={1.5} strokeDasharray="3 3" />
       <path d={hpPath} fill="none" stroke="var(--hp)" strokeWidth={2.25} strokeLinejoin="round" />
       {series.map((p, i) =>
-        p.damage > 0 ? <circle key={`d${i}`} cx={cx(i)} cy={hpY(p.hp - p.damage)} r={2.6} fill="var(--bg)" stroke="var(--hp)" strokeWidth={1.6} /> : null,
+        p.damage > 0 ? <circle key={`d${i}`} cx={cx(i)} cy={hpY(after(p))} r={2.6} fill="var(--bg)" stroke="var(--hp)" strokeWidth={1.6} /> : null,
       )}
 
       {/* gold */}
@@ -115,7 +118,7 @@ export function Timeline({
       {/* fight strip */}
       {series.map((p, i) => {
         const fill =
-          p.kind === "carousel" ? "transparent" : p.outcome === "win" ? "var(--good)" : p.outcome === "loss" ? "var(--hp)" : "var(--line-2)";
+          p.kind === "carousel" ? "transparent" : p.kind === "pve" ? "var(--line-2)" : p.outcome === "win" ? "var(--good)" : p.outcome === "loss" ? "var(--hp)" : "var(--line-2)";
         return (
           <rect
             key={`o${i}`}
@@ -125,7 +128,7 @@ export function Timeline({
             height={STRIP_H}
             rx={3}
             fill={fill}
-            fillOpacity={p.kind === "pve" ? 0.35 : 0.85}
+            fillOpacity={p.kind === "pve" ? 1 : 0.85}
             stroke={p.kind === "carousel" ? "var(--line-2)" : "none"}
             strokeDasharray={p.kind === "carousel" ? "2 2" : undefined}
           />
@@ -163,7 +166,7 @@ export function Timeline({
       {onSelect &&
         series.map((p, i) => (
           <rect key={`t${i}`} x={cx(i) - step / 2} y={0} width={step} height={H} fill="transparent" className="cursor-pointer" onClick={() => onSelect(p.stage)}>
-            <title>{`${p.stage}: ${p.hp - p.damage} HP, ${p.gold} gold, level ${p.level}`}</title>
+            <title>{`${p.stage}: ${after(p)} HP, ${p.gold} gold, level ${p.level}`}</title>
           </rect>
         ))}
     </svg>

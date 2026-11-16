@@ -47,7 +47,8 @@ describe("every cite matches the recording", () => {
     const f = review.findings.find((x) => x.kind === "loss-streak")!;
     const sum = f.stages.reduce((a, s) => a + byStage[s].damageTaken, 0);
     expect(f.hpCost).toBe(sum);
-    for (const s of f.stages) expect(byStage[s].outcome).toBe("loss");
+    // the span is continuous; every player fight inside it was a loss
+    for (const s of f.stages) if (byStage[s].kind === "pvp") expect(byStage[s].outcome).toBe("loss");
   });
 
   it("missed upgrades really were in a shop and not bought", () => {
