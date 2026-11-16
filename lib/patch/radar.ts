@@ -1,4 +1,4 @@
-import { UNIT_BY_ID } from "../game/set";
+import { COMP_LABELS, UNIT_BY_ID } from "../game/set";
 
 // Patch Radar: match the lines of a patch's notes against the comps a player
 // actually plays. Every verdict lists the note lines it came from.
@@ -33,8 +33,8 @@ export interface CompVerdict {
 export const PATCH = { from: "18.2", to: "18.3", date: "2026-11-12" };
 
 export const NOTES: NoteLine[] = [
-  { id: "u-aphelios-1", section: "Units", target: "aphelios", text: "Aphelios attack damage 62 to 56", direction: "nerf", weight: 2 },
-  { id: "u-aphelios-2", section: "Units", target: "aphelios", text: "Aphelios ability bonus attacks 4 to 3", direction: "nerf", weight: 2 },
+  { id: "u-khazix-1", section: "Units", target: "khazix", text: "Kha'Zix ability damage 240/360/560 to 220/330/520", direction: "nerf", weight: 2 },
+  { id: "u-khazix-2", section: "Units", target: "khazix", text: "Kha'Zix health 750 to 700", direction: "nerf", weight: 2 },
   { id: "u-masteryi-1", section: "Units", target: "masteryi", text: "Master Yi ability shield 250/325/450 to 280/360/500", direction: "buff", weight: 1 },
   { id: "u-ahri-1", section: "Units", target: "ahri", text: "Ahri mana 90 to 80", direction: "buff", weight: 2 },
   { id: "u-vi-1", section: "Units", target: "vi", text: "Vi health 750 to 800", direction: "buff", weight: 1 },
@@ -57,7 +57,11 @@ export function compTraits(core: string[]): string[] {
 
 export function compName(core: string[]): string {
   const carry = UNIT_BY_ID[core[0]]?.name ?? core[0];
-  const top = compTraits(core)[0];
+  const traits = compTraits(core);
+  // players name some trait pairs as one word (Lunar + Elderwood is "Lunarwood")
+  const blend = COMP_LABELS.find((l) => l.traits.every((tr) => traits.includes(tr)));
+  if (blend) return `${blend.label} ${carry}`;
+  const top = traits[0];
   return top ? `${top} ${carry}` : carry;
 }
 
@@ -66,7 +70,7 @@ function comp(id: string, core: string[], games: number, avgPlace: number, top4:
 }
 
 export const MY_COMPS: PlayedComp[] = [
-  comp("c1", ["aphelios", "mamabeak", "kayle", "xayah"], 14, 3.9, 57),
+  comp("c1", ["khazix", "hecarim", "diana", "aphelios", "ezreal"], 14, 3.9, 57),
   comp("c2", ["ahri", "masteryi", "yunara", "ashe"], 9, 4.4, 44),
   comp("c3", ["amumu", "vi", "sejuani", "rammus"], 6, 4.8, 33),
 ];

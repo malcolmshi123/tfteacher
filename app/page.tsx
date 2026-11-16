@@ -21,6 +21,17 @@ export default function Home() {
           break outer;
         }
   }
+  // missed: a unit from the final board that one more copy would have upgraded, left in the shop
+  const owned: Record<string, number> = {};
+  for (const x of [...r42.board, ...r42.bench]) owned[x.unit] = (owned[x.unit] ?? 0) + (x.star === 1 ? 1 : x.star === 2 ? 3 : 9);
+  const finalUnits = new Set(review.game.rounds[review.game.rounds.length - 1].board.map((x) => x.unit));
+  const missedAt = new Set<string>();
+  r42.shops.forEach((shop, si) =>
+    shop.forEach((u, k) => {
+      if (!boughtAt.has(`${si}:${k}`) && finalUnits.has(u) && (owned[u] ?? 0) % 3 === 2) missedAt.add(`${si}:${k}`);
+    }),
+  );
+  const missedNames = [...new Set([...missedAt].map((key) => { const [si, k] = key.split(":").map(Number); return UNIT_BY_ID[r42.shops[si][k]].name; }))];
   const rollCost = r42.rerolls * 2;
   const buyCost = r42.bought.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0);
   const soldFor = r42.sold.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0);
@@ -98,15 +109,15 @@ export default function Home() {
               <h2 className="text-[28px] font-semibold leading-tight tracking-[-0.02em] md:text-[34px]">Your final board is the least interesting part of the game.</h2>
               <p className="mt-4 text-[16px] leading-relaxed text-[var(--ink-2)]">
                 Match history shows where you ended up. The game was decided earlier: a loss streak held too long, a 2-star
-                you scrolled past, gold you never spent.
+                you rolled past, gold you never spent.
               </p>
             </div>
             <div className="mt-10 grid gap-4 md:grid-cols-2">
               <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
                 <div className="text-[13px] font-medium text-[var(--muted)]">What match history shows</div>
-                <div className="mt-5 flex flex-wrap gap-x-1 gap-y-3">
+                <div className="mt-5 flex flex-wrap gap-x-2.5 gap-y-3">
                   {last.board.map((p, i) => (
-                    <UnitToken key={i} piece={p} size={42} />
+                    <UnitToken key={i} piece={p} size={50} />
                   ))}
                 </div>
                 <dl className="tnum mt-5 grid grid-cols-3 gap-3 text-[13px]">
@@ -138,7 +149,7 @@ export default function Home() {
                       <span className="w-12 text-[11px] text-[var(--muted)]">{si === 0 ? "Free" : `Roll ${si}`}</span>
                       <div className="flex gap-2">
                         {shop.map((u, k) => (
-                          <UnitToken key={k} unitId={u} size={28} showName={false} state={boughtAt.has(`${si}:${k}`) ? "bought" : "dim"} />
+                          <UnitToken key={k} unitId={u} size={28} showName={false} state={boughtAt.has(`${si}:${k}`) ? "bought" : missedAt.has(`${si}:${k}`) ? "missed" : "dim"} />
                         ))}
                       </div>
                     </div>
@@ -163,6 +174,7 @@ export default function Home() {
                 <p className="tnum mt-4 text-[13px] text-[var(--muted)]">
                   {r42.gold} gold, minus {rollCost} on {r42.rerolls} rerolls and {buyCost} on the {r42.bought.length} outlined units,
                   plus {soldFor} for selling {soldNames}: {r42.goldEnd} left.
+                  {missedNames.length > 0 && <> In red: the {missedNames.join(" and ")} that would have made a 2-star, left in the shop.</>}
                 </p>
                 <p className="mt-4 text-[14px] leading-relaxed text-[var(--ink-2)]">
                   Every shop, every reroll, gold and HP at the start of each round, your bench and the lobby around you.
