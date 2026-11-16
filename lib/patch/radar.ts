@@ -113,7 +113,7 @@ export interface PatchPick {
 
 export const PATCH_SUMMARY: { lead: string; tryThese: PatchPick[]; avoid: PatchPick[] } = {
   lead:
-    "18.5 leans toward AP and sustain. Fae, AP 4-costs and Taric got stronger, while Blackthorn, Rapidfire and big Riftbeast boards lost some of their top end. Kha'Zix and Azir were nerfed directly.",
+    "18.5 leans toward AP and sustain. Fae, AP 4-costs and Taric got stronger, while Blackthorn, Rapidfire and boards with 7 or more Riftbeasts lost some of their top end. Kha'Zix and Azir were nerfed directly.",
   tryThese: [
     {
       name: "Fae boards",
@@ -149,7 +149,7 @@ export const PATCH_SUMMARY: { lead: string; tryThese: PatchPick[]; avoid: PatchP
     },
     {
       name: "Kha'Zix carries",
-      why: "Both of Kha'Zix's damage values went down, and Riot nerfed him again in the Oct 27 mid-patch update.",
+      why: "Both of Kha'Zix's damage values went down, so boards built to carry with him lose the most.",
       units: ["khazix"],
       lines: ["u-khazix-1", "u-khazix-2"],
     },
@@ -193,7 +193,7 @@ export function radar(comps = MY_COMPS, notes = NOTES): CompVerdict[] {
             const other = uniq(nerfs.filter((x) => x.target !== comp.carry).map((x) => name(x.target)));
             const buffed = uniq(buffs.map((x) => name(x.target)));
             const lead = carry ? `Your main carry ${name(comp.carry)} was nerfed in ${carry} line${carry === 1 ? "" : "s"}` : `${list(other)} got weaker`;
-            const more = carry && other.length ? `, and ${list(other)} took a smaller hit` : "";
+            const more = carry && other.length ? `, and ${list(other)} was nerfed too` : "";
             const offset = buffed.length ? ` ${list(buffed)} got buffed, but not enough to make up for it.` : "";
             return `${lead}${more}.${offset} Expect it to place lower until you adjust items or the board around it.`;
           })()

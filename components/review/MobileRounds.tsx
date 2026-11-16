@@ -28,7 +28,7 @@ export function MobileRounds({
   const after = (p: SeriesPoint) => Math.max(0, p.hp - p.damage);
   const y = (hp: number) => 6 + (H - 12) * (1 - hp / 100);
   const line = series.map((p, i) => `${i ? "L" : "M"}${x(i)},${y(after(p))}`).join(" ");
-  const lobby = series.map((p, i) => `${i ? "L" : "M"}${x(i)},${y(p.lobbyHp)}`).join(" ");
+  const lobby = series.filter((p) => p.lobbyAlive >= 4).map((p, i) => `${i ? "L" : "M"}${x(series.indexOf(p))},${y(p.lobbyHp)}`).join(" ");
   const si = series.findIndex((p) => p.stage === selected);
   const hlIdx = series.map((p, i) => (hl.has(p.stage) ? i : -1)).filter((i) => i >= 0);
 
@@ -103,7 +103,7 @@ export function MobileRounds({
           <span className="flex items-center gap-1.5"><span className="block h-2.5 w-2.5 rounded-[2px] bg-[var(--gold)]" />Held</span>
           <span className="flex items-center gap-1.5"><span className="block h-2.5 w-2.5 rounded-[2px] border border-dashed border-[var(--gold)] bg-[color-mix(in_oklab,var(--gold)_14%,transparent)]" />Spent</span>
         </span>
-        {si >= 0 && <span className="tnum text-[var(--gold)]">{series[si].goldEnd} of {series[si].gold} at {selected}</span>}
+        {si >= 0 && <span className="tnum text-[var(--gold)]">{series[si].goldEnd} held of {series[si].gold} at {selected}</span>}
       </div>
       <div className="relative">
       <div ref={strip} className="-mx-3 mt-3 flex snap-x snap-mandatory scroll-pl-3 gap-1.5 overflow-x-auto px-3 pb-1 [scrollbar-width:none]" role="list" aria-label="Rounds">

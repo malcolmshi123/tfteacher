@@ -7,6 +7,9 @@ import { analyze, ordinal } from "@/lib/review/engine";
 
 export const metadata = { title: "Reviews · TFTeacher" };
 
+// same severity colors as the review page
+const sev = (s: string) => (s === "high" ? "var(--hp)" : s === "medium" ? "var(--gold)" : "var(--ink-2)");
+
 const COMP_NAME = Object.fromEntries(MY_COMPS.map((c) => [c.id, c.name]));
 
 export default function ReviewsPage() {
@@ -29,7 +32,7 @@ export default function ReviewsPage() {
             <h1 className="text-[28px] font-semibold leading-tight tracking-[-0.02em] md:text-[36px]">Reviews</h1>
             <p className="mt-3 text-[15px] leading-relaxed text-[var(--ink-2)]">
               Every game you play with the app open shows up here when it ends. Open one to see what cost you placements,
-              round by round.
+              round by round. This sample account is on Pro, so every game gets a full review.
             </p>
           </div>
           <dl className="tnum grid grid-cols-3 gap-6 rounded-2xl border border-[var(--line)] bg-[var(--panel)] px-5 py-4 text-[13px]">
@@ -83,7 +86,10 @@ export default function ReviewsPage() {
                   <div className="col-span-2 min-w-0 md:col-span-1">
                     <div className="text-[14px] leading-snug text-[var(--ink)]">{top.title}</div>
                     {top.cost && (
-                      <span className="tnum mt-1.5 inline-block rounded-full bg-[color-mix(in_oklab,var(--hp)_13%,transparent)] px-2 py-0.5 text-[12px] text-[var(--hp)]">
+                      <span
+                        className="tnum mt-1.5 inline-block rounded-full px-2 py-0.5 text-[12px]"
+                        style={{ background: `color-mix(in oklab, ${sev(top.severity)} 13%, transparent)`, color: sev(top.severity) }}
+                      >
                         {top.cost}
                       </span>
                     )}

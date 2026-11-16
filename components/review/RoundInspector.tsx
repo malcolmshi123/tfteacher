@@ -45,7 +45,9 @@ export function RoundInspector({
         ? "Monster round"
         : r.outcome === "win"
           ? `Won vs ${r.opponent}`
-          : `Lost to ${r.opponent}, took ${r.damageTaken}`;
+          : idx === game.rounds.length - 1 && r.hp - r.damageTaken <= 0
+            ? `Died, took ${r.damageTaken}`
+            : `Lost to ${r.opponent}, took ${r.damageTaken}`;
 
   return (
     <div className={bare ? "" : "rounded-2xl border border-[var(--line)] bg-[var(--panel)]"}>
@@ -65,7 +67,7 @@ export function RoundInspector({
       {takeaway && <p className="text-pretty border-b border-[var(--line)] px-4 py-3 text-[14px] leading-snug text-[var(--ink)] sm:px-5">{takeaway}</p>}
 
       <dl className="grid grid-cols-2 border-b border-[var(--line)] sm:grid-cols-4">
-        <Stat k="HP entering" v={`${r.hp}`} sub={`lobby ${pt.lobbyHpEntering}`} tone={r.hp < pt.lobbyHpEntering ? "hp" : undefined} />
+        <Stat k="HP entering" v={`${r.hp}`} sub={pt.lobbyAliveEntering >= 4 ? `lobby ${pt.lobbyHpEntering}` : `${pt.lobbyAliveEntering} others left`} tone={pt.lobbyAliveEntering < 4 ? undefined : r.hp < pt.lobbyHpEntering ? "hp" : "good"} />
         <Stat k="Gold" v={`${r.gold}`} sub={`${r.goldEnd} at fight`} />
         <Stat k="Level" v={`${r.level}`} sub={`lobby ${pt.lobbyLevel}`} tone={r.level < pt.lobbyLevel ? "hp" : r.level > pt.lobbyLevel ? "good" : undefined} />
         <Stat k="Board" v={`${pt.boardValue}`} sub={`lobby ${pt.lobbyBoardValue}`} tone={pt.boardValue < pt.lobbyBoardValue ? "hp" : "good"} />
@@ -90,7 +92,7 @@ export function RoundInspector({
           <p className="text-[13px] leading-relaxed text-[var(--ink-2)]">
             {[
               r.bought.length ? `Bought ${summarize(r.bought)} for ${r.bought.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0)} gold${r.bought.length > 1 ? " total" : ""}` : "",
-              r.sold.length ? `sold ${summarize(r.sold)} (+${r.soldGold} gold)` : "",
+              r.sold.length ? `sold ${summarizeSold(r.sold)} (+${r.soldGold} gold)` : "",
               r.xpBought ? `bought XP ${r.xpBought}× (${r.xpBought * 4} gold)` : "",
               r.rerolls ? `rerolled ${r.rerolls}× (${r.rerolls * 2} gold)` : "",
             ]
@@ -159,6 +161,22 @@ function summarize(units: string[]) {
   for (const u of units) n[u] = (n[u] ?? 0) + 1;
   return Object.entries(n)
     .map(([u, c]) => `${UNIT_BY_ID[u].name}${c > 1 ? ` ×${c}` : ""}`)
+    .join(", ");
+}
+
+// sold copies as the units you actually sold: 3 copies of one unit is a 2-star
+function summarizeSold(units: string[]) {
+  const n: Record<string, number> = {};
+  for (const u of units) n[u] = (n[u] ?? 0) + 1;
+  return Object.entries(n)
+    .flatMap(([u, c]) => {
+      const name = UNIT_BY_ID[u].name;
+      const out: string[] = [];
+      for (let k = 0; k < Math.floor(c / 9); k++) out.push(`a 3-star ${name}`);
+      for (let k = 0; k < Math.floor((c % 9) / 3); k++) out.push(`a 2-star ${name}`);
+      if (c % 3) out.push(c % 3 > 1 ? `${name} ×${c % 3}` : name);
+      return out;
+    })
     .join(", ");
 }
 

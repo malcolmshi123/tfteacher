@@ -45,7 +45,8 @@ export function UnitToken({
           width: size,
           height: size,
           borderRadius: Math.max(6, size * 0.18),
-          marginBottom: piece?.items.length ? Math.round(size * 0.18) : 0,
+          // board tiles always leave room for item icons, so names line up across a row
+          marginBottom: piece ? Math.round(size * 0.18) : 0,
           // the cost border always shows; a highlight is a second ring outside it
           boxShadow: HIGHLIGHT[state]
             ? `0 0 0 ${b}px ${color}, 0 0 0 ${b + 1.5}px var(--panel-2), 0 0 0 ${b + 3.5}px ${HIGHLIGHT[state]}`
@@ -79,7 +80,7 @@ export function UnitToken({
           </span>
         )}
       </div>
-      {showName && <span className="mt-0.5 text-[11px] leading-none text-[var(--ink-2)]">{u.name}</span>}
+      {showName && <span className="mt-0.5 block w-full truncate text-center text-[11px] leading-none text-[var(--ink-2)]" title={u.name}>{u.name}</span>}
     </div>
   );
 }

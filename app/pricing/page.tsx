@@ -102,7 +102,7 @@ function TrendsPreview() {
     <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
       <div className="flex items-baseline justify-between gap-3">
         <h3 className="text-[15px] font-semibold">Pro trends: HP lost per game, by stage</h3>
-        <span className="text-[12px] text-[var(--muted)]">Sample account, last 19 games</span>
+        <span className="text-[12px] text-[var(--muted)]">Sample account, 19 games on patch 18.4</span>
       </div>
       <div className="mt-6 space-y-3">
         {TREND.map((t) => (
@@ -116,7 +116,7 @@ function TrendsPreview() {
         ))}
       </div>
       <p className="mt-6 border-t border-[var(--line)] pt-4 text-[14px] leading-relaxed text-[var(--ink-2)]">
-        Stage 3 costs this player the most HP per game. Their reviews point at the same habit: staying on loss streaks after HP drops below 50.
+        Stage 3 costs this player the most HP per game. Their reviews point at the same habit: staying on loss streaks after HP drops below 40.
       </p>
     </div>
   );

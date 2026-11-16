@@ -5,12 +5,12 @@ import type { SeriesPoint } from "@/lib/review/engine";
 // Layout in viewBox units. The compact (landing) version is drawn narrower, so the
 // same font sizes render larger, and it gets more room between the lanes.
 function layout(compact: boolean) {
-  const FS = compact ? 12 : 11.5; // label size
+  const FS = 12; // label size
   const PAD_L = compact ? 30 : 34;
   const PAD_R = 12;
   const HP_TOP = compact ? 34 : 18; // compact: legend row sits above the plot
   const HP_H = compact ? 136 : 128;
-  const GOLD_TOP = HP_TOP + HP_H + (compact ? 40 : 26);
+  const GOLD_TOP = HP_TOP + HP_H + (compact ? 40 : 34);
   const GOLD_H = compact ? 56 : 64;
   const STRIP_TOP = GOLD_TOP + GOLD_H + 14;
   const STRIP_H = compact ? 14 : 18;
@@ -46,7 +46,8 @@ export function Timeline({
 
   const hpPath = series.map((p, i) => `${i ? "L" : "M"}${cx(i)},${hpY(after(p))}`).join(" ");
   const hpArea = `${hpPath} L${cx(n - 1)},${HP_TOP + HP_H} L${cx(0)},${HP_TOP + HP_H} Z`;
-  const lobbyPath = series.map((p, i) => `${i ? "L" : "M"}${cx(i)},${hpY(p.lobbyHp)}`).join(" ");
+  // the lobby median stops once fewer than 4 opponents are left
+  const lobbyPath = series.filter((p) => p.lobbyAlive >= 4).map((p, i) => `${i ? "L" : "M"}${cx(series.indexOf(p))},${hpY(p.lobbyHp)}`).join(" ");
   const hl = new Set(highlight ?? []);
 
   // stage boundaries
@@ -87,12 +88,12 @@ export function Timeline({
       <text x={PAD_L} y={compact ? 14 : HP_TOP - 6} fontSize={FS} fill="var(--ink-2)">
         HP after combat
       </text>
-      <g transform={`translate(${W - PAD_R - (compact ? 170 : 150)}, ${compact ? 4 : HP_TOP - 14})`}>
+      {compact && <g transform={`translate(${W - PAD_R - 170}, 4)`}>
         <line x1={0} x2={16} y1={0} y2={0} stroke="var(--hp)" strokeWidth={2} transform="translate(0,4)" />
         <text x={22} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">You</text>
         <line x1={compact ? 66 : 58} x2={compact ? 84 : 74} y1={4} y2={4} stroke="var(--ink-2)" strokeWidth={1.5} strokeDasharray="3 3" />
         <text x={compact ? 90 : 80} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">Lobby median</text>
-      </g>
+      </g>}
 
       <path d={hpArea} fill="url(#hpFill)" />
       <path d={lobbyPath} fill="none" stroke="var(--ink-2)" strokeOpacity={0.6} strokeWidth={1.5} strokeDasharray="3 3" />
@@ -105,24 +106,24 @@ export function Timeline({
       <text x={PAD_L} y={GOLD_TOP - (compact ? 14 : 8)} fontSize={FS} fill="var(--ink-2)">
         Gold into combat
       </text>
-      <g transform={`translate(${PAD_L + (compact ? 150 : 128)}, ${GOLD_TOP - (compact ? 14 : 8) - FS * 0.75})`}>
+      {compact && <g transform={`translate(${PAD_L + 150}, ${GOLD_TOP - 14 - FS * 0.75})`}>
         <rect x={0} y={0} width={10} height={10} rx={2} fill="var(--gold)" opacity={0.85} />
         <text x={16} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">Held</text>
         <rect x={compact ? 66 : 58} y={0} width={10} height={10} rx={2} fill="var(--gold)" fillOpacity={0.14} stroke="var(--gold)" strokeOpacity={0.45} strokeDasharray="2 2" />
         <text x={compact ? 82 : 74} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">Spent</text>
-      </g>
+      </g>}
       <line x1={PAD_L} x2={W - PAD_R} y1={goldY(50)} y2={goldY(50)} stroke="var(--gold)" strokeOpacity={0.35} strokeDasharray="2 4" />
       <text x={PAD_L - 8} y={goldY(50) + FS / 3} textAnchor="end" fontSize={FS - 0.5} fill="var(--muted)" className="tnum">
         50
       </text>
       {series.map((p, i) => {
-        const on = selected === p.stage ? 1 : hl.has(p.stage) ? 0.85 : 0.45;
+        const on = selected === p.stage ? 1 : hl.has(p.stage) ? 0.9 : 0.62;
         const x = cx(i) - step * 0.3;
         const w = step * 0.6;
         return (
           <g key={`g${i}`}>
             {p.gold > p.goldEnd && (
-              <rect x={x + 0.5} y={goldY(p.gold) + 0.5} width={w - 1} height={goldY(p.goldEnd) - goldY(p.gold) - 1} rx={1.5} fill="var(--gold)" fillOpacity={0.12 * on + 0.04} stroke="var(--gold)" strokeOpacity={0.5 * on + 0.1} strokeDasharray="2 2" />
+              <rect x={x + 0.5} y={goldY(p.gold) + 0.5} width={w - 1} height={goldY(p.goldEnd) - goldY(p.gold) - 1} rx={1.5} fill="var(--gold)" fillOpacity={0.1} stroke="var(--gold)" strokeOpacity={0.75 * on + 0.15} strokeWidth={1.25} strokeDasharray="3 2" />
             )}
             <rect x={x} y={goldY(p.goldEnd)} width={w} height={GOLD_TOP + GOLD_H - goldY(p.goldEnd)} rx={1.5} fill="var(--gold)" opacity={on} />
           </g>

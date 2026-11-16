@@ -41,7 +41,7 @@ export default function PatchPage() {
             <p className="mt-3 text-[15px] leading-relaxed text-[var(--ink-2)]">
               We checked every trait and champion change in patch {PATCH.to} against the {games} ranked games you played on {PATCH.from}.
               A trait change only counts if your board reaches that breakpoint. This is the Pro view; Free shows your most played comp.
-              Augments, items and the mid-patch updates aren&apos;t included.
+              Augments, items and the mid-patch updates aren&apos;t included. Changes with a value per star level show the average.
             </p>
           </div>
           <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-4">
@@ -143,7 +143,7 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
             <UnitToken key={u} unitId={u} size={44} />
           ))}
         </div>
-        <dl className="tnum mt-auto grid grid-cols-3 gap-4 pt-5 text-[13px]">
+        <dl className="tnum mt-6 grid grid-cols-3 gap-4 border-t border-[var(--line)] pt-5 text-[13px]">
           <div>
             <dt className="text-[var(--muted)]">Games</dt>
             <dd className="mt-0.5 text-[18px] font-semibold">{v.comp.games}</dd>
@@ -210,9 +210,8 @@ function Delta({ n }: { n: NoteLine }) {
   if (pct === undefined) return null;
   return (
     <span className="tnum w-24 shrink-0 text-right text-[13px] font-medium" style={{ color: n.direction === "buff" ? "var(--good)" : n.direction === "nerf" ? "var(--hp)" : "var(--ink-2)" }}>
-      {Math.abs(pct).toFixed(Math.abs(pct) < 10 ? 1 : 0)}% {pct > 0 ? "higher" : "lower"}
+      {Math.abs(pct).toFixed(1)}% {pct > 0 ? "higher" : "lower"}
       {n.direction === "buff" && pct < 0 ? <span className="block text-[11px] font-normal text-[var(--muted)]">lower is better</span> : null}
-      {n.text.includes("/") ? <span className="block text-[11px] font-normal text-[var(--muted)]">average of tiers</span> : null}
     </span>
   );
 }

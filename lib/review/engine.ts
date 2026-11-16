@@ -47,6 +47,8 @@ export interface SeriesPoint {
   lobbyLevel: number;
   lobbyHp: number; // after this round's fights
   lobbyHpEntering: number; // before them (the previous round's roster)
+  lobbyAlive: number; // opponents still in after this round; the HP median means little under 4
+  lobbyAliveEntering: number;
   outcome: RoundSnapshot["outcome"];
   kind: RoundSnapshot["kind"];
   damage: number;
@@ -122,6 +124,8 @@ export function buildSeries(game: GameRecord): SeriesPoint[] {
       lobbyLevel: median(alive.map((o) => o.level)),
       lobbyHp: Math.round(median(r.roster.map((o) => o.hp))),
       lobbyHpEntering: Math.round(median(before.map((o) => o.hp))),
+      lobbyAlive: alive.length,
+      lobbyAliveEntering: before.filter((o) => o.hp > 0).length,
       outcome: r.outcome,
       kind: r.kind,
       damage: r.damageTaken,
@@ -184,7 +188,7 @@ export function analyze(game: GameRecord): Review {
         severity: endHp < 45 ? "high" : hpLost > 30 ? "medium" : "low",
         title: `${span.length}-fight loss streak cost ${hpLost} HP for ${earned} streak gold`,
         detail: `From ${first} to ${lastS} you lost every player fight and fell to ${endHp} HP. The streak paid ${earned} extra gold in total, about ${Math.round(hpLost / Math.max(1, earned))} HP per gold. That left no room to lose a fight while you built your final board.`,
-        advice: "A loss streak is worth it while HP stays above about 50. Below that, spend the streak gold on board strength and take the win.",
+        advice: "A loss streak is worth it while HP stays above about 40. Below that, spend the streak gold on board strength and take the win.",
         stages: R.slice(best.from, best.to + 1).map((r) => r.stage),
         focus: span[span.length - 1].stage,
         cites: [
@@ -406,7 +410,7 @@ export function analyze(game: GameRecord): Review {
     series,
     headline,
     shortHeadline: streakStory
-      ? `${place}: down to ${streakEndHp} HP after a loss streak, out holding ${last.goldEnd} gold.`
+      ? `${place}: down to ${streakEndHp} HP after ${streak!.focus}, died on ${last.stage} holding ${last.goldEnd} gold.`
       : `${place}: ${bad}.`,
     summary,
     stats: [

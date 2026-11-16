@@ -53,9 +53,9 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
       </Link>
       {/* header */}
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-        <div className="max-w-[760px]">
+        <div className="max-w-[920px]">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-[var(--muted)]">
-            <span className="tnum rounded-md bg-[color-mix(in_oklab,var(--place)_16%,var(--panel-2))] px-1.5 py-0.5 font-semibold text-[var(--place)] md:hidden">{ordinal(game.placement)} of 8</span>
+            <span className="tnum rounded-md bg-[color-mix(in_oklab,var(--place)_16%,var(--panel-2))] px-1.5 py-0.5 font-semibold text-[var(--place)]">{ordinal(game.placement)} of 8</span>
             <span>{game.queue}</span>
             <Dot />
             <span>{game.patch}</span>
@@ -66,22 +66,14 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
               {played.toLocaleDateString("en-US", { month: "short", day: "numeric" })},{" "}
               {played.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
             </span>
+            <span className="hidden lg:block"><Dot /></span>
+            <span className="hidden lg:inline">{SOURCE_LABEL[game.source]}</span>
           </div>
           <h1 className="mt-3 text-[28px] font-semibold leading-[1.15] tracking-[-0.02em] text-balance md:text-[36px]">
             <span className="md:hidden">{keepRounds(review.shortHeadline)}</span>
             <span className="hidden md:inline">{keepRounds(review.headline)}</span>
           </h1>
           <p className="mt-3 max-w-[640px] text-[15px] leading-relaxed text-[var(--ink-2)]">{keepRounds(review.summary)}</p>
-        </div>
-        <div className="hidden shrink-0 items-center gap-3 rounded-2xl border md:flex border-[var(--line)] bg-[var(--panel)] py-3 pl-3 pr-5">
-          <span className="tnum flex h-14 w-14 items-center justify-center rounded-xl bg-[color-mix(in_oklab,var(--place)_16%,var(--panel-2))] font-semibold text-[var(--place)]">
-            <span className="text-[24px] leading-none">{game.placement}</span>
-            <span className="ml-[2px] self-start pt-[13px] text-[11px] leading-none">{ordinal(game.placement).slice(String(game.placement).length)}</span>
-          </span>
-          <div>
-            <div className="text-[13px] text-[var(--ink-2)]">of 8 players</div>
-            <div className="mt-0.5 max-w-[190px] text-[12px] leading-snug text-[var(--muted)]">{SOURCE_LABEL[game.source]}</div>
-          </div>
         </div>
       </div>
 
@@ -101,12 +93,20 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2 px-2 md:px-0">
           <h2 className="text-[15px] font-medium">Every round</h2>
           <div className="hidden flex-wrap gap-x-4 gap-y-1 text-[12px] text-[var(--muted)] md:flex">
-            <Key color="var(--good)">Won fight</Key>
-            <Key color="var(--hp)">Lost fight</Key>
-            <Key color="var(--line-2)" solid>Monster round</Key>
-            <Key color="transparent" dashed>Shared draft</Key>
-            <Key color="var(--brand)" faint>
-              Rounds in the selected finding
+            <Key line="var(--hp)">You</Key>
+            <Key line="var(--ink-2)" dashed>
+              Lobby median
+            </Key>
+            <Key color="var(--gold)">Gold held</Key>
+            <Key color="transparent" spent>
+              Spent
+            </Key>
+            <span className="mx-1 h-3 w-px self-center bg-[var(--line-2)]" aria-hidden />
+            <Key color="var(--good)">Won</Key>
+            <Key color="var(--hp)">Lost</Key>
+            <Key color="var(--line-2)" solid>Monster</Key>
+            <Key color="transparent" dashed>
+              Shared draft
             </Key>
           </div>
         </div>
@@ -251,7 +251,21 @@ function Dot() {
   return <span className="block h-[3px] w-[3px] rounded-full bg-[var(--line-2)]" />;
 }
 
-function Key({ color, children, faint, solid, dashed }: { color: string; children: React.ReactNode; faint?: boolean; solid?: boolean; dashed?: boolean }) {
+function Key({ color = "transparent", children, faint, solid, dashed, line, spent }: { color?: string; children: React.ReactNode; faint?: boolean; solid?: boolean; dashed?: boolean; line?: string; spent?: boolean }) {
+  if (line)
+    return (
+      <span className="inline-flex items-center gap-1.5">
+        <span className="block w-4" style={{ borderTop: `${dashed ? "1.5px dashed" : "2px solid"} ${line}` }} />
+        {children}
+      </span>
+    );
+  if (spent)
+    return (
+      <span className="inline-flex items-center gap-1.5">
+        <span className="block h-2.5 w-2.5 rounded-[3px] border border-dashed border-[var(--gold)] bg-[color-mix(in_oklab,var(--gold)_12%,transparent)]" />
+        {children}
+      </span>
+    );
   return (
     <span className="inline-flex items-center gap-1.5">
       <span
