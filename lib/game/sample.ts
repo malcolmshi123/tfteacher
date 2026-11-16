@@ -49,6 +49,7 @@ interface Step {
   bench?: BoardSpec;
   itemBench?: string;
   forceShop?: Record<number, string[]>; // shop index -> units placed in it
+  shops?: string[][]; // hand-set shops for a showcase round (rng is still drawn so later rounds don't shift)
   goldDrop?: number;
 }
 
@@ -68,17 +69,28 @@ const SCRIPT: Step[] = [
   { stage: "3-2", kind: "pvp", outcome: "loss", dmg: 8, xp: 4, board: "ornn:2 alistar:2 khazix:1:hoj leblanc:1 hecarim:1:belt diana:1", bench: "khazix:1", itemBench: "rod,glove", forceShop: { 0: ["khazix"] } },
   { stage: "3-3", kind: "pvp", outcome: "loss", dmg: 9, board: "ornn:2 alistar:2 khazix:1:hoj leblanc:1 hecarim:1:belt diana:1", bench: "khazix:1", itemBench: "rod,glove", forceShop: { 0: ["khazix"] } },
   { stage: "3-4", kind: "carousel", outcome: "none", dmg: 0, board: "ornn:2 alistar:2 khazix:1:hoj leblanc:1 hecarim:1:belt diana:1", bench: "khazix:1", itemBench: "rod,glove,rod" },
-  { stage: "3-5", kind: "pvp", outcome: "loss", dmg: 9, board: "ornn:2 alistar:2 khazix:1:hoj leblanc:1 hecarim:1:belt diana:1", bench: "khazix:1", itemBench: "rod,glove,rod" },
-  { stage: "3-6", kind: "pvp", outcome: "loss", dmg: 10, xp: 3, board: "ornn:2 alistar:2 khazix:1:hoj leblanc:1 hecarim:1:belt diana:1", bench: "khazix:1", itemBench: "rod,glove,rod" },
-  { stage: "3-7", kind: "pve", outcome: "win", dmg: 0, board: "ornn:2 alistar:2 khazix:1:hoj leblanc:1 hecarim:1:belt diana:1", bench: "khazix:1", itemBench: "rod,glove,rod,tear,belt", goldDrop: 4 },
-  { stage: "4-1", kind: "pvp", outcome: "loss", dmg: 12, xp: 4, board: "ornn:2 alistar:2 khazix:1:hoj,hoj,rabadon leblanc:1 hecarim:1:warmog diana:1 aphelios:1", bench: "khazix:1" },
-  { stage: "4-2", kind: "pvp", outcome: "win", dmg: 0, rerolls: 4, board: "ornn:2 alistar:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 aphelios:1 ezreal:1", bench: "diana:1", forceShop: { 2: ["diana"] } },
-  { stage: "4-3", kind: "pvp", outcome: "loss", dmg: 11, rerolls: 2, board: "ornn:2 alistar:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 aphelios:1 ezreal:1", bench: "diana:1 hecarim:1" },
-  { stage: "4-4", kind: "carousel", outcome: "none", dmg: 0, board: "ornn:2 alistar:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 aphelios:1 ezreal:1", bench: "diana:1 hecarim:1", itemBench: "cloak" },
-  { stage: "4-5", kind: "pvp", outcome: "loss", dmg: 13, rerolls: 3, board: "ornn:2 alistar:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 aphelios:1 ezreal:1", bench: "diana:1 hecarim:1 khazix:1", itemBench: "cloak" },
-  { stage: "4-6", kind: "pvp", outcome: "win", dmg: 0, rerolls: 2, board: "ornn:2 alistar:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 aphelios:1 ezreal:1", bench: "diana:1 hecarim:1 khazix:1", itemBench: "cloak" },
-  { stage: "4-7", kind: "pve", outcome: "win", dmg: 0, board: "ornn:2 alistar:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 aphelios:1 ezreal:1", bench: "diana:1 hecarim:1 khazix:1", itemBench: "cloak", goldDrop: 3 },
-  { stage: "5-1", kind: "pvp", outcome: "loss", dmg: 15, rerolls: 4, board: "ornn:2 alistar:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog,gargoyle,spirit diana:1 aphelios:1 ezreal:1", bench: "diana:1 hecarim:1 khazix:1" },
+  { stage: "3-5", kind: "pvp", outcome: "loss", dmg: 9, board: "ornn:2 alistar:2 khazix:1:hoj leblanc:2 hecarim:1:belt diana:1", bench: "khazix:1", itemBench: "rod,glove,rod" },
+  { stage: "3-6", kind: "pvp", outcome: "loss", dmg: 10, xp: 3, board: "ornn:2 alistar:2 khazix:1:hoj leblanc:2 hecarim:1:belt diana:1", bench: "khazix:1", itemBench: "rod,glove,rod" },
+  { stage: "3-7", kind: "pve", outcome: "win", dmg: 0, board: "ornn:2 alistar:2 khazix:1:hoj leblanc:2 hecarim:1:belt diana:1", bench: "khazix:1", itemBench: "rod,glove,rod,tear,belt", goldDrop: 4 },
+  // the level 7 rolldown: hand-set shops with level 7 odds (5 one-costs, 8 two-costs, 10 three-costs, 2 four-costs)
+  {
+    stage: "4-1", kind: "pvp", outcome: "loss", dmg: 12, xp: 4, rerolls: 4,
+    board: "ornn:2 leblanc:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 fiddlesticks:1 soraka:1", bench: "diana:1",
+    shops: [
+      ["veigar", "kayle", "hecarim", "rammus", "elise"],
+      ["camille", "khazix", "sejuani", "tristana", "warwick"],
+      ["diana", "teemo", "vi", "alistar", "akali"],
+      ["yorick", "cassiopeia", "fiddlesticks", "caitlyn", "soraka"],
+      ["hecarim", "diana", "ezreal", "kobuko", "shen"],
+    ],
+  },
+  { stage: "4-2", kind: "pvp", outcome: "win", dmg: 0, rerolls: 3, board: "ornn:2 leblanc:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 fiddlesticks:1 soraka:1", bench: "diana:1" },
+  { stage: "4-3", kind: "pvp", outcome: "loss", dmg: 11, rerolls: 2, board: "ornn:2 leblanc:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 fiddlesticks:1 soraka:1", bench: "diana:1 hecarim:1" },
+  { stage: "4-4", kind: "carousel", outcome: "none", dmg: 0, board: "ornn:2 leblanc:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 fiddlesticks:1 soraka:1", bench: "diana:1 hecarim:1", itemBench: "cloak" },
+  { stage: "4-5", kind: "pvp", outcome: "loss", dmg: 13, rerolls: 3, board: "ornn:2 leblanc:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 fiddlesticks:1 soraka:1", bench: "diana:1 hecarim:1 khazix:1", itemBench: "cloak" },
+  { stage: "4-6", kind: "pvp", outcome: "win", dmg: 0, rerolls: 2, board: "ornn:2 leblanc:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 fiddlesticks:1 soraka:1", bench: "diana:1 hecarim:1 khazix:1", itemBench: "cloak" },
+  { stage: "4-7", kind: "pve", outcome: "win", dmg: 0, board: "ornn:2 leblanc:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 fiddlesticks:1 soraka:1", bench: "diana:1 hecarim:1 khazix:1", itemBench: "cloak", goldDrop: 3 },
+  { stage: "5-1", kind: "pvp", outcome: "loss", dmg: 15, rerolls: 4, board: "ornn:2 leblanc:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog,gargoyle,spirit diana:1 fiddlesticks:1 soraka:1", bench: "diana:1 hecarim:1 khazix:1" },
 ];
 
 const OPPONENTS: { id: string; name: string; place: number; strength: number }[] = [
@@ -201,7 +213,7 @@ export function buildSampleGame(): GameRecord {
       const shop = rollShop(level, r);
       const forced = s.forceShop?.[k];
       if (forced) forced.forEach((u, j) => (shop[j] = u));
-      shops.push(shop);
+      shops.push(s.shops?.[k] ? [...s.shops[k]] : shop);
     }
     gold -= rerolls * 2;
 

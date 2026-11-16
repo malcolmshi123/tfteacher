@@ -15,7 +15,7 @@ export function UnitToken({
   piece?: Piece;
   unitId?: string;
   size?: number;
-  state?: "normal" | "missed" | "bought" | "dim";
+  state?: "normal" | "missed" | "bought" | "flex" | "dim";
   showName?: boolean;
 }) {
   const id = piece?.unit ?? unitId!;
@@ -32,7 +32,7 @@ export function UnitToken({
           height: size,
           borderRadius: Math.max(6, size * 0.18),
           marginBottom: piece?.items.length ? Math.round(size * 0.18) : 0,
-          boxShadow: state === "bought" ? `0 0 0 2px var(--panel-2), 0 0 0 4px var(--ink)` : `0 0 0 ${small ? 1.5 : 2}px ${state === "missed" ? "var(--hp)" : color}`,
+          boxShadow: state === "bought" ? `0 0 0 2px var(--panel-2), 0 0 0 4px var(--ink)` : state === "flex" ? `0 0 0 2px var(--panel-2), 0 0 0 4px var(--brand)` : `0 0 0 ${small ? 1.5 : 2}px ${state === "missed" ? "var(--hp)" : color}`,
         }}
         title={`${u.name} · ${u.cost}-cost · ${u.traits.join(", ")}`}
       >

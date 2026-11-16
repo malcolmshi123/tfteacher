@@ -20,6 +20,7 @@ export interface PlayedComp {
   games: number;
   avgPlace: number;
   top4: number; // percent
+  flex?: string[]; // units that fit the board when the core is in place
 }
 
 export interface CompVerdict {
@@ -59,18 +60,19 @@ export function compName(core: string[]): string {
   const carry = UNIT_BY_ID[core[0]]?.name ?? core[0];
   const traits = compTraits(core);
   // players name some trait pairs as one word (Lunar + Elderwood is "Lunarwood")
-  const blend = COMP_LABELS.find((l) => l.traits.every((tr) => traits.includes(tr)));
+  const present = new Set(core.flatMap((id) => UNIT_BY_ID[id]?.traits ?? []));
+  const blend = COMP_LABELS.find((l) => l.traits.every((tr) => present.has(tr)));
   if (blend) return `${blend.label} ${carry}`;
   const top = traits[0];
   return top ? `${top} ${carry}` : carry;
 }
 
-function comp(id: string, core: string[], games: number, avgPlace: number, top4: number): PlayedComp {
-  return { id, name: compName(core), core, traits: compTraits(core), games, avgPlace, top4 };
+function comp(id: string, core: string[], games: number, avgPlace: number, top4: number, flex?: string[]): PlayedComp {
+  return { id, name: compName(core), core, traits: compTraits(core), games, avgPlace, top4, flex };
 }
 
 export const MY_COMPS: PlayedComp[] = [
-  comp("c1", ["khazix", "hecarim", "diana", "aphelios", "ezreal"], 14, 3.9, 57),
+  comp("c1", ["khazix", "hecarim", "diana", "fiddlesticks", "soraka"], 14, 3.9, 57, ["azir", "ezreal", "kennen", "aphelios", "alune", "sentinel", "taric", "alistar", "gnar"]),
   comp("c2", ["ahri", "masteryi", "yunara", "ashe"], 9, 4.4, 44),
   comp("c3", ["amumu", "vi", "sejuani", "rammus"], 6, 4.8, 33),
 ];

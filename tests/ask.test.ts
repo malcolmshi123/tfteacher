@@ -14,9 +14,12 @@ describe("claim check", () => {
     expect(s.ok).toBe(true);
   });
   it("removes a sentence with a made-up number", () => {
-    const [s] = checkAnswer("At 4-3 you went into combat with 37 gold.", facts);
+    const known = new Set(facts.filter((f) => f.stage === "4-3" || f.stage === "game").flatMap((f) => f.numbers));
+    let fake = 37;
+    while (known.has(fake)) fake++;
+    const [s] = checkAnswer(`At 4-3 you went into combat with ${fake} gold.`, facts);
     expect(s.ok).toBe(false);
-    expect(s.unsupported).toContain(37);
+    expect(s.unsupported).toContain(fake);
   });
   it("removes a sentence that names a round that never happened", () => {
     const [s] = checkAnswer("At 6-2 you had 23 gold.", facts);

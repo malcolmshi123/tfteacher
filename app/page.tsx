@@ -3,39 +3,29 @@ import { SiteFooter, SiteNav } from "@/components/SiteChrome";
 import { UnitToken } from "@/components/UnitToken";
 import { Timeline } from "@/components/review/Timeline";
 import { buildSampleGame } from "@/lib/game/sample";
-import { analyze, boardValue } from "@/lib/review/engine";
+import { analyze, boardValue, shopMarks } from "@/lib/review/engine";
 import { UNIT_BY_ID } from "@/lib/game/set";
 import { MY_COMPS } from "@/lib/patch/radar";
 
 export default function Home() {
   const review = analyze(buildSampleGame());
   const top = review.findings[0];
-  const r42 = review.game.rounds.find((r) => r.stage === "4-2")!;
-  // which shop slots the 4-2 buys came from: each bought unit takes the first unused slot showing it
-  const boughtAt = new Set<string>();
-  for (const u of r42.bought) {
-    outer: for (let si = 0; si < r42.shops.length; si++)
-      for (let k = 0; k < r42.shops[si].length; k++)
-        if (r42.shops[si][k] === u && !boughtAt.has(`${si}:${k}`)) {
-          boughtAt.add(`${si}:${k}`);
-          break outer;
-        }
-  }
-  // missed: a unit from the final board that one more copy would have upgraded, left in the shop
-  const owned: Record<string, number> = {};
-  for (const x of [...r42.board, ...r42.bench]) owned[x.unit] = (owned[x.unit] ?? 0) + (x.star === 1 ? 1 : x.star === 2 ? 3 : 9);
-  const finalUnits = new Set(review.game.rounds[review.game.rounds.length - 1].board.map((x) => x.unit));
-  const missedAt = new Set<string>();
-  r42.shops.forEach((shop, si) =>
-    shop.forEach((u, k) => {
-      if (!boughtAt.has(`${si}:${k}`) && finalUnits.has(u) && (owned[u] ?? 0) % 3 === 2) missedAt.add(`${si}:${k}`);
-    }),
-  );
-  const missedNames = [...new Set([...missedAt].map((key) => { const [si, k] = key.split(":").map(Number); return UNIT_BY_ID[r42.shops[si][k]].name; }))];
-  const rollCost = r42.rerolls * 2;
-  const buyCost = r42.bought.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0);
-  const soldFor = r42.sold.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0);
-  const soldNames = [...new Set(r42.sold.map((u) => UNIT_BY_ID[u].name))].join(", ");
+  const i41 = review.game.rounds.findIndex((r) => r.stage === "4-1");
+  const r41 = review.game.rounds[i41];
+  // which slots were bought and which upgrades were left in the shop (same walk the review uses)
+  const marks = shopMarks(review.game.rounds[i41 - 1], r41);
+  // flex units for this comp that showed up, so you can see what else fit the board
+  const flex = new Set(MY_COMPS[0].flex ?? []);
+  const slotState = (si: number, k: number, u: string) => {
+    const key = `${si}:${k}`;
+    return marks.bought.has(key) ? "bought" : marks.missed.has(key) ? "missed" : flex.has(u) ? "flex" : "dim";
+  };
+  const missedNames = [...new Set([...marks.missed].map((key) => { const [si, k] = key.split(":").map(Number); return UNIT_BY_ID[r41.shops[si][k]].name; }))];
+  const xpCost = r41.xpBought * 4;
+  const rollCost = r41.rerolls * 2;
+  const buyCost = r41.bought.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0);
+  const soldFor = r41.sold.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0);
+  const soldNames = [...new Set(r41.sold.map((u) => UNIT_BY_ID[u].name))].join(", ");
   const last = review.game.rounds[review.game.rounds.length - 1];
   const r32 = review.game.rounds.find((r) => r.stage === "3-2")!;
   const r43 = review.game.rounds.find((r) => r.stage === "4-3")!;
@@ -142,14 +132,14 @@ export default function Home() {
                 <p className="mt-5 text-[14px] leading-relaxed text-[var(--ink-2)]">Where you ended up, and nothing about how you got there.</p>
               </div>
               <div className="rounded-2xl border border-[var(--line-2)] bg-[var(--panel-2)] p-6">
-                <div className="text-[13px] font-medium text-[var(--brand)]">What TFTeacher sees at 4-2 alone</div>
+                <div className="text-[13px] font-medium text-[var(--brand)]">What TFTeacher sees at 4-1 alone</div>
                 <div className="mt-5 space-y-2">
-                  {r42.shops.map((shop, si) => (
+                  {r41.shops.map((shop, si) => (
                     <div key={si} className="flex items-center gap-3">
                       <span className="w-12 text-[11px] text-[var(--muted)]">{si === 0 ? "Free" : `Roll ${si}`}</span>
                       <div className="flex gap-2">
                         {shop.map((u, k) => (
-                          <UnitToken key={k} unitId={u} size={28} showName={false} state={boughtAt.has(`${si}:${k}`) ? "bought" : missedAt.has(`${si}:${k}`) ? "missed" : "dim"} />
+                          <UnitToken key={k} unitId={u} size={28} showName={false} state={slotState(si, k, u)} />
                         ))}
                       </div>
                     </div>
@@ -158,23 +148,27 @@ export default function Home() {
                 <dl className="tnum mt-5 grid grid-cols-3 gap-3 text-[13px]">
                   <div>
                     <dt className="text-[var(--muted)]">HP</dt>
-                    <dd className="text-[18px] font-semibold text-[var(--hp)]">{r42.hp}</dd>
+                    <dd className="text-[18px] font-semibold text-[var(--hp)]">{r41.hp}</dd>
                   </div>
                   <div>
                     <dt className="text-[var(--muted)]">Gold</dt>
                     <dd className="text-[18px] font-semibold">
-                      {r42.gold} <span className="text-[13px] font-normal text-[var(--muted)]">→ {r42.goldEnd}</span>
+                      {r41.gold} <span className="text-[13px] font-normal text-[var(--muted)]">→ {r41.goldEnd}</span>
                     </dd>
                   </div>
                   <div>
                     <dt className="text-[var(--muted)]">Rerolls</dt>
-                    <dd className="text-[18px] font-semibold">{r42.rerolls}</dd>
+                    <dd className="text-[18px] font-semibold">{r41.rerolls}</dd>
                   </div>
                 </dl>
-                <p className="tnum mt-4 text-[13px] text-[var(--muted)]">
-                  {r42.gold} gold, minus {rollCost} on {r42.rerolls} rerolls and {buyCost} on the {r42.bought.length} outlined units,
-                  plus {soldFor} for selling {soldNames}: {r42.goldEnd} left.
-                  {missedNames.length > 0 && <> In red: the {missedNames.join(" and ")} that would have made a 2-star, left in the shop.</>}
+                <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1.5 text-[12px] text-[var(--ink-2)]">
+                  <span className="flex items-center gap-1.5"><span className="block h-3 w-3 rounded-[3px] shadow-[0_0_0_1.5px_var(--panel-2),0_0_0_3px_var(--ink)]" />Bought</span>
+                  {missedNames.length > 0 && <span className="flex items-center gap-1.5"><span className="block h-3 w-3 rounded-[3px] bg-[color-mix(in_oklab,var(--hp)_45%,transparent)] shadow-[0_0_0_1.5px_var(--hp)]" />Missed 2-star ({missedNames.join(", ")})</span>}
+                  <span className="flex items-center gap-1.5"><span className="block h-3 w-3 rounded-[3px] shadow-[0_0_0_1.5px_var(--panel-2),0_0_0_3px_var(--brand)]" />Flex option for this board</span>
+                </div>
+                <p className="tnum mt-3 text-[13px] text-[var(--muted)]">
+                  {r41.gold} gold: {xpCost > 0 && <>{xpCost} on XP, </>}{rollCost} on {r41.rerolls} rerolls, {buyCost} on {r41.bought.length} units, plus {soldFor} for selling{" "}
+                  {soldNames}. {r41.goldEnd} left.
                 </p>
                 <p className="mt-4 text-[14px] leading-relaxed text-[var(--ink-2)]">
                   Every shop, every reroll, gold and HP at the start of each round, your bench and the lobby around you.

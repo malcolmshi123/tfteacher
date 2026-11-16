@@ -68,6 +68,27 @@ export function boardValue(board: Piece[]) {
   return board.reduce((a, p) => a + UNIT_BY_ID[p.unit].cost * copiesOf(p.star), 0);
 }
 
+// Walks a round's shops in order. Each purchase takes the first slot showing that
+// unit; a slot left behind while you held 2 (or 5, or 8) copies is a missed upgrade.
+// Slot keys are "shop:slot".
+export function shopMarks(prev: RoundSnapshot, r: RoundSnapshot) {
+  const owned = ownedCopies(prev);
+  const toBuy = [...r.bought];
+  const bought = new Set<string>();
+  const missed = new Set<string>();
+  r.shops.forEach((shop, si) =>
+    shop.forEach((u, k) => {
+      const j = toBuy.indexOf(u);
+      if (j >= 0) {
+        toBuy.splice(j, 1);
+        owned[u] = (owned[u] ?? 0) + 1;
+        bought.add(`${si}:${k}`);
+      } else if ((owned[u] ?? 0) % 3 === 2 && r.gold >= UNIT_BY_ID[u].cost) missed.add(`${si}:${k}`);
+    }),
+  );
+  return { bought, missed };
+}
+
 function ownedCopies(r: RoundSnapshot) {
   const out: Record<string, number> = {};
   for (const p of [...r.board, ...r.bench]) out[p.unit] = (out[p.unit] ?? 0) + copiesOf(p.star);
@@ -199,15 +220,11 @@ export function analyze(game: GameRecord): Review {
   for (let i = 1; i < R.length; i++) {
     const r = R[i];
     if (r.kind === "carousel") continue;
-    const owned = ownedCopies(R[i - 1]);
-    r.shops.forEach((shop, si) => {
-      for (const u of new Set(shop)) {
-        if ((owned[u] ?? 0) % 3 === 2 && !r.bought.includes(u) && r.gold >= UNIT_BY_ID[u].cost) {
-          if (!missed.some((m) => m.stage === r.stage && m.unit === u))
-            missed.push({ stage: r.stage, unit: u, gold: r.gold, shop: si });
-        }
-      }
-    });
+    for (const key of shopMarks(R[i - 1], r).missed) {
+      const [si, k] = key.split(":").map(Number);
+      const u = r.shops[si][k];
+      if (!missed.some((m) => m.stage === r.stage && m.unit === u)) missed.push({ stage: r.stage, unit: u, gold: r.gold, shop: si });
+    }
   }
   if (missed.length) {
     findings.push({
