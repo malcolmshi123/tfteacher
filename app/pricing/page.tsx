@@ -6,12 +6,13 @@ export const metadata = { title: "Pricing · TFTeacher" };
 const FREE = [
   "3 round-by-round reviews a week",
   "Final-board reviews for games you didn't record",
+  "3 questions per review",
   "Patch Radar summary for your top comp",
   "Last 20 games of history",
 ];
 const PRO = [
   "Unlimited round-by-round reviews",
-  "Ask follow-up questions about any round",
+  "Unlimited questions about any round",
   "Patch Radar for every comp you play",
   "Trends across your games: where you lose HP, how you spend gold",
   "Full history",
@@ -31,6 +32,30 @@ export default function Pricing() {
           <Plan name="Free" price="$0" cadence="forever" note="No card needed" items={FREE} cta="Download for Windows" href="/download" />
           <Plan name="Pro" price="$5" cadence="per month" note="or $48 a year, save $12" items={PRO} cta="Start 14 days free" href="/download?plan=pro" featured />
         </div>
+
+        <section className="mt-16 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <div className="overflow-hidden rounded-2xl border border-[var(--line)]">
+            <table className="w-full text-left text-[14px]">
+              <thead className="bg-[var(--panel)] text-[13px] text-[var(--muted)]">
+                <tr>
+                  <th className="px-5 py-3 font-medium">Compare</th>
+                  <th className="w-28 px-3 py-3 text-center font-medium">Free</th>
+                  <th className="w-28 px-3 py-3 text-center font-medium text-[var(--brand)]">Pro</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[var(--line)]">
+                {COMPARE.map(([label, free, pro]) => (
+                  <tr key={label}>
+                    <td className="px-5 py-3 text-[var(--ink-2)]">{label}</td>
+                    <td className="tnum px-3 py-3 text-center">{free}</td>
+                    <td className="tnum px-3 py-3 text-center">{pro}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <TrendsPreview />
+        </section>
 
         <section className="mt-16 grid gap-x-12 gap-y-8 border-t border-[var(--line)] pt-12 md:grid-cols-2">
           <Faq q="Can I get banned for using this?">
@@ -52,6 +77,48 @@ export default function Pricing() {
       </main>
       <SiteFooter />
     </>
+  );
+}
+
+const COMPARE: [string, string, string][] = [
+  ["Round-by-round reviews", "3 a week", "Unlimited"],
+  ["Final-board reviews", "Yes", "Yes"],
+  ["Questions per review", "3", "Unlimited"],
+  ["Patch Radar", "Top comp", "Every comp"],
+  ["Trends across games", "No", "Yes"],
+  ["History", "20 games", "All games"],
+];
+
+const TREND = [
+  { stage: "Stage 2", hp: 8 },
+  { stage: "Stage 3", hp: 31 },
+  { stage: "Stage 4", hp: 27 },
+  { stage: "Stage 5+", hp: 14 },
+];
+
+function TrendsPreview() {
+  const max = Math.max(...TREND.map((t) => t.hp));
+  return (
+    <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
+      <div className="flex items-baseline justify-between gap-3">
+        <h3 className="text-[15px] font-semibold">Pro trends: where your HP goes</h3>
+        <span className="text-[12px] text-[var(--muted)]">Sample account, last 20 games</span>
+      </div>
+      <div className="mt-6 space-y-3">
+        {TREND.map((t) => (
+          <div key={t.stage} className="grid grid-cols-[72px_1fr_44px] items-center gap-3 text-[13px]">
+            <span className="text-[var(--ink-2)]">{t.stage}</span>
+            <span className="h-3 overflow-hidden rounded-full bg-[var(--panel-2)]">
+              <span className="block h-full rounded-full" style={{ width: `${(t.hp / max) * 100}%`, background: t.hp === max ? "var(--hp)" : "color-mix(in oklab, var(--hp) 45%, var(--panel-2))" }} />
+            </span>
+            <span className="tnum text-right text-[var(--ink)]">{t.hp} HP</span>
+          </div>
+        ))}
+      </div>
+      <p className="mt-6 border-t border-[var(--line)] pt-4 text-[14px] leading-relaxed text-[var(--ink-2)]">
+        Stage 3 costs this player the most HP on average. Their reviews point at the same habit: loss streaking past 50 HP.
+      </p>
+    </div>
   );
 }
 
