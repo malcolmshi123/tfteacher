@@ -144,9 +144,8 @@ function NoteRow({ n }: { n: NoteLine }) {
 function Delta({ n }: { n: NoteLine }) {
   const pct = changePct(n.text);
   if (pct === undefined) return null;
-  const c = n.direction === "buff" ? "var(--good)" : n.direction === "nerf" ? "var(--hp)" : "var(--muted)";
   return (
-    <span className="tnum w-16 shrink-0 text-right text-[13px] font-medium" style={{ color: c }}>
+    <span className="tnum w-16 shrink-0 text-right text-[13px] text-[var(--muted)]" title="Raw change in the number. The arrow shows whether it helps.">
       {pct > 0 ? "+" : "−"}
       {Math.abs(pct).toFixed(Math.abs(pct) < 10 ? 1 : 0)}%
     </span>

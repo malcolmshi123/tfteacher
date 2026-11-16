@@ -243,7 +243,7 @@ export function analyze(game: GameRecord): Review {
       id: "idle-items",
       kind: "idle-items",
       severity: total >= 15 ? "medium" : "low",
-      title: `${idleReport.length} item components sat on your bench for ${total} rounds`,
+      title: `${idleReport.length} item components sat unused, one for ${Math.max(...idleReport.map((x) => x.rounds))} rounds`,
       detail: "Components only help once they are on a unit.",
       lines: idleReport.map((x) => `${x.from}: ${ITEMS[x.item]} sat on the bench until ${x.to}, ${x.rounds} rounds`),
       advice: "Components on the bench do nothing. While you are losing, slam a strong item on any unit you will keep, even if it is not perfect.",
@@ -303,7 +303,7 @@ export function analyze(game: GameRecord): Review {
           : f.kind === "missed-upgrade"
             ? `${f.stages.length} upgrades`
             : f.kind === "idle-items"
-              ? f.title.match(/(\d+) rounds/)?.[1] + " idle rounds"
+              ? `${f.lines?.length ?? 0} components`
               : f.kind === "level-tempo"
                 ? `${f.stages.length} fights behind`
                 : undefined;
@@ -335,7 +335,8 @@ export function analyze(game: GameRecord): Review {
     const losses = after.filter((r) => r.outcome === "loss").length;
     const peak = Math.max(...after.map((r) => r.hp));
     const gold = peakHpLoss.title.match(/for (\d+)/)?.[1];
-    summary = `The streak took ${peakHpLoss.hpCost} HP for ${gold} gold. After it you rolled ${rolls} times in ${after.length} rounds, lost ${losses} more fights and never got above ${peak} HP again.`;
+    const allRolls = rolls === totalRolls ? `all ${rolls} of your rerolls came in the last ${after.length} rounds` : `you rolled ${rolls} times in the last ${after.length} rounds`;
+    summary = `The streak took ${peakHpLoss.hpCost} HP for ${gold} gold. After it, ${allRolls}, you lost ${losses} more fights, and you never got above ${peak} HP again.`;
   } else {
     summary = `You rolled ${totalRolls} times and went out with ${last.goldEnd} gold.`;
   }

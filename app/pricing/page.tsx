@@ -29,7 +29,7 @@ export default function Pricing() {
 
         <div className="mt-10 grid gap-4 md:grid-cols-2">
           <Plan name="Free" price="$0" cadence="forever" note="No card needed" items={FREE} cta="Download for Windows" href="/download" />
-          <Plan name="Pro" price="$5" cadence="per month" note="or $48 a year, 2 months free" items={PRO} cta="Start 14 days free" href="/download?plan=pro" featured />
+          <Plan name="Pro" price="$5" cadence="per month" note="or $48 a year, save $12" items={PRO} cta="Start 14 days free" href="/download?plan=pro" featured />
         </div>
 
         <section className="mt-16 grid gap-x-12 gap-y-8 border-t border-[var(--line)] pt-12 md:grid-cols-2">

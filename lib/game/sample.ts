@@ -223,6 +223,25 @@ export function buildSampleGame(): GameRecord {
       gold += sold.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0);
     }
     if (gold < 0) throw new Error(`sample game went negative gold at ${s.stage}: ${gold}`);
+    // every unit bought must have been in a shop that round
+    if (s.kind !== "carousel") {
+      const locked = new Set<string>();
+      Object.entries(s.forceShop ?? {}).forEach(([si, us]) => us.forEach((_, j) => locked.add(`${si}:${j}`)));
+      const seen: Record<string, number> = {};
+      for (const shop of shops) for (const u of shop) seen[u] = (seen[u] ?? 0) + 1;
+      const need: Record<string, number> = {};
+      for (const u of bought) need[u] = (need[u] ?? 0) + 1;
+      for (const [u, n] of Object.entries(need)) {
+        for (let k = seen[u] ?? 0; k < n; k++) {
+          const free: [number, number][] = [];
+          shops.forEach((shop, si) => shop.forEach((x, j) => !locked.has(`${si}:${j}`) && !need[x] && free.push([si, j])));
+          if (!free.length) throw new Error(`no shop slot for ${u} at ${s.stage}`);
+          const [si, j] = free[Math.floor(r() * free.length)];
+          shops[si][j] = u;
+          locked.add(`${si}:${j}`);
+        }
+      }
+    }
     prevCopies = now;
 
     hp -= s.dmg;

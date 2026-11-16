@@ -51,8 +51,8 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
             <span>{game.patch}</span>
             <Dot />
             <span>{game.durationMin} min</span>
-            <Dot />
-            <span>
+            <span className="hidden sm:block"><Dot /></span>
+            <span className="hidden sm:inline">
               {played.toLocaleDateString("en-US", { month: "short", day: "numeric" })},{" "}
               {played.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
             </span>
@@ -111,7 +111,10 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
         <section>
           <div className="mb-3 flex items-baseline justify-between">
             <h2 className="text-[15px] font-medium">What decided this game</h2>
-            <span className="text-[12px] text-[var(--muted)]">{findings.filter((f) => !f.positive).length} findings, most costly first</span>
+            <span className="text-[12px] text-[var(--muted)]">
+              {findings.filter((f) => !f.positive).length} mistakes, most costly first
+              {findings.some((f) => f.positive) ? ` · ${findings.filter((f) => f.positive).length} strength` : ""}
+            </span>
           </div>
           <ol className="space-y-3">
             {findings.map((f, i) => (
@@ -130,10 +133,13 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
       {/* phone: the round opens in a bottom sheet */}
       {sheet && (
         <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label={`Round ${round}`}>
-          <button aria-label="Close" className="absolute inset-0 bg-black/60" onClick={() => setSheet(false)} />
-          <div className="absolute inset-x-0 bottom-0 max-h-[82dvh] overflow-y-auto rounded-t-2xl bg-[var(--bg)] px-2 pb-6 pt-2">
-            <div className="sticky top-0 z-10 flex items-center justify-between bg-[var(--bg)] px-2 pb-2">
-              <span className="mx-auto block h-1 w-10 rounded-full bg-[var(--line-2)]" />
+          <button aria-label="Close" className="absolute inset-0 bg-black/80 backdrop-blur-[2px]" onClick={() => setSheet(false)} />
+          <div className="absolute inset-x-0 bottom-0 max-h-[86dvh] overflow-y-auto rounded-t-2xl border-t border-[var(--line-2)] bg-[var(--bg)] px-2 pb-6 pt-2 shadow-[0_-20px_60px_rgba(0,0,0,0.6)]">
+            <div className="sticky top-0 z-10 flex items-center justify-between bg-[var(--bg)] px-2 pb-2 pt-1">
+              <span className="block h-1 w-10 rounded-full bg-[var(--ink-2)] opacity-50" />
+              <button onClick={() => setSheet(false)} aria-label="Close round" className="grid h-9 w-9 place-items-center rounded-full bg-[var(--panel-2)] text-[var(--ink-2)]">
+                <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
+              </button>
             </div>
             <RoundInspector game={game} stage={round} series={series} findings={findings} onPick={setRound} />
             <button onClick={() => setSheet(false)} className="mt-3 w-full rounded-xl border border-[var(--line-2)] py-3 text-[15px] font-medium">
@@ -167,7 +173,7 @@ function FindingCard({ f, active, lead, onClick, onCite, children }: { f: Findin
               {label}
             </span>
           </div>
-          <p className={`mt-2 ${lead ? "text-[15px]" : "text-[14px]"} leading-relaxed text-[var(--ink-2)] ${quiet ? "line-clamp-1" : ""}`}>{f.detail}</p>
+          <p className={`mt-2 ${lead ? "text-[15px]" : "text-[14px]"} leading-relaxed text-[var(--ink-2)] `}>{f.detail}</p>
           {!quiet && f.lines && (
             <ul className="tnum mt-3 space-y-1.5 text-[14px] leading-relaxed text-[var(--ink-2)]">
               {f.lines.map((l) => {
@@ -224,7 +230,10 @@ function Dot() {
 function Key({ color, children, faint, solid, dashed }: { color: string; children: React.ReactNode; faint?: boolean; solid?: boolean; dashed?: boolean }) {
   return (
     <span className="inline-flex items-center gap-1.5">
-      <span className={`block h-2.5 w-2.5 rounded-[3px] ${dashed ? "border border-dashed border-[var(--ink-2)]" : ""}`} style={{ background: color, opacity: faint ? 0.35 : solid || dashed ? 1 : 0.85 }} />
+      <span
+        className={`block h-2.5 w-2.5 rounded-[3px] ${dashed ? "border border-dashed border-[var(--ink-2)]" : ""} ${faint ? "border border-[color-mix(in_oklab,var(--brand)_55%,transparent)]" : ""}`}
+        style={{ background: faint ? "color-mix(in oklab, var(--brand) 14%, transparent)" : color, opacity: solid || dashed || faint ? 1 : 0.85 }}
+      />
       {children}
     </span>
   );

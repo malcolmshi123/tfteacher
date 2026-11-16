@@ -73,7 +73,9 @@ export function radar(comps = MY_COMPS, notes = NOTES): CompVerdict[] {
       (n) =>
         comp.core.includes(n.target) ||
         comp.traits.includes(n.target) ||
-        (n.section === "Units" && comp.core.some((u) => UNIT_BY_ID[u]?.traits.includes(n.target))),
+        (n.section === "Units" && comp.core.some((u) => UNIT_BY_ID[u]?.traits.includes(n.target))) ||
+        // shop odds for a cost tier touch every comp built around that tier
+        (n.target.startsWith("odds-") && comp.core.some((u) => UNIT_BY_ID[u]?.cost === 4)),
     );
     const score = lines.reduce((a, n) => a + (n.direction === "buff" ? n.weight : n.direction === "nerf" ? -n.weight : 0), 0);
     const buffs = lines.filter((n) => n.direction === "buff");
@@ -84,7 +86,7 @@ export function radar(comps = MY_COMPS, notes = NOTES): CompVerdict[] {
       verdict === "weaker"
         ? `Your main carry ${name(comp.core[0])} lost damage in ${nerfs.length} line${nerfs.length > 1 ? "s" : ""}. This was your best comp; expect it to place lower until you adjust items or the board around it.`
         : verdict === "stronger"
-          ? `${list(buffs.map((b) => name(b.target)).filter((v, i, a) => a.indexOf(v) === i))} all got stronger, and nothing in the comp was nerfed.`
+          ? `${list(buffs.map((b) => name(b.target)).filter((v, i, a) => a.indexOf(v) === i))} all got stronger.${nerfs.length ? ` The only hit is smaller: ${nerfs.map((x) => x.text.charAt(0).toLowerCase() + x.text.slice(1)).join("; ")}.` : " Nothing in the comp was nerfed."}`
           : verdict === "mixed"
             ? `Buffs and nerfs roughly cancel out. Play it the same way and watch the first few games.`
             : "Nothing in this comp changed.";

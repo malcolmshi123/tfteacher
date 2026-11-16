@@ -23,6 +23,16 @@ describe("sample game economy", () => {
   it("never fields more units than the player's level", () => {
     for (const r of game.rounds) expect(r.board.length, r.stage).toBeLessThanOrEqual(r.level + (r.xpBought ? 1 : 0));
   });
+  it("only buys units that were in a shop that round", () => {
+    for (const r of game.rounds) {
+      if (r.kind === "carousel") continue;
+      const seen: Record<string, number> = {};
+      for (const u of r.shops.flat()) seen[u] = (seen[u] ?? 0) + 1;
+      const need: Record<string, number> = {};
+      for (const u of r.bought) need[u] = (need[u] ?? 0) + 1;
+      for (const [u, n] of Object.entries(need)) expect(seen[u] ?? 0, `${r.stage} ${u}`).toBeGreaterThanOrEqual(n);
+    }
+  });
   it("tracks HP from damage taken", () => {
     for (let i = 1; i < game.rounds.length; i++) {
       expect(game.rounds[i].hp).toBe(game.rounds[i - 1].hp - game.rounds[i - 1].damageTaken);

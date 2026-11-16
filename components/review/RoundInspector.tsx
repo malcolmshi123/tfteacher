@@ -86,8 +86,8 @@ export function RoundInspector({
         {(r.bought.length > 0 || r.sold.length > 0 || r.xpBought > 0) && (
           <p className="text-[13px] leading-relaxed text-[var(--ink-2)]">
             {[
-              r.bought.length ? `Bought ${summarize(r.bought)}` : "",
-              r.sold.length ? `sold ${summarize(r.sold)}` : "",
+              r.bought.length ? `Bought ${summarize(r.bought)} (${r.bought.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0)} gold)` : "",
+              r.sold.length ? `sold ${summarize(r.sold)} (+${r.sold.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0)} gold)` : "",
               r.xpBought ? `bought XP ${r.xpBought}× (${r.xpBought * 4} gold)` : "",
               r.rerolls ? `rerolled ${r.rerolls}× (${r.rerolls * 2} gold)` : "",
             ]
