@@ -166,8 +166,9 @@ function Meter({ score }: { score: number }) {
   const color = score > 0 ? "var(--good)" : score < 0 ? "var(--hp)" : "var(--muted)";
   return (
     <div className="mt-3" aria-label={`Net patch effect ${score > 0 ? "+" : ""}${score}`}>
-      <div className="relative h-1.5 rounded-full bg-[var(--panel-2)]">
-        <span className="absolute left-1/2 top-[-3px] block h-3 w-px bg-[var(--line-2)]" />
+      <div className="relative h-2 rounded-full bg-[var(--panel-2)]">
+        <span className="absolute left-1/2 top-[-4px] block h-4 w-0.5 -translate-x-1/2 rounded bg-[var(--ink-2)]" />
+        {clamped === 0 && <span className="absolute left-1/2 top-1/2 block h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[var(--panel)]" style={{ background: "var(--gold)" }} />}
         <span
           className="absolute top-0 block h-full rounded-full"
           style={{ background: color, width: `${pct}%`, left: clamped < 0 ? `${50 - pct}%` : "50%" }}
@@ -185,8 +186,9 @@ function Delta({ n }: { n: NoteLine }) {
   const pct = changePct(n.text);
   if (pct === undefined) return null;
   return (
-    <span className="tnum w-24 shrink-0 text-right text-[13px] font-medium text-[var(--ink)]">
+    <span className="tnum w-24 shrink-0 text-right text-[13px] font-medium" style={{ color: n.direction === "buff" ? "var(--good)" : n.direction === "nerf" ? "var(--hp)" : "var(--ink-2)" }}>
       {Math.abs(pct).toFixed(Math.abs(pct) < 10 ? 1 : 0)}% {pct > 0 ? "higher" : "lower"}
+      {n.direction === "buff" && pct < 0 ? <span className="block text-[11px] font-normal text-[var(--muted)]">lower is better</span> : null}
     </span>
   );
 }

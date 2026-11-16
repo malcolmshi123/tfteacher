@@ -25,7 +25,7 @@ export function UnitToken({
   const star = piece?.star ?? 0;
   const small = size < 36;
   const border =
-    state === "missed" ? "inset 0 0 0 2px var(--hp)" : state === "bought" ? "inset 0 0 0 2px var(--good)" : `inset 0 0 0 1.5px color-mix(in oklab, ${color} 75%, transparent)`;
+    state === "missed" ? "inset 0 0 0 2px var(--hp)" : state === "bought" ? "0 0 0 2px var(--panel), 0 0 0 4px var(--ink)" : `inset 0 0 0 1.5px color-mix(in oklab, ${color} 75%, transparent)`;
   return (
     <div className="flex flex-col items-center gap-1.5" style={{ width: size + (showName ? 10 : 0), opacity: state === "dim" ? 0.55 : 1 }}>
       <div
@@ -42,7 +42,13 @@ export function UnitToken({
         }}
         title={`${u.name} · ${u.cost}-cost · ${u.traits.join(", ")}`}
       >
-        <TraitGlyph trait={u.traits[0]} size={size * 0.5} color={`color-mix(in oklab, ${color} 62%, white)`} />
+        {/* each unit: its own letter as the main mark, main trait as a crest behind it */}
+        <span className="absolute inset-0 grid place-items-center opacity-30">
+          <TraitGlyph trait={u.traits[0]} size={size * 0.78} color={`color-mix(in oklab, ${color} 70%, white)`} />
+        </span>
+        <span className="relative font-semibold leading-none" style={{ fontSize: size * 0.42, color: `color-mix(in oklab, ${color} 35%, white)`, textShadow: "0 1px 2px rgba(0,0,0,0.6)" }}>
+          {u.name[0]}
+        </span>
         {!small && (
           <span className="absolute bottom-[3px] right-[3px] opacity-70">
             <TraitGlyph trait={u.traits[1]} size={Math.max(9, size * 0.22)} color={`color-mix(in oklab, ${color} 45%, var(--ink-2))`} />
@@ -56,13 +62,7 @@ export function UnitToken({
           </span>
         )}
         {state === "missed" && <Badge color="var(--hp)">2★</Badge>}
-        {state === "bought" && (
-          <Badge color="var(--good)">
-            <svg width="8" height="8" viewBox="0 0 10 10" aria-hidden>
-              <path d="M2 5.2 4.2 7.4 8.2 2.8" fill="none" stroke="var(--bg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </Badge>
-        )}
+
         {piece && piece.items.length > 0 && (
           <span className="absolute -bottom-[6px] left-1/2 flex -translate-x-1/2 gap-[2px] rounded-[4px] bg-[var(--bg)] p-[2px]">
             {piece.items.map((it) => (

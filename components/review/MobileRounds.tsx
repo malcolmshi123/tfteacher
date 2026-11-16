@@ -24,7 +24,7 @@ export function MobileRounds({
   const GH = 30;
   const maxGold = Math.max(60, ...series.map((p) => p.gold));
   const n = series.length;
-  const x = (i: number) => L + ((W - L - 4) * i) / (n - 1);
+  const x = (i: number) => L + ((W - L - 14) * i) / (n - 1);
   const after = (p: SeriesPoint) => Math.max(0, p.hp - p.damage);
   const y = (hp: number) => 6 + (H - 12) * (1 - hp / 100);
   const line = series.map((p, i) => `${i ? "L" : "M"}${x(i)},${y(after(p))}`).join(" ");
@@ -50,11 +50,11 @@ export function MobileRounds({
           </span>
           <span className="flex items-center gap-1.5">
             <span className="block h-0 w-3 border-t border-dashed border-[var(--ink-2)]" />
-            Lobby
+            Lobby median
           </span>
         </span>
       </div>
-      <svg viewBox={`0 0 ${W} ${H + 10 + GH}`} className="mt-2 block h-auto w-full" aria-hidden>
+      <svg viewBox={`0 0 ${W} ${H + 10 + GH + 18}`} className="mt-2 block h-auto w-full" aria-hidden>
         {hlIdx.length > 0 && (
           <rect x={x(hlIdx[0]) - 3} y={0} width={x(hlIdx[hlIdx.length - 1]) - x(hlIdx[0]) + 6} height={H} rx={4} fill="var(--brand)" opacity={0.16} />
         )}
@@ -66,6 +66,13 @@ export function MobileRounds({
         ))}
         <path d={lobby} fill="none" stroke="var(--ink-2)" strokeOpacity={0.55} strokeWidth={1.25} strokeDasharray="3 3" />
         <path d={line} fill="none" stroke="var(--hp)" strokeWidth={2.25} strokeLinejoin="round" />
+        {series.map((p, i) =>
+          p.stage.endsWith("-1") && p.stage !== "1-1" ? (
+            <text key={`t${i}`} x={x(i)} y={H + 10 + GH + 14} textAnchor="middle" fontSize="11" fill={p.stage === selected ? "var(--ink)" : "var(--muted)"} className="tnum">
+              {p.stage}
+            </text>
+          ) : null,
+        )}
         {series.map((p, i) => {
           const h = (p.gold / maxGold) * GH;
           return <rect key={i} x={x(i) - 3.5} y={H + 10 + GH - h} width={7} height={h} rx={1.5} fill="var(--gold)" opacity={i === si ? 1 : 0.45} />;
@@ -116,7 +123,7 @@ export function MobileRounds({
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--good)]" />Won</span>
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--hp)]" />Lost</span>
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--line-2)]" />Monster round</span>
-        <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full border border-dashed border-[var(--ink-2)]" />Draft</span>
+        <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full border border-dashed border-[var(--ink-2)]" />Shared draft</span>
         <span>Tap a round to open it</span>
       </p>
     </div>

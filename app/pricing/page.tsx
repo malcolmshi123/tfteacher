@@ -101,8 +101,8 @@ function TrendsPreview() {
   return (
     <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
       <div className="flex items-baseline justify-between gap-3">
-        <h3 className="text-[15px] font-semibold">Pro trends: where your HP goes</h3>
-        <span className="text-[12px] text-[var(--muted)]">Sample account, last 20 games</span>
+        <h3 className="text-[15px] font-semibold">Pro trends: HP lost per game, by stage</h3>
+        <span className="text-[12px] text-[var(--muted)]">Sample account, last 29 games</span>
       </div>
       <div className="mt-6 space-y-3">
         {TREND.map((t) => (
@@ -116,7 +116,7 @@ function TrendsPreview() {
         ))}
       </div>
       <p className="mt-6 border-t border-[var(--line)] pt-4 text-[14px] leading-relaxed text-[var(--ink-2)]">
-        Stage 3 costs this player the most HP on average. Their reviews point at the same habit: loss streaking past 50 HP.
+        Stage 3 costs this player the most HP per game. Their reviews point at the same habit: loss streaking after dropping below 50 HP.
       </p>
     </div>
   );
@@ -127,7 +127,7 @@ function Plan({ name, price, cadence, note, items, cta, href, featured }: { name
     <div className={`flex flex-col rounded-2xl border p-7 ${featured ? "border-[color-mix(in_oklab,var(--brand)_60%,var(--line))] bg-[linear-gradient(180deg,color-mix(in_oklab,var(--brand)_9%,var(--panel-2)),var(--panel-2)_45%)] shadow-[0_30px_80px_-40px_color-mix(in_oklab,var(--brand)_40%,transparent)]" : "border-[var(--line)] bg-[var(--panel)]"}`}>
       <div className="flex items-center justify-between">
         <h2 className="text-[18px] font-semibold">{name}</h2>
-        {featured && <span className="text-[13px] text-[var(--ink-2)]">No card for the trial</span>}
+
       </div>
       <div className="mt-5 flex items-baseline gap-2">
         <span className="tnum text-[44px] font-semibold tracking-tight">{price}</span>
@@ -151,6 +151,7 @@ function Plan({ name, price, cadence, note, items, cta, href, featured }: { name
       >
         {cta}
       </Link>
+      <p className="mt-2 text-center text-[13px] text-[var(--ink-2)]">{featured ? "No card needed for the trial. Cancel any time." : "Web reviews work on any computer."}</p>
     </div>
   );
 }

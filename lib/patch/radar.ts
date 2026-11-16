@@ -53,14 +53,16 @@ export const MY_COMPS: PlayedComp[] = [
   { id: "c3", name: "Ironclad Bastion", core: ["dax", "garrick", "thane", "halvar"], traits: ["Ironclad", "Bastion"], games: 6, avgPlace: 4.8, top4: 33 },
 ];
 
-// "62 to 56" -> -9.7. Uses the last "a to b" pair in the line; tiered values compare the first tier.
+// "62 to 56" -> -9.7. Tiered values ("250/325/450 to 280/360/500") average the
+// change across tiers.
 export function changePct(text: string): number | undefined {
-  const m = [...text.matchAll(/([\d.]+)%?(?:\/[\d.]+%?)*(?:\/([\d.]+))?%?\s+to\s+([\d.]+)%?(?:\/[\d.]+%?)*(?:\/([\d.]+))?/g)].pop();
+  const m = text.match(/([\d.]+%?(?:\/[\d.]+%?)*)\s+to\s+([\d.]+%?(?:\/[\d.]+%?)*)/);
   if (!m) return undefined;
-  const from = Number(m[2] ?? m[1]);
-  const to = Number(m[4] ?? m[3]);
-  if (!from) return undefined;
-  return ((to - from) / from) * 100;
+  const a = m[1].split("/").map((v) => parseFloat(v));
+  const b = m[2].split("/").map((v) => parseFloat(v));
+  if (a.length !== b.length || a.some((v) => !v)) return undefined;
+  const pcts = a.map((v, k) => ((b[k] - v) / v) * 100);
+  return pcts.reduce((x, y) => x + y, 0) / pcts.length;
 }
 
 function list(xs: string[]) {

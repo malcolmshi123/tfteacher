@@ -89,7 +89,9 @@ export function RoundInspector({
       </dl>
       <p className="flex gap-4 border-b border-[var(--line)] px-4 py-2 text-[12px] text-[var(--muted)] sm:px-5">
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-1.5 rounded-full bg-[var(--hp)]" />Behind the lobby</span>
-        <span className="flex items-center gap-1.5"><span className="block h-1.5 w-1.5 rounded-full bg-[var(--good)]" />Ahead of it</span>
+        {(pt.boardValue > pt.lobbyBoardValue || r.level > pt.lobbyLevel) && (
+          <span className="flex items-center gap-1.5"><span className="block h-1.5 w-1.5 rounded-full bg-[var(--good)]" />Ahead of it</span>
+        )}
       </p>
 
       <div className="space-y-5 px-4 py-5 sm:px-5">
@@ -159,7 +161,7 @@ export function RoundInspector({
               ))}
             </div>
             <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-[var(--muted)]">
-              {r.bought.length > 0 && <Legend color="var(--good)">Bought</Legend>}
+              {r.bought.length > 0 && <Legend color="var(--ink)">Bought</Legend>}
               {r.shops.some((shop) => shop.some((u) => (prevOwned[u] ?? 0) % 3 === 2 && !r.bought.includes(u))) && (
                 <Legend color="var(--hp)">Would have made a 2-star</Legend>
               )}

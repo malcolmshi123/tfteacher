@@ -58,7 +58,10 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
               {played.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
             </span>
           </div>
-          <h1 className="mt-3 text-[28px] font-semibold leading-[1.15] tracking-[-0.02em] text-balance md:text-[36px]">{review.headline}</h1>
+          <h1 className="mt-3 text-[28px] font-semibold leading-[1.15] tracking-[-0.02em] text-balance md:text-[36px]">
+            <span className="md:hidden">{review.shortHeadline}</span>
+            <span className="hidden md:inline">{review.headline}</span>
+          </h1>
           <p className="mt-3 max-w-[640px] text-[15px] leading-relaxed text-[var(--ink-2)]">{review.summary}</p>
         </div>
         <div className="hidden shrink-0 items-center gap-3 rounded-2xl border md:flex border-[var(--line)] bg-[var(--panel)] py-3 pl-3 pr-5">
@@ -164,15 +167,23 @@ function FindingCard({ f, active, lead, onClick, onCite, children }: { f: Findin
       onClick={onClick}
     >
       <div className="flex items-start gap-3">
-        <span className="mt-[7px] block h-2 w-2 shrink-0 rounded-full" style={{ background: tone }} />
+        <span className="mt-[7px] hidden h-2 w-2 shrink-0 rounded-full sm:block" style={{ background: tone }} />
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <h3 className={`${lead ? "text-[20px]" : "text-[16px]"} font-semibold leading-snug tracking-tight`}>{f.title}</h3>
+          <div className={`flex items-start justify-between gap-x-3 gap-y-2 ${lead ? "flex-col-reverse sm:flex-row" : ""}`}>
+            <h3 className={`${lead ? "text-[18px] sm:text-[20px]" : "text-[16px]"} font-semibold leading-snug tracking-tight`}>{f.title}</h3>
             <span className="tnum shrink-0 rounded-full px-2 py-0.5 text-[12px] font-medium" style={{ color: tone, background: `color-mix(in oklab, ${tone} 13%, transparent)` }}>
               {label}
             </span>
           </div>
           <p className={`mt-2 ${lead ? "text-[15px]" : "text-[14px]"} leading-relaxed text-[var(--ink-2)] ${quiet ? "hidden lg:block" : ""}`}>{f.detail}</p>
+          {quiet && (
+            <span className="mt-2 inline-flex items-center gap-1 text-[13px] text-[var(--muted)] group-hover:text-[var(--ink-2)]">
+              {f.positive ? "Show rounds" : "Show rounds and fix"}
+              <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden>
+                <path d="M2.5 3.8 5 6.3l2.5-2.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          )}
           {!quiet && f.lines && (
             <ul className="tnum mt-3 space-y-1.5 text-[14px] leading-relaxed text-[var(--ink-2)]">
               {f.lines.map((l) => {

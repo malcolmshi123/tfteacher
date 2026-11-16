@@ -55,6 +55,7 @@ export interface Review {
   findings: Finding[];
   series: SeriesPoint[];
   headline: string;
+  shortHeadline: string;
   summary: string;
   stats: { label: string; value: string; note?: string }[];
 }
@@ -319,7 +320,7 @@ export function analyze(game: GameRecord): Review {
     game.placement <= 4
       ? `Top 4. Here is what kept it from being a win.`
       : streak && streakEndHp !== undefined && last.goldEnd >= 10
-        ? `You placed ${ordinal(game.placement)}: a loss streak left you at ${streakEndHp} HP by ${streak.focus}, and you went out at ${last.stage} holding ${last.goldEnd} gold.`
+        ? `You placed ${ordinal(game.placement)}: a loss streak left you at ${streakEndHp} HP after ${streak.focus}, and you went out at ${last.stage} holding ${last.goldEnd} gold.`
         : top.length
           ? `You placed ${ordinal(game.placement)}. ${top[0].title}.`
           : `You placed ${ordinal(game.placement)}. Here is what made the difference.`;
@@ -346,6 +347,10 @@ export function analyze(game: GameRecord): Review {
     findings,
     series,
     headline,
+    shortHeadline:
+      streak && streakEndHp !== undefined && last.goldEnd >= 10
+        ? `${ordinal(game.placement)}: down to ${streakEndHp} HP after a loss streak, out holding ${last.goldEnd} gold.`
+        : headline,
     summary,
     stats: [
       { label: "Fights lost", value: `${R.filter((r) => r.kind === "pvp" && r.outcome === "loss").length} of ${R.filter((r) => r.kind === "pvp").length}`, note: "player fights" },

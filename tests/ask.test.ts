@@ -43,7 +43,7 @@ describe("the review's own text passes the claim check", () => {
     });
   }
   it("headline and summary", () => {
-    const bad = checkAnswer(`${review.headline} ${review.summary}`, facts).filter((s) => !s.ok);
+    const bad = checkAnswer(`${review.headline} ${review.shortHeadline} ${review.summary}`, facts).filter((s) => !s.ok);
     expect(bad.map((b) => `${b.text} [${b.unsupported.join(",")}]`)).toEqual([]);
   });
 });
