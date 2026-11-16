@@ -8,8 +8,9 @@ const review = analyze(buildSampleGame());
 const facts = buildFacts(review);
 
 describe("claim check", () => {
+  const r43 = review.game.rounds.find((r) => r.stage === "4-3")!;
   it("keeps sentences whose numbers match the round they name", () => {
-    const [s] = checkAnswer("At 4-3 you went into combat with 23 gold at 29 HP.", facts);
+    const [s] = checkAnswer(`At 4-3 you went into combat with ${r43.goldEnd} gold at ${r43.hp} HP.`, facts);
     expect(s.ok).toBe(true);
   });
   it("removes a sentence with a made-up number", () => {
@@ -22,8 +23,10 @@ describe("claim check", () => {
     expect(s.ok).toBe(false);
   });
   it("does not let a number from another round support a claim", () => {
-    // 50 gold is true at 5-1, not at 3-3
-    const [s] = checkAnswer("At 3-3 you held 50 gold.", facts);
+    // pick a number that is true at 5-1 but appears nowhere in 3-3's facts
+    const in33 = new Set(facts.filter((f) => f.stage === "3-3" || f.stage === "game").flatMap((f) => f.numbers));
+    const n = facts.filter((f) => f.stage === "5-1").flatMap((f) => f.numbers).find((x) => !in33.has(x))!;
+    const [s] = checkAnswer(`At 3-3 you held ${n} gold.`, facts);
     expect(s.ok).toBe(false);
   });
 });

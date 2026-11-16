@@ -45,7 +45,8 @@ export interface SeriesPoint {
   boardValue: number;
   lobbyBoardValue: number;
   lobbyLevel: number;
-  lobbyHp: number;
+  lobbyHp: number; // after this round's fights
+  lobbyHpEntering: number; // before them (the previous round's roster)
   outcome: RoundSnapshot["outcome"];
   kind: RoundSnapshot["kind"];
   damage: number;
@@ -85,8 +86,9 @@ function streakGold(n: number) {
 }
 
 export function buildSeries(game: GameRecord): SeriesPoint[] {
-  return game.rounds.map((r) => {
+  return game.rounds.map((r, i) => {
     const alive = r.roster.filter((o) => o.hp > 0);
+    const before = (game.rounds[i - 1] ?? r).roster.filter((o) => o.hp > 0);
     return {
       stage: r.stage,
       hp: r.hp,
@@ -97,6 +99,7 @@ export function buildSeries(game: GameRecord): SeriesPoint[] {
       lobbyBoardValue: Math.round(median(alive.map((o) => o.boardValue))),
       lobbyLevel: median(alive.map((o) => o.level)),
       lobbyHp: Math.round(median(alive.map((o) => o.hp))),
+      lobbyHpEntering: Math.round(median(before.map((o) => o.hp))),
       outcome: r.outcome,
       kind: r.kind,
       damage: r.damageTaken,
@@ -288,7 +291,7 @@ export function analyze(game: GameRecord): Review {
       positive: true,
       severity: "low",
       title: `Won your first ${opening} player fights`,
-      detail: `Your board at ${wins[0].stage} was worth ${boardValue(wins[0].board)} against a lobby median of ${series.find((p) => p.stage === wins[0].stage)?.lobbyBoardValue}. The opener was not where this game was lost.`,
+      detail: `You won ${wins.map((w) => w.stage).join(" and ")} and kept all ${wins[0].hp} HP until the streak began. The opener was not where this game was lost.`,
       advice: "Keep opening this way. Spend the review time on stage 3 and 4.",
       stages: wins.map((r) => r.stage),
       focus: wins[0].stage,
@@ -329,7 +332,7 @@ export function analyze(game: GameRecord): Review {
 
   const totalRolls = R.reduce((a, r) => a + r.rerolls, 0);
   const r41 = R.find((r) => r.stage === "4-1");
-  const lobbyHp41 = r41 ? Math.round(median(r41.roster.filter((o) => o.hp > 0).map((o) => o.hp))) : undefined;
+  const lobbyHp41 = r41 ? series[R.indexOf(r41)].lobbyHpEntering : undefined;
   let summary = "";
   if (peakHpLoss) {
     const k = R.findIndex((r) => r.stage === peakHpLoss.focus);

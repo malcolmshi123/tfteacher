@@ -5,7 +5,7 @@ import type { SeriesPoint } from "@/lib/review/engine";
 // Layout in viewBox units. The compact (landing) version is drawn narrower, so the
 // same font sizes render larger, and it gets more room between the lanes.
 function layout(compact: boolean) {
-  const FS = compact ? 12 : 10.5; // label size
+  const FS = compact ? 12 : 11.5; // label size
   const PAD_L = compact ? 30 : 34;
   const PAD_R = 12;
   const HP_TOP = compact ? 34 : 18; // compact: legend row sits above the plot
@@ -152,7 +152,7 @@ export function Timeline({
             x={cx(i)}
             y={AXIS_Y}
             textAnchor="middle"
-            fontSize={compact ? FS : 10}
+            fontSize={compact ? FS : 11}
             className="tnum"
             fill={selected === p.stage ? "var(--ink)" : isStart ? "var(--ink-2)" : "var(--muted)"}
             fontWeight={selected === p.stage ? 600 : 400}

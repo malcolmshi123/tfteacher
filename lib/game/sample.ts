@@ -246,8 +246,9 @@ export function buildSampleGame(): GameRecord {
     prevCopies = now;
 
     hp -= s.dmg;
-    if (s.outcome === "win") streak = streak > 0 ? streak + 1 : 1;
-    if (s.outcome === "loss") streak = streak < 0 ? streak - 1 : -1;
+    // only player fights count toward a streak; monster rounds don't break it
+    if (s.kind === "pvp" && s.outcome === "win") streak = streak > 0 ? streak + 1 : 1;
+    if (s.kind === "pvp" && s.outcome === "loss") streak = streak < 0 ? streak - 1 : -1;
 
     // HP never goes up: each opponent's HP is capped at its previous value
     const roster = OPPONENTS.map((o, j) => {

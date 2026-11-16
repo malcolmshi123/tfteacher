@@ -25,7 +25,7 @@ export function UnitToken({
   const star = piece?.star ?? 0;
   const small = size < 36;
   const border =
-    state === "missed" ? "inset 0 0 0 2px var(--hp)" : state === "bought" ? "0 0 0 2px var(--panel), 0 0 0 4px var(--ink)" : `inset 0 0 0 1.5px color-mix(in oklab, ${color} 75%, transparent)`;
+    state === "missed" ? "inset 0 0 0 2px var(--hp)" : state === "bought" ? "inset 0 0 0 2.5px var(--ink)" : `inset 0 0 0 1.5px color-mix(in oklab, ${color} 75%, transparent)`;
   return (
     <div className="flex flex-col items-center gap-1.5" style={{ width: size + (showName ? 10 : 0), opacity: state === "dim" ? 0.55 : 1 }}>
       <div

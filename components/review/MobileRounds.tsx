@@ -21,7 +21,7 @@ export function MobileRounds({
   const W = 340;
   const H = 140;
   const L = 26; // room for HP labels
-  const GH = 36;
+  const GH = 48;
   const maxGold = Math.max(60, ...series.map((p) => p.gold));
   const n = series.length;
   const x = (i: number) => L + ((W - L - 14) * i) / (n - 1);
@@ -36,7 +36,8 @@ export function MobileRounds({
     // scroll only the strip sideways; never move the page
     const box = strip.current;
     const el = box?.querySelector<HTMLElement>(`[data-stage="${selected}"]`);
-    if (box && el) box.scrollTo({ left: el.offsetLeft - box.clientWidth / 2 + el.clientWidth / 2, behavior: "smooth" });
+    // put the selected round third from the left, on a chip boundary
+    if (box && el) box.scrollTo({ left: Math.max(0, el.offsetLeft - box.offsetLeft - 2 * (el.clientWidth + 6) - 12), behavior: "smooth" });
   }, [selected]);
 
   return (
@@ -75,7 +76,7 @@ export function MobileRounds({
         )}
         {series.map((p, i) => {
           const h = (p.gold / maxGold) * GH;
-          return <rect key={i} x={x(i) - 3.5} y={H + 10 + GH - h} width={7} height={h} rx={1.5} fill="var(--gold)" opacity={i === si ? 1 : 0.45} />;
+          return <rect key={i} x={x(i) - 4} y={H + 10 + GH - h} width={8} height={h} rx={1.5} fill="var(--gold)" opacity={i === si ? 1 : 0.5} />;
         })}
         {si >= 0 && (
           <>
@@ -90,7 +91,7 @@ export function MobileRounds({
         {si >= 0 && <span className="tnum text-[var(--gold)]">{series[si].gold} gold at {selected}</span>}
       </div>
       <div className="relative">
-      <div ref={strip} className="-mx-3 mt-3 flex snap-x gap-1.5 overflow-x-auto px-3 pb-1 [scrollbar-width:none]" role="list" aria-label="Rounds">
+      <div ref={strip} className="-mx-3 mt-3 flex snap-x snap-mandatory scroll-pl-3 gap-1.5 overflow-x-auto px-3 pb-1 [scrollbar-width:none]" role="list" aria-label="Rounds">
         {series.map((p) => {
           const sel = p.stage === selected;
           const bar =
@@ -101,17 +102,17 @@ export function MobileRounds({
               data-stage={p.stage}
               role="listitem"
               onClick={() => onSelect(p.stage)}
-              className={`flex h-[60px] w-12 shrink-0 snap-center flex-col items-center justify-between rounded-xl border py-2 ${
+              className={`flex h-[60px] w-12 shrink-0 snap-start flex-col items-center justify-between rounded-xl border py-2 ${
                 sel ? "border-[var(--ink)] bg-[var(--panel-2)]" : hl.has(p.stage) ? "border-[color-mix(in_oklab,var(--brand)_40%,var(--line))] bg-[color-mix(in_oklab,var(--brand)_7%,var(--panel))]" : "border-[var(--line)] bg-[var(--panel)]"
               }`}
               aria-label={`Round ${p.stage}, ${after(p)} HP after`}
             >
-              <span className={`tnum text-[12px] ${sel ? "font-semibold text-[var(--ink)]" : "text-[var(--ink-2)]"}`}>{p.stage}</span>
+              <span className={`tnum text-[13px] ${sel ? "font-semibold text-[var(--ink)]" : "text-[var(--ink-2)]"}`}>{p.stage}</span>
               <span
                 className="block h-1.5 w-6 rounded-full"
                 style={{ background: bar, border: p.kind === "carousel" ? "1px dashed var(--ink-2)" : undefined }}
               />
-              <span className="tnum text-[12px] text-[var(--muted)]">{after(p)}</span>
+              <span className="tnum text-[13px] text-[var(--ink-2)]">{after(p)}</span>
             </button>
           );
         })}
@@ -124,7 +125,7 @@ export function MobileRounds({
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--hp)]" />Lost</span>
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--line-2)]" />Monster round</span>
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full border border-dashed border-[var(--ink-2)]" />Shared draft</span>
-        <span className="w-full text-[var(--ink-2)]">Swipe the rounds, tap one to open it</span>
+        <span className="w-full text-[var(--ink-2)]">Chips show HP after combat. Swipe, then tap a round to open it.</span>
       </p>
     </div>
   );

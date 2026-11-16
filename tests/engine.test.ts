@@ -94,6 +94,17 @@ describe("ordering", () => {
   });
 });
 
+describe("streak gold", () => {
+  it("is paid on the round after each fight of a loss streak", () => {
+    const pvp = game.rounds.filter((r) => r.kind === "pvp");
+    const i41 = game.rounds.findIndex((r) => r.stage === "4-2");
+    const prev = game.rounds[i41 - 1];
+    const base = 5 + Math.min(5, Math.floor(prev.goldEnd / 10));
+    expect(game.rounds[i41].gold - prev.goldEnd).toBeGreaterThan(base); // streak gold on top
+    expect(pvp.length).toBeGreaterThan(0);
+  });
+});
+
 describe("lobby", () => {
   it("opponent HP never goes up", () => {
     for (let i = 1; i < game.rounds.length; i++)

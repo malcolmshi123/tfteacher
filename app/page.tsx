@@ -10,6 +10,9 @@ export default function Home() {
   const top = review.findings[0];
   const r42 = review.game.rounds.find((r) => r.stage === "4-2")!;
   const last = review.game.rounds[review.game.rounds.length - 1];
+  const r32 = review.game.rounds.find((r) => r.stage === "3-2")!;
+  const r43 = review.game.rounds.find((r) => r.stage === "4-3")!;
+  const r45 = review.game.rounds.find((r) => r.stage === "4-5")!;
 
   return (
     <>
@@ -156,9 +159,9 @@ export default function Home() {
                 <div className="flex items-center justify-between rounded-xl border border-[var(--line)] bg-[var(--panel)] px-4 py-3 text-[13px]">
                   <span className="flex items-center gap-2 text-[var(--ink-2)]">
                     <span className="block h-2 w-2 rounded-full bg-[var(--hp)]" />
-                    Recording round 3-2
+                    Recording round {r32.stage}
                   </span>
-                  <span className="tnum text-[var(--muted)]">77 HP entering · 39 gold</span>
+                  <span className="tnum text-[var(--muted)]">{r32.hp} HP entering · {r32.gold} gold</span>
                 </div>
               }
             >
@@ -205,8 +208,9 @@ export default function Home() {
             </div>
             <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
               <p className="text-[15px] leading-relaxed text-[var(--ink)]">
-                &ldquo;You entered <Cite stage="4-3">at 29 HP</Cite>, fought holding <Cite stage="4-3">23 gold</Cite> and lost <Cite stage="4-3">11 HP</Cite>. Two
-                rounds later you entered <Cite stage="4-5">at 18 HP</Cite> and still fought holding <Cite stage="4-5">32 gold</Cite>.&rdquo;
+                &ldquo;You entered <Cite stage="4-3">at {r43.hp} HP</Cite>, fought holding <Cite stage="4-3">{r43.goldEnd} gold</Cite> and lost{" "}
+                <Cite stage="4-3">{r43.damageTaken} HP</Cite>. Two rounds later you entered <Cite stage="4-5">at {r45.hp} HP</Cite> and still fought
+                holding <Cite stage="4-5">{r45.goldEnd} gold</Cite>.&rdquo;
               </p>
               <div className="mt-5 flex items-center gap-2 text-[12px] text-[var(--muted)]">
                 <span className="block h-1.5 w-1.5 rounded-full bg-[var(--good)]" />5 numbers, all match the recording
