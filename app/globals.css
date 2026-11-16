@@ -1,26 +1,60 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #0c0e11;
+  --panel: #13161b;
+  --panel-2: #191d23;
+  --line: #242932;
+  --line-2: #2f3540;
+  --ink: #eceef1;
+  --ink-2: #b4bbc6;
+  --muted: #7f8896;
+  --brand: #f4b740;
+  --hp: #f26b5b;
+  --gold: #f4b740;
+  --lvl: #5aa9f2;
+  --good: #49c98c;
+  --c1: #9aa3af;
+  --c2: #4fbf7a;
+  --c3: #4c9bf0;
+  --c4: #c06af0;
+  --c5: #f2c14e;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel-2);
+  --color-line: var(--line);
+  --color-line-2: var(--line-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-hp: var(--hp);
+  --color-gold: var(--gold);
+  --color-lvl: var(--lvl);
+  --color-good: var(--good);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--bg);
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-feature-settings: "ss01", "cv11";
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--brand) 35%, transparent);
 }

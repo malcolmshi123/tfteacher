@@ -26,6 +26,7 @@ export interface Finding {
   positive?: boolean;
   title: string;
   detail: string;
+  lines?: string[];
   advice: string;
   stages: string[]; // rounds this finding is about, for the timeline
   focus: string; // the one round to open first
@@ -42,6 +43,7 @@ export interface SeriesPoint {
   boardValue: number;
   lobbyBoardValue: number;
   lobbyLevel: number;
+  lobbyHp: number;
   outcome: RoundSnapshot["outcome"];
   kind: RoundSnapshot["kind"];
   damage: number;
@@ -90,6 +92,7 @@ export function buildSeries(game: GameRecord): SeriesPoint[] {
       boardValue: boardValue(r.board),
       lobbyBoardValue: Math.round(median(alive.map((o) => o.boardValue))),
       lobbyLevel: median(alive.map((o) => o.level)),
+      lobbyHp: Math.round(median(alive.map((o) => o.hp))),
       outcome: r.outcome,
       kind: r.kind,
       damage: r.damageTaken,
@@ -154,7 +157,7 @@ export function analyze(game: GameRecord): Review {
         detail: `From ${first} to ${lastS} you lost every player fight and fell to ${endHp} HP. The streak paid ${earned} extra gold in total, about ${Math.round(hpLost / Math.max(1, earned))} HP per gold. That left no room to lose a fight while you built your final board.`,
         advice: "A loss streak is worth it while HP stays above about 50. Below that, spend the streak gold on board strength and take the win.",
         stages: span.map((r) => r.stage),
-        focus: span[Math.min(2, span.length - 1)].stage,
+        focus: span[span.length - 1].stage,
         cites: [
           { stage: first, label: `${span[0].hp} HP` },
           { stage: lastS, label: `${endHp} HP after combat` },
@@ -174,9 +177,8 @@ export function analyze(game: GameRecord): Review {
       kind: "held-gold-low-hp",
       severity: held.length >= 2 ? "high" : "medium",
       title: `Lost ${held.length} more fight${held.length > 1 ? "s" : ""} under 40 HP with 20+ gold unspent`,
-      detail: held
-        .map((r) => `${r.stage}: ${r.hp} HP, ${r.goldEnd} gold into combat, lost ${r.damageTaken}`)
-        .join(". ") + ".",
+      detail: "Each of these fights started with gold you could have turned into board strength.",
+      lines: held.map((r) => `${r.stage}: ${r.hp} HP, went into combat with ${r.goldEnd} gold, lost ${r.damageTaken} HP`),
       advice: "Under 40 HP, interest is worth less than HP. Roll to stabilize, then rebuild economy only after you win.",
       stages: held.map((r) => r.stage),
       focus: held[0].stage,
@@ -206,13 +208,12 @@ export function analyze(game: GameRecord): Review {
       kind: "missed-upgrade",
       severity: missed.length >= 2 ? "medium" : "low",
       title: `Passed on ${missed.length} upgrade${missed.length > 1 ? "s" : ""} the shop offered`,
-      detail: missed
-        .map((m) => `${m.stage}: ${UNIT_BY_ID[m.unit].name} was in ${m.shop === 0 ? "your free shop" : `reroll ${m.shop}`} and would have made a 2-star. You had ${m.gold} gold`)
-        .join(". ") + ".",
+      detail: "You owned two copies each time, so one purchase would have made a 2-star.",
+      lines: missed.map((m) => `${m.stage}: ${UNIT_BY_ID[m.unit].name} in ${m.shop === 0 ? "your free shop" : `roll ${m.shop}`}, with ${m.gold} gold available`),
       advice: "A 2-star upgrade on a board unit is usually worth more than the interest it costs. Buy it, even if you sell something to fit it.",
       stages: missed.map((m) => m.stage),
       focus: missed[0].stage,
-      cites: missed.map((m) => ({ stage: m.stage, label: `${UNIT_BY_ID[m.unit].name} in shop ${m.shop + 1}` })),
+      cites: missed.map((m) => ({ stage: m.stage, label: `${UNIT_BY_ID[m.unit].name}, ${m.shop === 0 ? "free shop" : `roll ${m.shop}`}` })),
     });
   }
 
@@ -242,9 +243,8 @@ export function analyze(game: GameRecord): Review {
       kind: "idle-items",
       severity: total >= 15 ? "medium" : "low",
       title: `${idleReport.length} item components sat on your bench for ${total} rounds`,
-      detail: idleReport
-        .map((x) => `${ITEMS[x.item]} from ${x.from} to ${x.to} (${x.rounds} rounds)`)
-        .join(". ") + ".",
+      detail: "Components only help once they are on a unit.",
+      lines: idleReport.map((x) => `${ITEMS[x.item]}: on the bench from ${x.from} to ${x.to}, ${x.rounds} rounds`),
       advice: "Components on the bench do nothing. While you are losing, slam a strong item on any unit you will keep, even if it is not perfect.",
       stages: idleReport.map((x) => x.from),
       focus: idleReport[0].from,
@@ -315,7 +315,7 @@ export function analyze(game: GameRecord): Review {
     headline,
     summary,
     stats: [
-      { label: "Placement", value: ordinal(game.placement) },
+      { label: "Fights lost", value: `${R.filter((r) => r.kind === "pvp" && r.outcome === "loss").length} of ${R.filter((r) => r.kind === "pvp").length}`, note: "player fights" },
       { label: "HP at 4-1", value: String(R.find((r) => r.stage === "4-1")?.hp ?? "n/a"), note: lobbyHp41 !== undefined ? `lobby median ${lobbyHp41}` : undefined },
       { label: "Rerolls", value: String(totalRolls), note: "whole game" },
       { label: "Gold at death", value: String(last.goldEnd) },
