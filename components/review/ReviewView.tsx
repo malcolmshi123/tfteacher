@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { Finding, Review } from "@/lib/review/engine";
+import { AskPanel } from "./AskPanel";
 import { RoundInspector } from "./RoundInspector";
 import { Timeline } from "./Timeline";
 
@@ -116,6 +117,9 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
               <FindingCard key={f.id} f={f} lead={i === 0} active={f.id === active} onClick={() => pick(f)} onCite={(s) => { setActive(f.id); openRound(s); }} />
             ))}
           </ol>
+          <div className="mt-6">
+            <AskPanel gameId={game.id} onCite={openRound} />
+          </div>
         </section>
         <aside className="hidden lg:sticky lg:top-20 lg:block lg:self-start">
           <RoundInspector game={game} stage={round} series={series} findings={findings} onPick={setRound} />

@@ -31,7 +31,7 @@ export async function answer(review: Review, question: string): Promise<AskResul
   const sources = hits.map((f) => ({ stage: f.stage, text: f.text }));
 
   const key = process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN;
-  if (!key) return offline(question, hits, facts, sources);
+  if (!key) return offline(question, hits, facts, sources, review);
 
   const client = new Anthropic();
   const response = await client.beta.messages.create({
@@ -53,7 +53,7 @@ export async function answer(review: Review, question: string): Promise<AskResul
     ],
   });
 
-  if (response.stop_reason === "refusal") return offline(question, hits, facts, sources);
+  if (response.stop_reason === "refusal") return offline(question, hits, facts, sources, review);
 
   const text = response.content
     .filter((b): b is Anthropic.Beta.BetaTextBlock => b.type === "text")
@@ -74,19 +74,23 @@ export async function answer(review: Review, question: string): Promise<AskResul
   };
 }
 
-// No model available: answer from the best matching finding and round facts.
-function offline(question: string, hits: Fact[], facts: Fact[], sources: AskResult["sources"]): AskResult {
-  const finding = hits.find((f) => f.id.startsWith("f-"));
-  const round = hits.find((f) => f.id.startsWith("r-"));
+// No model available: answer from the best matching finding and round, in plain words.
+function offline(question: string, hits: Fact[], facts: Fact[], sources: AskResult["sources"], review: Review): AskResult {
   const parts: string[] = [];
-  if (finding) {
-    const [title, ...rest] = finding.text.split(". ");
-    parts.push(`${title}.`);
-    const advice = finding.text.split("Advice: ")[1];
-    if (advice) parts.push(advice);
-    void rest;
+  const stageAsked = question.match(/\d-\d/)?.[0];
+  const findingFact = hits.find((f) => f.id.startsWith("f-"));
+  const finding = review.findings.find((f) => `f-${f.id}` === findingFact?.id);
+  const r = review.game.rounds.find((x) => x.stage === (stageAsked ?? hits.find((f) => f.id.startsWith("r-"))?.stage));
+  if (r) {
+    const after = Math.max(0, r.hp - r.damageTaken);
+    const did = [r.rerolls ? `rerolled ${r.rerolls} times` : "didn't reroll", r.xpBought ? `bought XP ${r.xpBought} times` : ""].filter(Boolean).join(" and ");
+    parts.push(`At ${r.stage} you started at ${r.hp} HP with ${r.gold} gold, ${did}, and went into combat with ${r.goldEnd} gold.`);
+    if (r.kind === "pvp") parts.push(r.outcome === "loss" ? `You lost and dropped to ${after} HP at ${r.stage}.` : `You won at ${r.stage}.`);
   }
-  if (round) parts.push(`At ${round.text}`);
+  if (finding) {
+    parts.push(`${finding.title}.`);
+    parts.push(finding.advice);
+  }
   if (!parts.length) parts.push("I couldn't find anything in this game's recording that answers that. Try naming a round, like 4-2.");
   const checked = checkAnswer(parts.join(" "), facts);
   return { question, sentences: checked.filter((s) => s.ok), removed: checked.filter((s) => !s.ok).length, sources, mode: "offline" };
