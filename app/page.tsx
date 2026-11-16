@@ -41,9 +41,9 @@ export default function Home() {
             <div className="rounded-[20px] border border-[var(--line)] bg-[var(--panel)] p-4 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.7)] md:p-5">
               <div className="flex items-center justify-between px-1">
                 <div className="flex items-center gap-2.5">
-                  <span className="tnum grid h-8 w-8 place-items-center rounded-lg bg-[color-mix(in_oklab,var(--hp)_16%,var(--panel-2))] text-[14px] font-semibold text-[var(--hp)]">6</span>
+                  <span className="tnum grid h-8 min-w-8 place-items-center rounded-lg bg-[color-mix(in_oklab,var(--hp)_16%,var(--panel-2))] px-1.5 text-[13px] font-semibold text-[var(--hp)]">6th</span>
                   <div>
-                    <div className="text-[13px] font-medium">Ranked · {review.game.patch}</div>
+                    <div className="text-[13px] font-medium">Sample game · Ranked · {review.game.patch}</div>
                     <div className="text-[12px] text-[var(--muted)]">Recorded round by round</div>
                   </div>
                 </div>
@@ -205,11 +205,11 @@ export default function Home() {
             </div>
             <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
               <p className="text-[15px] leading-relaxed text-[var(--ink)]">
-                &ldquo;At <Cite stage="4-3">29 HP</Cite> you went into combat holding <Cite stage="4-3">23 gold</Cite> and lost 11. Two
-                rounds later you still had <Cite stage="4-5">32 gold</Cite> at <Cite stage="4-5">18 HP</Cite>.&rdquo;
+                &ldquo;You entered <Cite stage="4-3">at 29 HP</Cite>, fought holding <Cite stage="4-3">23 gold</Cite> and lost <Cite stage="4-3">11 HP</Cite>. Two
+                rounds later you entered <Cite stage="4-5">at 18 HP</Cite> and still fought holding <Cite stage="4-5">32 gold</Cite>.&rdquo;
               </p>
               <div className="mt-5 flex items-center gap-2 text-[12px] text-[var(--muted)]">
-                <span className="block h-1.5 w-1.5 rounded-full bg-[var(--good)]" />4 numbers, all match the recording
+                <span className="block h-1.5 w-1.5 rounded-full bg-[var(--good)]" />5 numbers, all match the recording
               </div>
             </div>
           </div>

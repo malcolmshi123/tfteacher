@@ -14,6 +14,9 @@ const TONE = {
 export default function PatchPage() {
   const verdicts = radar();
   const used = new Set(verdicts.flatMap((v) => v.lines.map((l) => l.id)));
+  // lines that touch every comp are shown once, above the comps
+  const shared = NOTES.filter((n) => verdicts.every((v) => v.lines.some((l) => l.id === n.id)));
+  const sharedIds = new Set(shared.map((n) => n.id));
   const rest = NOTES.filter((n) => !used.has(n.id));
   const games = verdicts.reduce((a, v) => a + v.comp.games, 0);
 
@@ -33,7 +36,8 @@ export default function PatchPage() {
               Your best comp got weaker this patch. One you play less got better.
             </h1>
             <p className="mt-3 text-[15px] leading-relaxed text-[var(--ink-2)]">
-              We matched all {NOTES.length} lines of the patch notes against the {games} games you played last patch. Only
+              We matched all {NOTES.length} lines of the patch notes against the {games} games you played last patch. This is the
+              Pro view; Free shows your most played comp. Only
               the lines that touch your comps are below, each shown with the size of the change.
             </p>
           </div>
@@ -63,9 +67,20 @@ export default function PatchPage() {
           </div>
         </div>
 
-        <div className="mt-10 space-y-4">
+        {shared.length > 0 && (
+          <section className="mt-10 rounded-2xl border border-[var(--line)] bg-[var(--panel)] px-5 py-4">
+            <div className="text-[13px] text-[var(--muted)]">Touches all your comps</div>
+            <ul className="mt-2 space-y-2">
+              {shared.map((n) => (
+                <NoteRow key={n.id} n={n} />
+              ))}
+            </ul>
+          </section>
+        )}
+
+        <div className="mt-4 space-y-4">
           {verdicts.map((v) => (
-            <CompCard key={v.comp.id} v={v} />
+            <CompCard key={v.comp.id} v={v} hide={sharedIds} />
           ))}
         </div>
 
@@ -89,11 +104,11 @@ export default function PatchPage() {
   );
 }
 
-function CompCard({ v }: { v: CompVerdict }) {
+function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
   const t = TONE[v.verdict];
   return (
     <article className="grid overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--panel)] lg:grid-cols-[400px_minmax(0,1fr)]">
-      <div className="border-b border-[var(--line)] p-6 lg:border-b-0 lg:border-r">
+      <div className="flex flex-col border-b border-[var(--line)] p-6 lg:border-b-0 lg:border-r">
         <div className="flex items-center gap-2 text-[13px] font-medium" style={{ color: t.color }}>
           <span className="block h-2 w-2 rounded-full" style={{ background: t.color }} />
           {t.label}
@@ -105,7 +120,7 @@ function CompCard({ v }: { v: CompVerdict }) {
             <UnitToken key={u} unitId={u} size={44} />
           ))}
         </div>
-        <dl className="tnum mt-5 grid grid-cols-3 gap-4 text-[13px]">
+        <dl className="tnum mt-auto grid grid-cols-3 gap-4 pt-5 text-[13px]">
           <div>
             <dt className="text-[var(--muted)]">Games</dt>
             <dd className="mt-0.5 text-[18px] font-semibold">{v.comp.games}</dd>
@@ -123,9 +138,11 @@ function CompCard({ v }: { v: CompVerdict }) {
       <div className="p-6">
         <p className="max-w-[620px] text-[16px] font-medium leading-relaxed text-[var(--ink)]">{v.why}</p>
         <ul className="mt-5 space-y-2">
-          {v.lines.map((l) => (
-            <NoteRow key={l.id} n={l} />
-          ))}
+          {v.lines
+            .filter((l) => !hide.has(l.id))
+            .map((l) => (
+              <NoteRow key={l.id} n={l} />
+            ))}
         </ul>
       </div>
     </article>
@@ -168,9 +185,8 @@ function Delta({ n }: { n: NoteLine }) {
   const pct = changePct(n.text);
   if (pct === undefined) return null;
   return (
-    <span className="tnum w-16 shrink-0 text-right text-[13px] text-[var(--muted)]" title="Raw change in the number. The arrow shows whether it helps.">
-      {pct > 0 ? "+" : "−"}
-      {Math.abs(pct).toFixed(Math.abs(pct) < 10 ? 1 : 0)}%
+    <span className="tnum w-24 shrink-0 text-right text-[13px] font-medium text-[var(--ink)]">
+      {Math.abs(pct).toFixed(Math.abs(pct) < 10 ? 1 : 0)}% {pct > 0 ? "higher" : "lower"}
     </span>
   );
 }
@@ -178,10 +194,8 @@ function Delta({ n }: { n: NoteLine }) {
 function Dir({ d }: { d: NoteLine["direction"] }) {
   const c = d === "buff" ? "var(--good)" : d === "nerf" ? "var(--hp)" : "var(--muted)";
   return (
-    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md" style={{ background: `color-mix(in oklab, ${c} 16%, transparent)`, color: c }} aria-label={d}>
-      <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden>
-        {d === "buff" ? <path d="M5 1.5 9 7.5H1z" fill="currentColor" /> : d === "nerf" ? <path d="M5 8.5 1 2.5h8z" fill="currentColor" /> : <rect x="1.5" y="4" width="7" height="2" rx="1" fill="currentColor" />}
-      </svg>
+    <span className="w-12 shrink-0 rounded-md py-0.5 text-center text-[12px] font-medium" style={{ background: `color-mix(in oklab, ${c} 14%, transparent)`, color: c }}>
+      {d === "buff" ? "Buff" : d === "nerf" ? "Nerf" : "Change"}
     </span>
   );
 }

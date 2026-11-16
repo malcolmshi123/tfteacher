@@ -19,9 +19,12 @@ export function MobileRounds({
   const strip = useRef<HTMLDivElement>(null);
   const hl = new Set(highlight ?? []);
   const W = 340;
-  const H = 76;
+  const H = 104;
+  const L = 26; // room for HP labels
+  const GH = 30;
+  const maxGold = Math.max(60, ...series.map((p) => p.gold));
   const n = series.length;
-  const x = (i: number) => 4 + ((W - 8) * i) / (n - 1);
+  const x = (i: number) => L + ((W - L - 4) * i) / (n - 1);
   const after = (p: SeriesPoint) => Math.max(0, p.hp - p.damage);
   const y = (hp: number) => 6 + (H - 12) * (1 - hp / 100);
   const line = series.map((p, i) => `${i ? "L" : "M"}${x(i)},${y(after(p))}`).join(" ");
@@ -30,8 +33,10 @@ export function MobileRounds({
   const hlIdx = series.map((p, i) => (hl.has(p.stage) ? i : -1)).filter((i) => i >= 0);
 
   useEffect(() => {
-    const el = strip.current?.querySelector<HTMLElement>(`[data-stage="${selected}"]`);
-    el?.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+    // scroll only the strip sideways; never move the page
+    const box = strip.current;
+    const el = box?.querySelector<HTMLElement>(`[data-stage="${selected}"]`);
+    if (box && el) box.scrollTo({ left: el.offsetLeft - box.clientWidth / 2 + el.clientWidth / 2, behavior: "smooth" });
   }, [selected]);
 
   return (
@@ -49,21 +54,35 @@ export function MobileRounds({
           </span>
         </span>
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="mt-2 block h-auto w-full" aria-hidden>
+      <svg viewBox={`0 0 ${W} ${H + 10 + GH}`} className="mt-2 block h-auto w-full" aria-hidden>
         {hlIdx.length > 0 && (
-          <rect x={x(hlIdx[0]) - 3} y={0} width={x(hlIdx[hlIdx.length - 1]) - x(hlIdx[0]) + 6} height={H} rx={4} fill="var(--brand)" opacity={0.1} />
+          <rect x={x(hlIdx[0]) - 3} y={0} width={x(hlIdx[hlIdx.length - 1]) - x(hlIdx[0]) + 6} height={H} rx={4} fill="var(--brand)" opacity={0.16} />
         )}
-        <line x1={0} x2={W} y1={y(50)} y2={y(50)} stroke="var(--line)" strokeDasharray="2 4" />
+        {[0, 50, 100].map((v) => (
+          <g key={v}>
+            <line x1={L} x2={W} y1={y(v)} y2={y(v)} stroke="var(--line)" strokeDasharray={v ? "2 4" : undefined} />
+            <text x={L - 6} y={y(v) + 4} textAnchor="end" fontSize="11" fill="var(--muted)" className="tnum">{v}</text>
+          </g>
+        ))}
         <path d={lobby} fill="none" stroke="var(--ink-2)" strokeOpacity={0.55} strokeWidth={1.25} strokeDasharray="3 3" />
         <path d={line} fill="none" stroke="var(--hp)" strokeWidth={2.25} strokeLinejoin="round" />
+        {series.map((p, i) => {
+          const h = (p.gold / maxGold) * GH;
+          return <rect key={i} x={x(i) - 3.5} y={H + 10 + GH - h} width={7} height={h} rx={1.5} fill="var(--gold)" opacity={i === si ? 1 : 0.45} />;
+        })}
         {si >= 0 && (
           <>
-            <line x1={x(si)} x2={x(si)} y1={0} y2={H} stroke="var(--ink)" strokeOpacity={0.35} />
+            <line x1={x(si)} x2={x(si)} y1={0} y2={H + 10 + GH} stroke="var(--ink)" strokeOpacity={0.35} />
             <circle cx={x(si)} cy={y(after(series[si]))} r={4} fill="var(--bg)" stroke="var(--hp)" strokeWidth={2} />
           </>
         )}
       </svg>
 
+      <div className="mt-1 flex justify-between px-1 text-[11px] text-[var(--muted)]">
+        <span>Gold at round start</span>
+        {si >= 0 && <span className="tnum text-[var(--gold)]">{series[si].gold} gold at {selected}</span>}
+      </div>
+      <div className="relative">
       <div ref={strip} className="-mx-3 mt-3 flex snap-x gap-1.5 overflow-x-auto px-3 pb-1 [scrollbar-width:none]" role="list" aria-label="Rounds">
         {series.map((p) => {
           const sel = p.stage === selected;
@@ -90,10 +109,14 @@ export function MobileRounds({
           );
         })}
       </div>
+      <span className="pointer-events-none absolute inset-y-0 -left-3 w-6 bg-gradient-to-r from-[var(--panel)] to-transparent" />
+      <span className="pointer-events-none absolute inset-y-0 -right-3 w-6 bg-gradient-to-l from-[var(--panel)] to-transparent" />
+      </div>
       <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 px-1 text-[12px] text-[var(--muted)]">
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--good)]" />Won</span>
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--hp)]" />Lost</span>
-        <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--line-2)]" />Monsters</span>
+        <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--line-2)]" />Monster round</span>
+        <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full border border-dashed border-[var(--ink-2)]" />Draft</span>
         <span>Tap a round to open it</span>
       </p>
     </div>

@@ -160,7 +160,7 @@ export function analyze(game: GameRecord): Review {
         stages: R.slice(best.from, best.to + 1).map((r) => r.stage),
         focus: span[span.length - 1].stage,
         cites: [
-          { stage: first, label: `${span[0].hp} HP` },
+          { stage: first, label: `${span[0].hp} HP entering` },
           { stage: lastS, label: `${endHp} HP after combat` },
           { stage: lastS, label: `+${earned} streak gold` },
         ],
@@ -177,7 +177,7 @@ export function analyze(game: GameRecord): Review {
       id: "held-gold-low-hp",
       kind: "held-gold-low-hp",
       severity: held.length >= 2 ? "high" : "medium",
-      title: `Lost ${held.length} more fight${held.length > 1 ? "s" : ""} under 40 HP with 20+ gold unspent`,
+      title: `Lost at ${held.map((r) => r.stage).join(" and ")} under 40 HP with 20+ gold unspent`,
       detail: "Each of these fights started with gold you could have turned into board strength.",
       lines: held.map((r) => `${r.stage}: ${r.hp} HP, went into combat with ${r.goldEnd} gold, lost ${r.damageTaken} HP`),
       advice: "Under 40 HP, interest is worth less than HP. Roll to stabilize, then rebuild economy only after you win.",
@@ -262,7 +262,7 @@ export function analyze(game: GameRecord): Review {
       kind: "level-tempo",
       severity: behind.length >= 5 ? "medium" : "low",
       title: `Below lobby level in ${behind.length} fights from stage 3 on`,
-      detail: `The lobby's median level passed yours from ${behind[0].stage}. The biggest gap in board strength was at ${worst.stage}: your board was worth ${worst.boardValue} against a lobby median of ${worst.lobbyBoardValue}.`,
+      detail: `You were a level behind the lobby's median in ${behind.length} of ${series.filter((p) => p.kind === "pvp" && p.stage >= "3-1").length} fights from stage 3 on. It started at ${behind[0].stage}, and fewer slots meant a weaker board: at ${worst.stage} yours was worth ${worst.boardValue} against a lobby median of ${worst.lobbyBoardValue}.`,
       advice: "Higher level means more units and better shop odds. If you are not rolling for a reroll comp, match the lobby's level by stage 4.",
       stages: behind.map((p) => p.stage),
       focus: worst.stage,
@@ -351,7 +351,7 @@ export function analyze(game: GameRecord): Review {
       { label: "Fights lost", value: `${R.filter((r) => r.kind === "pvp" && r.outcome === "loss").length} of ${R.filter((r) => r.kind === "pvp").length}`, note: "player fights" },
       { label: "HP entering 4-1", value: String(R.find((r) => r.stage === "4-1")?.hp ?? "n/a"), note: lobbyHp41 !== undefined ? `lobby median ${lobbyHp41}` : undefined },
       { label: "Rerolls", value: String(totalRolls), note: "whole game" },
-      { label: "Gold at death", value: String(last.goldEnd) },
+      { label: "Gold at death", value: String(last.goldEnd), note: `unspent at ${last.stage}` },
     ],
   };
 }

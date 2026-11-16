@@ -83,11 +83,11 @@ const SCRIPT: Step[] = [
 
 const OPPONENTS: { id: string; name: string; place: number; strength: number }[] = [
   { id: "o1", name: "Kaito", place: 1, strength: 1.18 },
-  { id: "o2", name: "lumen", place: 2, strength: 1.12 },
+  { id: "o2", name: "Lumen", place: 2, strength: 1.12 },
   { id: "o3", name: "Rho", place: 3, strength: 1.06 },
-  { id: "o4", name: "bramblefox", place: 4, strength: 1.02 },
+  { id: "o4", name: "Bramblefox", place: 4, strength: 1.02 },
   { id: "o5", name: "Sev", place: 5, strength: 0.98 },
-  { id: "o7", name: "quietcarry", place: 7, strength: 0.9 },
+  { id: "o7", name: "Quietcarry", place: 7, strength: 0.9 },
   { id: "o8", name: "Pim", place: 8, strength: 0.84 },
 ];
 

@@ -44,7 +44,7 @@ export function AskPanel({ gameId, onCite }: { gameId: string; onCite: (stage: s
           id="ask"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Should I have rolled at 4-1?"
+          placeholder="Ask about any round, like 3-2"
           className="h-11 min-w-0 flex-1 rounded-xl border border-[var(--line-2)] bg-[var(--bg)] px-4 text-[15px] placeholder:text-[var(--muted)] focus:border-[var(--brand)] focus:outline-none"
         />
         <button disabled={busy} className="h-11 shrink-0 rounded-xl bg-[var(--ink)] px-4 text-[14px] font-medium text-[var(--bg)] disabled:opacity-50">

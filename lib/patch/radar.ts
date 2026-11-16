@@ -87,12 +87,12 @@ export function radar(comps = MY_COMPS, notes = NOTES): CompVerdict[] {
         ? (() => {
             const carry = nerfs.filter((x) => x.target === comp.core[0]).length;
             const other = nerfs.length - carry;
-            return `Your main carry ${name(comp.core[0])} was nerfed in ${carry} line${carry === 1 ? "" : "s"}${other ? `, and ${other} more line${other === 1 ? "" : "s"} hit the comp` : ""}. Expect it to place lower until you adjust items or the board around it.`;
+            return `Your main carry ${name(comp.core[0])} was nerfed in ${carry} line${carry === 1 ? "" : "s"}${other ? `, and the shared change above hits it too` : ""}. Expect it to place lower until you adjust items or the board around it.`;
           })()
         : verdict === "stronger"
           ? `${list(buffs.map((b) => name(b.target)).filter((v, i, a) => a.indexOf(v) === i))} all got stronger.${nerfs.length ? ` The only hit is smaller: ${nerfs.map((x) => x.text.charAt(0).toLowerCase() + x.text.slice(1)).join("; ")}.` : " Nothing in the comp was nerfed."}`
           : verdict === "mixed"
-            ? `Buffs and nerfs roughly cancel out. Play it the same way and watch the first few games.`
+            ? `Buffs and nerfs roughly cancel out, counting every line below and any shared change above. Play it the same way and watch your first few games.`
             : "Nothing in this comp changed.";
     return { comp, verdict, score, lines, why };
   });

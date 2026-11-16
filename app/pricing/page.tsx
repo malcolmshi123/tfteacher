@@ -30,7 +30,7 @@ export default function Pricing() {
 
         <div className="mt-10 grid gap-4 md:grid-cols-2">
           <Plan name="Free" price="$0" cadence="forever" note="No card needed" items={FREE} cta="Download for Windows" href="/download" />
-          <Plan name="Pro" price="$5" cadence="per month" note="or $48 a year, save $12" items={PRO} cta="Start 14 days free" href="/download?plan=pro" featured />
+          <Plan name="Pro" price="$5" cadence="per month" note="or $48 a year, save $12" items={PRO} cta="Try Pro free for 14 days" href="/download?plan=pro" featured />
         </div>
 
         <section className="mt-16 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
@@ -124,10 +124,10 @@ function TrendsPreview() {
 
 function Plan({ name, price, cadence, note, items, cta, href, featured }: { name: string; price: string; cadence: string; note?: string; items: string[]; cta: string; href: string; featured?: boolean }) {
   return (
-    <div className={`flex flex-col rounded-2xl border p-7 ${featured ? "border-[color-mix(in_oklab,var(--brand)_45%,var(--line))] bg-[var(--panel-2)]" : "border-[var(--line)] bg-[var(--panel)]"}`}>
+    <div className={`flex flex-col rounded-2xl border p-7 ${featured ? "border-[color-mix(in_oklab,var(--brand)_60%,var(--line))] bg-[linear-gradient(180deg,color-mix(in_oklab,var(--brand)_9%,var(--panel-2)),var(--panel-2)_45%)] shadow-[0_30px_80px_-40px_color-mix(in_oklab,var(--brand)_40%,transparent)]" : "border-[var(--line)] bg-[var(--panel)]"}`}>
       <div className="flex items-center justify-between">
         <h2 className="text-[18px] font-semibold">{name}</h2>
-        {featured && <span className="text-[13px] text-[var(--muted)]">Cancel any time</span>}
+        {featured && <span className="text-[13px] text-[var(--ink-2)]">No card for the trial</span>}
       </div>
       <div className="mt-5 flex items-baseline gap-2">
         <span className="tnum text-[44px] font-semibold tracking-tight">{price}</span>

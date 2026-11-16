@@ -112,7 +112,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
           <div className="mb-3 flex items-baseline justify-between">
             <h2 className="text-[15px] font-medium">What decided this game</h2>
             <span className="text-[12px] text-[var(--muted)]">
-              {findings.filter((f) => !f.positive).length} mistakes, most costly first
+              {findings.filter((f) => !f.positive).length} mistakes, worst first
               {findings.some((f) => f.positive) ? ` · ${findings.filter((f) => f.positive).length} strength` : ""}
             </span>
           </div>
@@ -134,15 +134,14 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
       {sheet && (
         <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label={`Round ${round}`}>
           <button aria-label="Close" className="absolute inset-0 bg-black/80 backdrop-blur-[2px]" onClick={() => setSheet(false)} />
-          <div className="absolute inset-x-0 bottom-0 max-h-[86dvh] overflow-y-auto rounded-t-2xl border-t border-[var(--line-2)] bg-[var(--bg)] px-2 pb-6 pt-2 shadow-[0_-20px_60px_rgba(0,0,0,0.6)]">
-            <div className="sticky top-0 z-10 flex items-center justify-between bg-[var(--bg)] px-2 pb-2 pt-1">
-              <span className="block h-1 w-10 rounded-full bg-[var(--ink-2)] opacity-50" />
+          <div className="absolute inset-x-0 bottom-0 max-h-[86dvh] overflow-y-auto rounded-t-2xl border-t border-[var(--line-2)] bg-[var(--panel)] pb-6 pt-2 shadow-[0_-20px_60px_rgba(0,0,0,0.6)]">
+            <div className="sticky top-0 z-10 flex items-center justify-end bg-[var(--panel)] px-4 pb-1 pt-1">
               <button onClick={() => setSheet(false)} aria-label="Close round" className="grid h-9 w-9 place-items-center rounded-full bg-[var(--panel-2)] text-[var(--ink-2)]">
                 <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
               </button>
             </div>
-            <RoundInspector game={game} stage={round} series={series} findings={findings} onPick={setRound} />
-            <button onClick={() => setSheet(false)} className="mt-3 w-full rounded-xl border border-[var(--line-2)] py-3 text-[15px] font-medium">
+            <RoundInspector game={game} stage={round} series={series} findings={findings} onPick={setRound} bare />
+            <button onClick={() => setSheet(false)} className="mx-4 mt-3 w-[calc(100%-2rem)] rounded-xl border border-[var(--line-2)] py-3 text-[15px] font-medium">
               Close
             </button>
           </div>
@@ -173,7 +172,7 @@ function FindingCard({ f, active, lead, onClick, onCite, children }: { f: Findin
               {label}
             </span>
           </div>
-          <p className={`mt-2 ${lead ? "text-[15px]" : "text-[14px]"} leading-relaxed text-[var(--ink-2)] `}>{f.detail}</p>
+          <p className={`mt-2 ${lead ? "text-[15px]" : "text-[14px]"} leading-relaxed text-[var(--ink-2)] ${quiet ? "hidden lg:block" : ""}`}>{f.detail}</p>
           {!quiet && f.lines && (
             <ul className="tnum mt-3 space-y-1.5 text-[14px] leading-relaxed text-[var(--ink-2)]">
               {f.lines.map((l) => {
