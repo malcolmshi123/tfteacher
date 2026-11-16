@@ -45,3 +45,4 @@ next-env.d.ts
 
 # local waitlist store
 /data/
+/.next-build/
