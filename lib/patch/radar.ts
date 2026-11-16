@@ -194,7 +194,7 @@ export function radar(comps = MY_COMPS, notes = NOTES): CompVerdict[] {
             const buffed = uniq(buffs.map((x) => name(x.target)));
             const lead = carry ? `Your main carry ${name(comp.carry)} was nerfed in ${carry} line${carry === 1 ? "" : "s"}` : `${list(other)} got weaker`;
             const more = carry && other.length ? `, and ${list(other)} was nerfed too` : "";
-            const offset = buffed.length ? ` ${list(buffed)} got buffed, but not enough to make up for it.` : "";
+            const offset = buffed.length ? ` ${list(buffed)} got buffed, but nerfs to the carry and its traits weigh more.` : "";
             return `${lead}${more}.${offset} Expect it to place lower until you adjust items or the board around it.`;
           })()
         : verdict === "stronger"

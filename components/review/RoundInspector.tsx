@@ -31,7 +31,7 @@ export function RoundInspector({
   const prevPt = series[idx - 1];
   const takeaway =
     r.bought.length >= 5
-      ? `Rolldown: your board went from ${prevPt?.boardValue ?? 0} to ${pt.boardValue} gold of units.`
+      ? `Your board grew from ${prevPt?.boardValue ?? 0} to ${pt.boardValue} gold of units this round.`
       : r.kind === "pvp" && r.outcome === "loss" && r.hp <= 40 && r.goldEnd >= 20
         ? `Started at ${r.hp} HP and lost ${r.damageTaken} while holding ${r.goldEnd} gold.`
         : r.xpBought >= 3
@@ -192,7 +192,7 @@ function NavBtn({ children, onClick, disabled, label }: { children: React.ReactN
       aria-label={label}
       disabled={disabled}
       onClick={onClick}
-      className="grid h-8 w-8 place-items-center rounded-lg border border-[var(--line)] text-[18px] leading-none text-[var(--ink-2)] transition-colors hover:border-[var(--line-2)] hover:text-[var(--ink)] disabled:opacity-30"
+      className="grid h-11 w-11 place-items-center rounded-lg sm:h-8 sm:w-8 border border-[var(--line)] text-[18px] leading-none text-[var(--ink-2)] transition-colors hover:border-[var(--line-2)] hover:text-[var(--ink)] disabled:opacity-30"
     >
       {children}
     </button>

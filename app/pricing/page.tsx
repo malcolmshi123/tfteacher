@@ -91,10 +91,11 @@ const COMPARE: [string, string, string][] = [
 ];
 
 const TREND = [
-  { stage: "Stage 2", hp: 8 },
-  { stage: "Stage 3", hp: 31 },
-  { stage: "Stage 4", hp: 27 },
-  { stage: "Stage 5+", hp: 14 },
+  // averages over the 19 games: they add up to about 95 because every game but a win ends at 0 HP
+  { stage: "Stage 2", hp: 9 },
+  { stage: "Stage 3", hp: 34 },
+  { stage: "Stage 4", hp: 30 },
+  { stage: "Stage 5+", hp: 22 },
 ];
 
 function TrendsPreview() {

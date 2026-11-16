@@ -153,13 +153,10 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
         <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label={`Round ${round}`}>
           <button aria-label="Close" className="absolute inset-0 bg-black/85 backdrop-blur-[6px]" onClick={() => setSheet(false)} />
           <div className="absolute inset-x-0 bottom-0 max-h-[68dvh] overflow-y-auto rounded-t-2xl border-t border-[var(--line-2)] bg-[var(--panel)] pb-6 pt-2 shadow-[0_-20px_60px_rgba(0,0,0,0.6)]">
-            <div className="sticky top-0 z-10 flex items-center justify-between bg-[var(--panel)] px-4 pb-1 pt-1">
-              <span className="w-9" />
-              <span className="block h-1 w-10 rounded-full bg-[var(--ink-2)] opacity-40" aria-hidden />
-              <button onClick={() => setSheet(false)} aria-label="Close round" className="grid h-9 w-9 place-items-center rounded-full bg-[var(--panel-2)] text-[var(--ink-2)]">
-                <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
-              </button>
-            </div>
+            {/* the handle is the close control: tap it (or the dimmed page) to close */}
+            <button onClick={() => setSheet(false)} aria-label="Close round" className="flex w-full justify-center pb-2 pt-1">
+              <span className="block h-1 w-10 rounded-full bg-[var(--ink-2)] opacity-50" aria-hidden />
+            </button>
             <RoundInspector game={game} stage={round} series={series} findings={findings} onPick={setRound} bare />
             <button onClick={() => setSheet(false)} className="mx-4 mt-3 w-[calc(100%-2rem)] rounded-xl border border-[var(--line-2)] py-3 text-[15px] font-medium">
               Close

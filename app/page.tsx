@@ -102,7 +102,7 @@ export default function Home() {
                 you rolled past, gold you never spent.
               </p>
             </div>
-            <div className="mt-10 grid gap-4 md:grid-cols-2">
+            <div className="mt-10 grid gap-4 md:grid-cols-2 md:items-start">
               <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
                 <div className="text-[13px] font-medium text-[var(--muted)]">What match history shows</div>
                 <div className="mt-5 flex flex-wrap gap-x-2.5 gap-y-3">
@@ -167,7 +167,7 @@ export default function Home() {
                   <span className="flex items-center gap-1.5"><HighlightSwatch state="flex" />Flex option</span>
                 </div>
                 <p className="tnum mt-3 text-[13px] text-[var(--muted)]">
-                  {r41.gold} gold: {xpCost > 0 && <>{xpCost} on XP, </>}{rollCost} on {r41.rerolls} rerolls, {buyCost} on {r41.bought.length} units, plus {soldFor} for selling{" "}
+                  {r41.gold} gold: {xpCost > 0 && <>{xpCost} on XP, </>}{rollCost} on {r41.rerolls} rerolls, {buyCost} on {r41.bought.length} unit buys, plus {soldFor} for selling{" "}
                   {soldNames}. {r41.goldEnd} left.
                 </p>
                 <p className="mt-4 text-[14px] leading-relaxed text-[var(--ink-2)]">
