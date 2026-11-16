@@ -192,9 +192,8 @@ export function analyze(game: GameRecord): Review {
         stages: R.slice(best.from, best.to + 1).map((r) => r.stage),
         focus: span[span.length - 1].stage,
         cites: [
-          { stage: first, label: `${span[0].hp} HP before the fight` },
-          { stage: lastS, label: `${endHp} HP after combat` },
-          { stage: first, label: `to ${lastS}, +${earned} streak gold` },
+          { stage: first, label: `${span[0].hp} HP before combat` },
+          { stage: lastS, label: `${endHp} HP after combat, +${earned} streak gold` },
         ],
         hpCost: hpLost,
       });
@@ -391,7 +390,9 @@ export function analyze(game: GameRecord): Review {
     const losses = after.filter((r) => r.outcome === "loss").length;
     const gold = peakHpLoss.title.match(/for (\d+)/)?.[1];
     const allRolls = rolls === totalRolls ? `all ${rolls} of your rerolls came in the last ${after.length} rounds` : `you rolled ${rolls} times in the last ${after.length} rounds`;
-    summary = `The streak took ${peakHpLoss.hpCost} HP for ${gold} gold. After it, ${allRolls}, and you lost ${losses} of the ${after.filter((r) => r.kind === "pvp").length} fights that were left.`;
+    // rolls that bought no board strength are worth saying out loud
+    const flat = boardValue(R[k].board) === boardValue(last.board) && rolls > 0;
+    summary = `The streak took ${peakHpLoss.hpCost} HP for ${gold} gold. After it, ${allRolls}${flat ? " without making your board any stronger" : ""}, and you lost ${losses} of the ${after.filter((r) => r.kind === "pvp").length} fights that were left.`;
   } else {
     const fights = R.filter((r) => r.kind === "pvp");
     const lost = fights.filter((r) => r.outcome === "loss").length;

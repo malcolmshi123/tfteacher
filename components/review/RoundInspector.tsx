@@ -75,7 +75,7 @@ export function RoundInspector({
 
       <div className="space-y-5 px-4 py-5 sm:px-5">
         <Section title="Board when combat started">
-          <div className="flex flex-wrap gap-x-1 gap-y-4 pt-3">
+          <div className="grid grid-cols-4 justify-items-center gap-y-4 pt-3">
             {r.board.map((p, i) => (
               <UnitToken key={i} piece={p} size={bare ? 34 : 38} />
             ))}

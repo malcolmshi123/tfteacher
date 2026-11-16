@@ -68,8 +68,15 @@ export default function PatchPage() {
           </div>
         </div>
 
+
+        <div className="mt-10 space-y-4">
+          {verdicts.map((v) => (
+            <CompCard key={v.comp.id} v={v} hide={sharedIds} />
+          ))}
+        </div>
+
         {shared.length > 0 && (
-          <section className="mt-10 rounded-2xl border border-[var(--line)] bg-[var(--panel)] px-5 py-4">
+          <section className="mt-4 rounded-2xl border border-[var(--line)] bg-[var(--panel)] px-5 py-4">
             <div className="text-[13px] font-medium text-[var(--ink)]">Shared by more than one of your comps</div>
             <ul className="mt-3 space-y-2">
               {shared.map((n) => (
@@ -79,15 +86,15 @@ export default function PatchPage() {
           </section>
         )}
 
-        <div className="mt-4 space-y-4">
-          {verdicts.map((v) => (
-            <CompCard key={v.comp.id} v={v} hide={sharedIds} />
-          ))}
-        </div>
-
         <section id="rest" className="mt-20 scroll-mt-20 border-t border-[var(--line)] pt-12">
           <h2 className="text-[28px] font-semibold tracking-[-0.02em]">The rest of {PATCH.to}</h2>
-          <p className="mt-2 max-w-[760px] text-[15px] leading-relaxed text-[var(--ink-2)]">{PATCH_SUMMARY.lead}</p>
+          <p className="mt-2 text-[17px] text-[var(--ink)]">{PATCH_SUMMARY.lead}</p>
+          <dl className="mt-4 grid max-w-[860px] gap-2 text-[15px] leading-relaxed sm:grid-cols-[110px_minmax(0,1fr)]">
+            <dt className="font-medium text-[var(--good)]">Stronger</dt>
+            <dd className="text-[var(--ink-2)]">{PATCH_SUMMARY.up}</dd>
+            <dt className="font-medium text-[var(--hp)]">Weaker</dt>
+            <dd className="text-[var(--ink-2)]">{PATCH_SUMMARY.down}</dd>
+          </dl>
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <PickList title="Worth trying" tone="var(--good)" picks={PATCH_SUMMARY.tryThese} />
             <PickList title="Worth avoiding" tone="var(--hp)" picks={PATCH_SUMMARY.avoid} />
@@ -109,15 +116,13 @@ function PickList({ title, tone, picks }: { title: string; tone: string; picks: 
       <ul className="mt-4 divide-y divide-[var(--line)]">
         {picks.map((pk) => (
           <li key={pk.name} className="py-4 first:pt-0 last:pb-0">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h3 className="text-[16px] font-semibold tracking-tight">{pk.name}</h3>
-              <div className="flex gap-1.5">
-                {pk.units.map((u) => (
-                  <UnitToken key={u} unitId={u} size={28} showName={false} />
-                ))}
-              </div>
+            <h3 className="text-[16px] font-semibold tracking-tight">{pk.name}</h3>
+            <div className="mt-3 flex flex-wrap gap-x-2 gap-y-3">
+              {pk.units.map((u) => (
+                <UnitToken key={u} unitId={u} size={34} />
+              ))}
             </div>
-            <p className="mt-2 text-[14px] leading-relaxed text-[var(--ink-2)]">{pk.why}</p>
+            <p className="mt-3 text-[14px] leading-relaxed text-[var(--ink-2)]">{pk.why}</p>
           </li>
         ))}
       </ul>
@@ -168,16 +173,21 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
                     <td className="py-2 text-[var(--ink-2)]">{k}</td>
                     <td className="py-2 text-right text-[var(--ink-2)]">{was}</td>
                     <td className="py-2 text-right text-[15px] font-semibold text-[var(--ink)]">
+                      {is}
                       {up !== undefined && (
-                        <span className="mr-1 text-[11px]" style={{ color: up ? "var(--good)" : "var(--hp)" }} aria-label={up ? "better" : "worse"}>
-                          {up ? "▲" : "▼"}
+                        <span className="ml-1.5 text-[12px] font-medium" style={{ color: up ? "var(--good)" : "var(--hp)" }}>
+                          {up ? "better" : "worse"}
                         </span>
                       )}
-                      {is}
                     </td>
                   </tr>
                 ))}
               </tbody>
+              {now.length > 0 && now.length < 5 && (
+                <caption className="caption-bottom pt-2 text-left text-[12px] text-[var(--muted)]">
+                  Only {now.length} game{now.length === 1 ? "" : "s"} on {PATCH.to} so far, so treat this column as early.
+                </caption>
+              )}
             </table>
           );
         })()}
@@ -192,7 +202,7 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
             <>
               <p className="max-w-[620px] text-[17px] font-semibold leading-snug text-[var(--ink)]">{lead}</p>
               {rest && <p className="mt-2 max-w-[620px] text-[14px] leading-relaxed text-[var(--ink-2)]">{rest}</p>}
-              {hidden > 0 && <p className="mt-2 text-[13px] text-[var(--muted)]">Also counts {hidden} shared change{hidden === 1 ? "" : "s"} listed above.</p>}
+              {hidden > 0 && <p className="mt-2 text-[13px] text-[var(--muted)]">Also counts {hidden} shared change{hidden === 1 ? "" : "s"} listed below the cards.</p>}
             </>
           );
         })()}

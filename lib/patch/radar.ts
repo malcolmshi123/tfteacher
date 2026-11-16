@@ -111,9 +111,10 @@ export interface PatchPick {
   lines: string[]; // NoteLine ids
 }
 
-export const PATCH_SUMMARY: { lead: string; tryThese: PatchPick[]; avoid: PatchPick[] } = {
-  lead:
-    "18.5 leans toward AP and sustain. Fae, AP 4-costs and Taric got stronger, while Blackthorn, Rapidfire, Flora Fatalis healing and the top breakpoints of Elderwood (9) and Riftbeast (7) lost some power. Among units, Kha'Zix, Azir and Mama Beak lost damage and Sentinel's stun got shorter.",
+export const PATCH_SUMMARY: { lead: string; up: string; down: string; tryThese: PatchPick[]; avoid: PatchPick[] } = {
+  lead: "18.5 mostly helps AP carries, Fae and Taric.",
+  up: "Fae, AP 4-costs (Morgana, Soraka, Sett) and Taric.",
+  down: "Blackthorn, Rapidfire, Flora Fatalis healing, Elderwood (9) and Riftbeast (7), plus Kha'Zix, Azir and Mama Beak's damage and Sentinel's stun.",
   tryThese: [
     {
       name: "Fae boards",

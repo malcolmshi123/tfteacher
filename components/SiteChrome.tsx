@@ -26,7 +26,7 @@ export function SiteNav({ active }: { active?: string }) {
     <>
     {active && SAMPLE_PAGES.includes(active) && (
       <div className="border-b border-[var(--line)] bg-[color-mix(in_oklab,var(--brand)_8%,var(--bg))] px-4 py-2 text-center text-[13px] text-[var(--ink-2)]">
-        <span className="sm:hidden">Sample account. Sign in to see yours.</span>
+        <span className="sm:hidden">Sample account. Get the app to see yours.</span>
         <span className="hidden sm:inline">You&apos;re looking at a sample account. Install the app and sign in to see your own games.</span>
       </div>
     )}
