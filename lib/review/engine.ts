@@ -40,6 +40,7 @@ export interface SeriesPoint {
   stage: string;
   hp: number;
   gold: number;
+  goldEnd: number;
   level: number;
   boardValue: number;
   lobbyBoardValue: number;
@@ -90,6 +91,7 @@ export function buildSeries(game: GameRecord): SeriesPoint[] {
       stage: r.stage,
       hp: r.hp,
       gold: r.gold,
+      goldEnd: r.goldEnd,
       level: r.level,
       boardValue: boardValue(r.board),
       lobbyBoardValue: Math.round(median(alive.map((o) => o.boardValue))),
@@ -163,7 +165,7 @@ export function analyze(game: GameRecord): Review {
         cites: [
           { stage: first, label: `${span[0].hp} HP entering` },
           { stage: lastS, label: `${endHp} HP after combat` },
-          { stage: lastS, label: `+${earned} streak gold` },
+          { stage: first, label: `to ${lastS}, +${earned} streak gold` },
         ],
         hpCost: hpLost,
       });
@@ -334,10 +336,9 @@ export function analyze(game: GameRecord): Review {
     const after = R.slice(k + 1);
     const rolls = after.reduce((a, r) => a + r.rerolls, 0);
     const losses = after.filter((r) => r.outcome === "loss").length;
-    const peak = Math.max(...after.map((r) => r.hp));
     const gold = peakHpLoss.title.match(/for (\d+)/)?.[1];
     const allRolls = rolls === totalRolls ? `all ${rolls} of your rerolls came in the last ${after.length} rounds` : `you rolled ${rolls} times in the last ${after.length} rounds`;
-    summary = `The streak took ${peakHpLoss.hpCost} HP for ${gold} gold. After it, ${allRolls}, you lost ${losses} more fights, and you never got above ${peak} HP again.`;
+    summary = `The streak took ${peakHpLoss.hpCost} HP for ${gold} gold. After it, ${allRolls}, and you lost ${losses} of the ${after.filter((r) => r.kind === "pvp").length} fights that were left.`;
   } else {
     summary = `You rolled ${totalRolls} times and went out with ${last.goldEnd} gold.`;
   }

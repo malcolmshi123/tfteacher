@@ -30,7 +30,7 @@ export interface CompVerdict {
   why: string;
 }
 
-export const PATCH = { from: "14.2", to: "14.3", date: "2026-11-12" };
+export const PATCH = { from: "18.2", to: "18.3", date: "2026-11-12" };
 
 export const NOTES: NoteLine[] = [
   { id: "u-kestrel-1", section: "Units", target: "kestrel", text: "Kestrel attack damage 62 to 56", direction: "nerf", weight: 2 },
@@ -40,7 +40,7 @@ export const NOTES: NoteLine[] = [
   { id: "u-dax-1", section: "Units", target: "dax", text: "Dax health 750 to 800", direction: "buff", weight: 1 },
   { id: "u-ombra-1", section: "Units", target: "ombra", text: "Ombra ability damage 280/420/1200 to 260/390/1200", direction: "nerf", weight: 1 },
   { id: "u-halvar-1", section: "Units", target: "halvar", text: "Halvar armor 45 to 50", direction: "buff", weight: 1 },
-  { id: "t-tidecaller-1", section: "Traits", target: "Tidecaller", text: "Tidecaller (4) bonus mana regen 4 to 3", direction: "nerf", weight: 2 },
+  { id: "t-tidecaller-1", section: "Traits", target: "Tidecaller", text: "Tidecaller (4) bonus mana regen 4 to 3", direction: "nerf", weight: 3 },
   { id: "t-ironclad-1", section: "Traits", target: "Ironclad", text: "Ironclad (2) armor 20 to 25", direction: "buff", weight: 1 },
   { id: "t-ashen-1", section: "Traits", target: "Ashen", text: "Ashen (3) burn 1% to 1.5% max health", direction: "buff", weight: 2 },
   { id: "i-bow-1", section: "Items", target: "bow", text: "Quickbow attack speed 15% to 12%", direction: "nerf", weight: 1 },
@@ -92,9 +92,12 @@ export function radar(comps = MY_COMPS, notes = NOTES): CompVerdict[] {
             return `Your main carry ${name(comp.core[0])} was nerfed in ${carry} line${carry === 1 ? "" : "s"}${other ? `, and the shared change above hits it too` : ""}. Expect it to place lower until you adjust items or the board around it.`;
           })()
         : verdict === "stronger"
-          ? `${list(buffs.map((b) => name(b.target)).filter((v, i, a) => a.indexOf(v) === i))} all got stronger.${nerfs.length ? ` The only hit is smaller: ${nerfs.map((x) => x.text.charAt(0).toLowerCase() + x.text.slice(1)).join("; ")}.` : " Nothing in the comp was nerfed."}`
+          ? `${list(buffs.map((b) => name(b.target)).filter((v, i, a) => a.indexOf(v) === i))} all got stronger.${nerfs.length ? ` The one hit is shared by every comp: ${nerfs.map((x) => x.text).join("; ")}.` : " Nothing in the comp was nerfed."}`
           : verdict === "mixed"
-            ? `Buffs and nerfs roughly cancel out, counting every line below and any shared change above. Play it the same way and watch your first few games.`
+            ? (() => {
+                const big = [...lines].sort((p, q) => Math.abs(changePct(q.text) ?? 0) - Math.abs(changePct(p.text) ?? 0))[0];
+                return `Close call. The biggest single change is a ${big.direction}: ${big.text}. The ${big.direction === "nerf" ? "buffs" : "nerfs"} on this card offset most of it${score < 0 ? ", so it comes out slightly weaker" : score > 0 ? ", so it comes out slightly stronger" : ""}. Play it the same way and watch your first few games.`;
+              })()
             : "Nothing in this comp changed.";
     return { comp, verdict, score, lines, why };
   });

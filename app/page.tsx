@@ -19,7 +19,7 @@ export default function Home() {
         <section className="mx-auto grid max-w-[1240px] gap-10 px-4 pb-16 pt-12 md:px-6 md:pt-20 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:items-center lg:gap-14">
           <div>
             <h1 className="text-[40px] font-semibold leading-[1.04] tracking-[-0.035em] text-balance md:text-[56px]">
-              Find out why you placed 6th.
+              Find out why you went 8th.
             </h1>
             <p className="mt-5 max-w-[480px] text-[17px] leading-relaxed text-[var(--ink-2)]">
               TFTeacher records every round of your Teamfight Tactics game. When it ends, you get the few decisions that
@@ -41,7 +41,7 @@ export default function Home() {
             <div className="rounded-[20px] border border-[var(--line)] bg-[var(--panel)] p-4 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.7)] md:p-5">
               <div className="flex items-center justify-between px-1">
                 <div className="flex items-center gap-2.5">
-                  <span className="tnum grid h-8 min-w-8 place-items-center rounded-lg bg-[color-mix(in_oklab,var(--hp)_16%,var(--panel-2))] px-1.5 text-[13px] font-semibold text-[var(--hp)]">6th</span>
+                  <span className="tnum grid h-8 min-w-8 place-items-center rounded-lg bg-[color-mix(in_oklab,var(--hp)_16%,var(--panel-2))] px-1.5 text-[13px] font-semibold text-[var(--hp)]">{review.game.placement}th</span>
                   <div>
                     <div className="text-[13px] font-medium">Sample game · Ranked · {review.game.patch}</div>
                     <div className="text-[12px] text-[var(--muted)]">Recorded round by round</div>
@@ -50,7 +50,7 @@ export default function Home() {
                 <span className="text-[12px] text-[var(--muted)]">{review.game.durationMin} min</span>
               </div>
               <div className="mt-3">
-                <Timeline series={review.series} highlight={top.stages} selected={top.focus} compact width={460} />
+                <Timeline series={review.series} highlight={top.stages} selected={top.focus} compact width={560} />
               </div>
               <div className="mt-3 rounded-2xl border border-[var(--line)] bg-[var(--panel-2)] p-4">
                 <div className="flex items-start gap-3">
@@ -93,7 +93,7 @@ export default function Home() {
                 <dl className="tnum mt-5 grid grid-cols-3 gap-3 text-[13px]">
                   <div>
                     <dt className="text-[var(--muted)]">Placement</dt>
-                    <dd className="text-[18px] font-semibold">6th</dd>
+                    <dd className="text-[18px] font-semibold">{review.game.placement}th</dd>
                   </div>
                   <div>
                     <dt className="text-[var(--muted)]">Level</dt>
@@ -158,7 +158,7 @@ export default function Home() {
                     <span className="block h-2 w-2 rounded-full bg-[var(--hp)]" />
                     Recording round 3-2
                   </span>
-                  <span className="tnum text-[var(--muted)]">77 HP · 39 gold · lvl 6</span>
+                  <span className="tnum text-[var(--muted)]">77 HP entering · 39 gold</span>
                 </div>
               }
             >

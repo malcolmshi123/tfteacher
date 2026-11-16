@@ -105,7 +105,7 @@ export default function PatchPage() {
 }
 
 function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
-  const t = TONE[v.verdict];
+  const t = v.verdict === "mixed" && v.score !== 0 ? { ...TONE.mixed, label: v.score < 0 ? "Mixed, leans weaker" : "Mixed, leans stronger" } : TONE[v.verdict];
   return (
     <article className="grid overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--panel)] lg:grid-cols-[400px_minmax(0,1fr)]">
       <div className="flex flex-col border-b border-[var(--line)] p-6 lg:border-b-0 lg:border-r">
@@ -189,6 +189,7 @@ function Delta({ n }: { n: NoteLine }) {
     <span className="tnum w-24 shrink-0 text-right text-[13px] font-medium" style={{ color: n.direction === "buff" ? "var(--good)" : n.direction === "nerf" ? "var(--hp)" : "var(--ink-2)" }}>
       {Math.abs(pct).toFixed(Math.abs(pct) < 10 ? 1 : 0)}% {pct > 0 ? "higher" : "lower"}
       {n.direction === "buff" && pct < 0 ? <span className="block text-[11px] font-normal text-[var(--muted)]">lower is better</span> : null}
+      {n.text.includes("/") ? <span className="block text-[11px] font-normal text-[var(--muted)]">average of tiers</span> : null}
     </span>
   );
 }

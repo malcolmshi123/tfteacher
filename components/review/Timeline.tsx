@@ -2,16 +2,22 @@
 
 import type { SeriesPoint } from "@/lib/review/engine";
 
-const PAD_L = 34;
-const PAD_R = 12;
-const HP_TOP = 18;
-const HP_H = 128;
-const GOLD_TOP = HP_TOP + HP_H + 26;
-const GOLD_H = 64;
-const STRIP_TOP = GOLD_TOP + GOLD_H + 14;
-const STRIP_H = 18;
-const AXIS_Y = STRIP_TOP + STRIP_H + 18;
-const H = AXIS_Y + 8;
+// Layout in viewBox units. The compact (landing) version is drawn narrower, so the
+// same font sizes render larger, and it gets more room between the lanes.
+function layout(compact: boolean) {
+  const FS = compact ? 12 : 10.5; // label size
+  const PAD_L = compact ? 30 : 34;
+  const PAD_R = 12;
+  const HP_TOP = compact ? 34 : 18; // compact: legend row sits above the plot
+  const HP_H = compact ? 136 : 128;
+  const GOLD_TOP = HP_TOP + HP_H + (compact ? 40 : 26);
+  const GOLD_H = compact ? 56 : 64;
+  const STRIP_TOP = GOLD_TOP + GOLD_H + 14;
+  const STRIP_H = compact ? 14 : 18;
+  const AXIS_Y = STRIP_TOP + STRIP_H + (compact ? 20 : 18);
+  const H = AXIS_Y + 8;
+  return { FS, PAD_L, PAD_R, HP_TOP, HP_H, GOLD_TOP, GOLD_H, STRIP_TOP, STRIP_H, AXIS_Y, H };
+}
 const after = (p: SeriesPoint) => Math.max(0, p.hp - p.damage);
 
 export function Timeline({
@@ -30,6 +36,7 @@ export function Timeline({
   width?: number;
 }) {
   const W = width;
+  const { FS, PAD_L, PAD_R, HP_TOP, HP_H, GOLD_TOP, GOLD_H, STRIP_TOP, STRIP_H, AXIS_Y, H } = layout(compact);
   const n = series.length;
   const step = (W - PAD_L - PAD_R) / n;
   const cx = (i: number) => PAD_L + step * i + step / 2;
@@ -72,19 +79,19 @@ export function Timeline({
       {[0, 50, 100].map((v) => (
         <g key={v}>
           <line x1={PAD_L} x2={W - PAD_R} y1={hpY(v)} y2={hpY(v)} stroke="var(--line)" strokeDasharray={v === 0 ? undefined : "2 4"} />
-          <text x={PAD_L - 8} y={hpY(v) + 3.5} textAnchor="end" fontSize="10" fill="var(--muted)" className="tnum">
+          <text x={PAD_L - 8} y={hpY(v) + FS / 3} textAnchor="end" fontSize={FS - 0.5} fill="var(--muted)" className="tnum">
             {v}
           </text>
         </g>
       ))}
-      <text x={PAD_L} y={HP_TOP - 6} fontSize="10.5" fill="var(--ink-2)">
+      <text x={PAD_L} y={compact ? 14 : HP_TOP - 6} fontSize={FS} fill="var(--ink-2)">
         HP after combat
       </text>
-      <g transform={`translate(${W - PAD_R - 150}, ${HP_TOP - 14})`}>
+      <g transform={`translate(${W - PAD_R - (compact ? 170 : 150)}, ${compact ? 4 : HP_TOP - 14})`}>
         <line x1={0} x2={16} y1={0} y2={0} stroke="var(--hp)" strokeWidth={2} transform="translate(0,4)" />
-        <text x={22} y={7.5} fontSize="10.5" fill="var(--ink-2)">You</text>
-        <line x1={58} x2={74} y1={4} y2={4} stroke="var(--ink-2)" strokeWidth={1.5} strokeDasharray="3 3" />
-        <text x={80} y={7.5} fontSize="10.5" fill="var(--ink-2)">Lobby median</text>
+        <text x={22} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">You</text>
+        <line x1={compact ? 66 : 58} x2={compact ? 84 : 74} y1={4} y2={4} stroke="var(--ink-2)" strokeWidth={1.5} strokeDasharray="3 3" />
+        <text x={compact ? 90 : 80} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">Lobby median</text>
       </g>
 
       <path d={hpArea} fill="url(#hpFill)" />
@@ -95,11 +102,11 @@ export function Timeline({
       )}
 
       {/* gold */}
-      <text x={PAD_L} y={GOLD_TOP - 8} fontSize="10.5" fill="var(--ink-2)">
+      <text x={PAD_L} y={GOLD_TOP - (compact ? 14 : 8)} fontSize={FS} fill="var(--ink-2)">
         Gold at round start
       </text>
       <line x1={PAD_L} x2={W - PAD_R} y1={goldY(50)} y2={goldY(50)} stroke="var(--gold)" strokeOpacity={0.35} strokeDasharray="2 4" />
-      <text x={PAD_L - 8} y={goldY(50) + 3.5} textAnchor="end" fontSize="10" fill="var(--muted)" className="tnum">
+      <text x={PAD_L - 8} y={goldY(50) + FS / 3} textAnchor="end" fontSize={FS - 0.5} fill="var(--muted)" className="tnum">
         50
       </text>
       {series.map((p, i) => (
@@ -145,7 +152,7 @@ export function Timeline({
             x={cx(i)}
             y={AXIS_Y}
             textAnchor="middle"
-            fontSize="10"
+            fontSize={compact ? FS : 10}
             className="tnum"
             fill={selected === p.stage ? "var(--ink)" : isStart ? "var(--ink-2)" : "var(--muted)"}
             fontWeight={selected === p.stage ? 600 : 400}

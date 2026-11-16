@@ -12,7 +12,7 @@ import type {
 // Builds a realistic sample game in the recorder's shape. Gold, XP and shops are
 // simulated with the real economy rules so the review engine reads consistent
 // numbers. The player's choices are scripted to tell one believable story:
-// a long loss streak into a late, thin rolldown, finishing 6th.
+// a long loss streak into a late, thin rolldown, out first in 8th.
 
 function rng(seed: number) {
   return () => {
@@ -87,8 +87,8 @@ const OPPONENTS: { id: string; name: string; place: number; strength: number }[]
   { id: "o3", name: "Rho", place: 3, strength: 1.06 },
   { id: "o4", name: "Bramblefox", place: 4, strength: 1.02 },
   { id: "o5", name: "Sev", place: 5, strength: 0.98 },
-  { id: "o7", name: "Quietcarry", place: 7, strength: 0.9 },
-  { id: "o8", name: "Pim", place: 8, strength: 0.84 },
+  { id: "o7", name: "Quietcarry", place: 6, strength: 0.9 },
+  { id: "o8", name: "Pim", place: 7, strength: 0.84 },
 ];
 
 function stageIndex(stage: string) {
@@ -99,7 +99,8 @@ function stageIndex(stage: string) {
 function opponentAt(o: (typeof OPPONENTS)[number], stage: string, i: number, r: () => number): Opponent {
   const t = stageIndex(stage);
   // HP drops faster for weaker players; eliminations are scripted by placement.
-  const elimAt = o.place === 8 ? 43 : o.place === 7 ? 46 : 99;
+  // the player is the first one out (8th), so nobody else is eliminated before 5-1
+  const elimAt = 99;
   const lossRate = (1.3 - o.strength) * 4.6;
   const progressed = Math.max(0, t - 20);
   let hp = Math.round(100 - lossRate * progressed * (t > 30 ? 1.25 : 1) - r() * 3);
@@ -115,7 +116,7 @@ function opponentAt(o: (typeof OPPONENTS)[number], stage: string, i: number, r: 
     hp,
     level,
     boardValue,
-    eliminatedAt: hp === 0 ? (o.place === 8 ? "4-3" : "4-6") : undefined,
+    eliminatedAt: undefined,
   };
   void i;
 }
@@ -248,7 +249,12 @@ export function buildSampleGame(): GameRecord {
     if (s.outcome === "win") streak = streak > 0 ? streak + 1 : 1;
     if (s.outcome === "loss") streak = streak < 0 ? streak - 1 : -1;
 
-    const roster = OPPONENTS.map((o, j) => opponentAt(o, s.stage, j, r));
+    // HP never goes up: each opponent's HP is capped at its previous value
+    const roster = OPPONENTS.map((o, j) => {
+      const op = opponentAt(o, s.stage, j, r);
+      const prev = rounds[rounds.length - 1]?.roster[j];
+      return prev ? { ...op, hp: Math.min(op.hp, prev.hp) } : op;
+    });
     const alive = roster.filter((o) => o.hp > 0);
 
     rounds.push({
@@ -279,8 +285,8 @@ export function buildSampleGame(): GameRecord {
   return {
     id: "sample",
     player: "you",
-    placement: 6,
-    patch: "Patch 14.3",
+    placement: 8,
+    patch: "Patch 18.3",
     setName: "Sample Set",
     queue: "Ranked",
     playedAt: "2026-11-15T22:41:00-05:00",

@@ -30,6 +30,12 @@ export const UNITS: UnitDef[] = [
   { id: "nyx", name: "Nyx", cost: 5, traits: ["Tidecaller", "Ashen"] },
 ];
 
+// Short mark drawn on each unit tile: the first letter, or two letters when
+// another unit shares that first letter.
+export const UNIT_MARK: Record<string, string> = Object.fromEntries(
+  UNITS.map((u) => [u.id, UNITS.some((o) => o.id !== u.id && o.name[0] === u.name[0]) ? u.name.slice(0, 2) : u.name[0]]),
+);
+
 export const UNIT_BY_ID: Record<string, UnitDef> = Object.fromEntries(
   UNITS.map((u) => [u.id, u]),
 );

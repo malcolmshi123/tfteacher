@@ -82,8 +82,8 @@ export function RoundInspector({
       {takeaway && <p className="text-pretty border-b border-[var(--line)] px-4 py-3 text-[14px] leading-snug text-[var(--ink)] sm:px-5">{takeaway}</p>}
 
       <dl className="grid grid-cols-2 border-b border-[var(--line)] sm:grid-cols-4">
-        <Stat k="HP" v={`${r.hp}`} sub={r.damageTaken ? `→ ${Math.max(0, r.hp - r.damageTaken)} after` : `lobby ${pt.lobbyHp}`} tone={r.hp < pt.lobbyHp ? "hp" : undefined} />
-        <Stat k="Gold" v={`${r.gold}`} sub={`→ ${r.goldEnd} at fight`} />
+        <Stat k="HP" v={`${r.hp}`} sub={`lobby ${pt.lobbyHp}`} tone={r.hp < pt.lobbyHp ? "hp" : undefined} />
+        <Stat k="Gold" v={`${r.gold}`} sub={`${r.goldEnd} at fight`} />
         <Stat k="Level" v={`${r.level}`} sub={`lobby ${pt.lobbyLevel}`} tone={r.level < pt.lobbyLevel ? "hp" : r.level > pt.lobbyLevel ? "good" : undefined} />
         <Stat k="Board" v={`${pt.boardValue}`} sub={`lobby ${pt.lobbyBoardValue}`} tone={pt.boardValue < pt.lobbyBoardValue ? "hp" : "good"} />
       </dl>

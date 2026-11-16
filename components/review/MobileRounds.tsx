@@ -19,9 +19,9 @@ export function MobileRounds({
   const strip = useRef<HTMLDivElement>(null);
   const hl = new Set(highlight ?? []);
   const W = 340;
-  const H = 104;
+  const H = 140;
   const L = 26; // room for HP labels
-  const GH = 30;
+  const GH = 36;
   const maxGold = Math.max(60, ...series.map((p) => p.gold));
   const n = series.length;
   const x = (i: number) => L + ((W - L - 14) * i) / (n - 1);
@@ -119,12 +119,12 @@ export function MobileRounds({
       <span className="pointer-events-none absolute inset-y-0 -left-3 w-6 bg-gradient-to-r from-[var(--panel)] to-transparent" />
       <span className="pointer-events-none absolute inset-y-0 -right-3 w-6 bg-gradient-to-l from-[var(--panel)] to-transparent" />
       </div>
-      <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 px-1 text-[12px] text-[var(--muted)]">
+      <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 px-1 text-[13px] text-[var(--muted)]">
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--good)]" />Won</span>
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--hp)]" />Lost</span>
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--line-2)]" />Monster round</span>
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full border border-dashed border-[var(--ink-2)]" />Shared draft</span>
-        <span>Tap a round to open it</span>
+        <span className="w-full text-[var(--ink-2)]">Swipe the rounds, tap one to open it</span>
       </p>
     </div>
   );

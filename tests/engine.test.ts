@@ -93,3 +93,17 @@ describe("ordering", () => {
     expect(boardValue([{ unit: "kestrel", star: 2, items: [] }])).toBe(12);
   });
 });
+
+describe("lobby", () => {
+  it("opponent HP never goes up", () => {
+    for (let i = 1; i < game.rounds.length; i++)
+      game.rounds[i].roster.forEach((o, j) => expect(o.hp, `${game.rounds[i].stage} ${o.name}`).toBeLessThanOrEqual(game.rounds[i - 1].roster[j].hp));
+  });
+});
+
+describe("placement", () => {
+  it("is 8th, so no opponent is out before the player", () => {
+    expect(game.placement).toBe(8);
+    for (const r of game.rounds) for (const o of r.roster) expect(o.hp, `${r.stage} ${o.name}`).toBeGreaterThan(0);
+  });
+});

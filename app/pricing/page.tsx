@@ -7,7 +7,7 @@ const FREE = [
   "3 round-by-round reviews a week",
   "Final-board reviews for games you didn't record",
   "3 questions per review",
-  "Patch Radar summary for your top comp",
+  "Patch Radar for your most played comp",
   "Last 20 games of history",
 ];
 const PRO = [
@@ -84,7 +84,7 @@ const COMPARE: [string, string, string][] = [
   ["Round-by-round reviews", "3 a week", "Unlimited"],
   ["Final-board reviews", "Yes", "Yes"],
   ["Questions per review", "3", "Unlimited"],
-  ["Patch Radar", "Top comp", "Every comp"],
+  ["Patch Radar", "Most played comp", "Every comp"],
   ["Trends across games", "No", "Yes"],
   ["History", "20 games", "All games"],
 ];
@@ -116,7 +116,7 @@ function TrendsPreview() {
         ))}
       </div>
       <p className="mt-6 border-t border-[var(--line)] pt-4 text-[14px] leading-relaxed text-[var(--ink-2)]">
-        Stage 3 costs this player the most HP per game. Their reviews point at the same habit: loss streaking after dropping below 50 HP.
+        Stage 3 costs this player the most HP per game. Their reviews point at the same habit: staying on loss streaks after HP drops below 50.
       </p>
     </div>
   );
@@ -151,7 +151,7 @@ function Plan({ name, price, cadence, note, items, cta, href, featured }: { name
       >
         {cta}
       </Link>
-      <p className="mt-2 text-center text-[13px] text-[var(--ink-2)]">{featured ? "No card needed for the trial. Cancel any time." : "Web reviews work on any computer."}</p>
+      <p className="mt-2 text-center text-[13px] text-[var(--ink-2)]">{featured ? "No card needed for the trial. Cancel any time." : "No Windows? Final-board reviews work on the web."}</p>
     </div>
   );
 }

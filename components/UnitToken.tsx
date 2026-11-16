@@ -1,4 +1,4 @@
-import { ITEMS, UNIT_BY_ID } from "@/lib/game/set";
+import { ITEMS, UNIT_BY_ID, UNIT_MARK } from "@/lib/game/set";
 import type { Piece } from "@/lib/game/types";
 import { TraitGlyph } from "./TraitGlyph";
 
@@ -46,8 +46,8 @@ export function UnitToken({
         <span className="absolute inset-0 grid place-items-center opacity-30">
           <TraitGlyph trait={u.traits[0]} size={size * 0.78} color={`color-mix(in oklab, ${color} 70%, white)`} />
         </span>
-        <span className="relative font-semibold leading-none" style={{ fontSize: size * 0.42, color: `color-mix(in oklab, ${color} 35%, white)`, textShadow: "0 1px 2px rgba(0,0,0,0.6)" }}>
-          {u.name[0]}
+        <span className="relative font-semibold leading-none" style={{ fontSize: size * (UNIT_MARK[id].length > 1 ? 0.34 : 0.42), color: `color-mix(in oklab, ${color} 35%, white)`, textShadow: "0 1px 2px rgba(0,0,0,0.6)" }}>
+          {UNIT_MARK[id]}
         </span>
         {!small && (
           <span className="absolute bottom-[3px] right-[3px] opacity-70">
