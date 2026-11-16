@@ -109,7 +109,8 @@ function streakGold(n: number) {
 export function buildSeries(game: GameRecord): SeriesPoint[] {
   return game.rounds.map((r, i) => {
     const alive = r.roster.filter((o) => o.hp > 0);
-    const before = (game.rounds[i - 1] ?? r).roster.filter((o) => o.hp > 0);
+    // HP median counts knocked-out players at 0, so it can only go down
+    const before = (game.rounds[i - 1] ?? r).roster;
     return {
       stage: r.stage,
       hp: r.hp,
@@ -119,7 +120,7 @@ export function buildSeries(game: GameRecord): SeriesPoint[] {
       boardValue: boardValue(r.board),
       lobbyBoardValue: Math.round(median(alive.map((o) => o.boardValue))),
       lobbyLevel: median(alive.map((o) => o.level)),
-      lobbyHp: Math.round(median(alive.map((o) => o.hp))),
+      lobbyHp: Math.round(median(r.roster.map((o) => o.hp))),
       lobbyHpEntering: Math.round(median(before.map((o) => o.hp))),
       outcome: r.outcome,
       kind: r.kind,
@@ -315,7 +316,7 @@ export function analyze(game: GameRecord): Review {
       positive: true,
       severity: "low",
       title: `Won your first ${opening} player fights`,
-      detail: `You won ${wins.map((w) => w.stage).join(" and ")} and kept all ${wins[0].hp} HP until the streak began. The opener was not where this game was lost.`,
+      detail: `You won ${wins.map((w) => w.stage).join(" and ")} and kept all ${wins[0].hp} HP until your first loss.${game.placement > 4 ? " The opener was not where this game was lost." : " The opener set this game up."}`,
       advice: "Keep opening this way. Spend the review time on stage 3 and 4.",
       stages: wins.map((r) => r.stage),
       focus: wins[0].stage,

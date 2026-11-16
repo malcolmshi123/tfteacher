@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ordinal, type Finding, type Review } from "@/lib/review/engine";
 import { AskPanel } from "./AskPanel";
@@ -41,12 +42,15 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
   const played = new Date(game.playedAt);
 
   return (
-    <div className="mx-auto max-w-[1240px] px-4 pb-24 pt-8 md:px-6 md:pt-10">
+    <div className="mx-auto max-w-[1240px] px-4 pb-24 pt-6 md:px-6 md:pt-8" style={{ ["--place" as string]: game.placement <= 4 ? "var(--good)" : "var(--hp)" }}>
+      <Link href="/reviews" className="mb-5 inline-flex items-center gap-1.5 text-[13px] text-[var(--muted)] hover:text-[var(--ink)]">
+        <span aria-hidden>‹</span> All reviews
+      </Link>
       {/* header */}
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div className="max-w-[760px]">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-[var(--muted)]">
-            <span className="tnum rounded-md bg-[color-mix(in_oklab,var(--hp)_16%,var(--panel-2))] px-1.5 py-0.5 font-semibold text-[var(--hp)] md:hidden">{ordinal(game.placement)} of 8</span>
+            <span className="tnum rounded-md bg-[color-mix(in_oklab,var(--place)_16%,var(--panel-2))] px-1.5 py-0.5 font-semibold text-[var(--place)] md:hidden">{ordinal(game.placement)} of 8</span>
             <span>{game.queue}</span>
             <Dot />
             <span>{game.patch}</span>
@@ -65,7 +69,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
           <p className="mt-3 max-w-[640px] text-[15px] leading-relaxed text-[var(--ink-2)]">{review.summary}</p>
         </div>
         <div className="hidden shrink-0 items-center gap-3 rounded-2xl border md:flex border-[var(--line)] bg-[var(--panel)] py-3 pl-3 pr-5">
-          <span className="tnum flex h-14 w-14 items-center justify-center rounded-xl bg-[color-mix(in_oklab,var(--hp)_16%,var(--panel-2))] font-semibold text-[var(--hp)]">
+          <span className="tnum flex h-14 w-14 items-center justify-center rounded-xl bg-[color-mix(in_oklab,var(--place)_16%,var(--panel-2))] font-semibold text-[var(--place)]">
             <span className="text-[24px] leading-none">{game.placement}</span>
             <span className="ml-[2px] self-start pt-[13px] text-[11px] leading-none">{ordinal(game.placement).slice(String(game.placement).length)}</span>
           </span>
@@ -115,8 +119,11 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
           <div className="mb-3 flex items-baseline justify-between">
             <h2 className="text-[15px] font-medium">What decided this game</h2>
             <span className="text-[12px] text-[var(--muted)]">
-              {findings.filter((f) => !f.positive).length} mistakes, worst first
-              {findings.some((f) => f.positive) ? ` · ${findings.filter((f) => f.positive).length} strength` : ""}
+              {(() => {
+                const bad = findings.filter((f) => !f.positive).length;
+                const good = findings.length - bad;
+                return `${bad} mistake${bad === 1 ? "" : "s"}, worst first${good ? ` · ${good} strength${good === 1 ? "" : "s"}` : ""}`;
+              })()}
             </span>
           </div>
           <ol className="space-y-3">

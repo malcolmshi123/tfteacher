@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { SiteFooter, SiteNav } from "@/components/SiteChrome";
 import { ReviewView } from "@/components/review/ReviewView";
-import { buildSampleGame } from "@/lib/game/sample";
+import { gameById } from "@/lib/game/games";
 import { analyze } from "@/lib/review/engine";
 
 export const metadata = { title: "Game review · TFTeacher" };
@@ -15,12 +15,13 @@ export default async function ReviewPage({
 }) {
   const { id } = await params;
   const { round } = await searchParams;
-  if (id !== "sample") notFound();
-  const review = analyze(buildSampleGame());
+  const found = gameById(id);
+  if (!found) notFound();
+  const review = analyze(found.game);
   const initial = review.game.rounds.some((r) => r.stage === round) ? round : undefined;
   return (
     <>
-      <SiteNav active="/review/sample" />
+      <SiteNav active="/reviews" />
       <main>
         <ReviewView review={review} initialRound={initial} />
       </main>

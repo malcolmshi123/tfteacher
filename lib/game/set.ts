@@ -103,6 +103,17 @@ export const ITEMS: Record<string, string> = {
   warmog: "Warmog's Armor",
   gargoyle: "Gargoyle Stoneplate",
   spirit: "Spirit Visage",
+  jeweled: "Jeweled Gauntlet",
+  shojin: "Spear of Shojin",
+  morello: "Morellonomicon",
+  bramble: "Bramble Vest",
+  claw: "Dragon's Claw",
+  guinsoo: "Guinsoo's Rageblade",
+  eon: "Edge of Night",
+  quicksilver: "Quicksilver",
+  lw: "Last Whisper",
+  sterak: "Sterak's Gage",
+  ie: "Infinity Edge",
 };
 
 export const RECIPES: Record<string, [string, string]> = {
@@ -111,6 +122,17 @@ export const RECIPES: Record<string, [string, string]> = {
   warmog: ["belt", "belt"],
   gargoyle: ["vest", "cloak"],
   spirit: ["tear", "belt"],
+  jeweled: ["rod", "glove"],
+  shojin: ["edge", "tear"],
+  morello: ["rod", "belt"],
+  bramble: ["vest", "vest"],
+  claw: ["cloak", "cloak"],
+  guinsoo: ["bow", "rod"],
+  eon: ["edge", "vest"],
+  quicksilver: ["glove", "cloak"],
+  lw: ["bow", "glove"],
+  sterak: ["edge", "belt"],
+  ie: ["edge", "glove"],
 };
 
 // Combine component pairs on one unit into their completed items.

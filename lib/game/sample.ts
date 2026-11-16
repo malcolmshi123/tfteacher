@@ -38,7 +38,7 @@ function parse(spec: string): Piece[] {
     });
 }
 
-interface Step {
+export interface Step {
   stage: string;
   kind: RoundKind;
   outcome: Outcome;
@@ -51,6 +51,8 @@ interface Step {
   forceShop?: Record<number, string[]>; // shop index -> units placed in it
   shops?: string[][]; // hand-set shops for a showcase round (rng is still drawn so later rounds don't shift)
   goldDrop?: number;
+  levelTo?: number; // buy XP until this level (instead of a fixed xp count)
+  rollTo?: number; // after buys, reroll down to this much gold (instead of a fixed count)
 }
 
 const SCRIPT: Step[] = [
@@ -152,14 +154,82 @@ function rollShop(level: number, r: () => number): string[] {
   return shop;
 }
 
+// Lobby for any placement: the opponents take the other 7 places. Those who
+// finish below you are knocked out one by one between 4-2 and your last round;
+// those above you are still alive when you go out, with more HP the better they
+// placed.
+interface LobbySeat {
+  place: number;
+  strength: number;
+  outAt?: number; // stage index of the round they're knocked out in
+  endT: number; // stage index of the player's last round
+}
+
+function lobbyPlan(script: Step[], placement: number): LobbySeat[] {
+  const places = [1, 2, 3, 4, 5, 6, 7, 8].filter((p) => p !== placement);
+  const endT = stageIndex(script[script.length - 1].stage);
+  const below = places.filter((p) => p > placement).sort((a, b) => b - a); // 8th goes first
+  const slots = script.filter((x) => x.kind === "pvp" && stageIndex(x.stage) >= 42 && stageIndex(x.stage) < endT).map((x) => stageIndex(x.stage));
+  return places.map((place) => {
+    const k = below.indexOf(place);
+    const outAt = k >= 0 ? slots[Math.min(slots.length - 1, Math.floor(((k + 1) * slots.length) / (below.length + 1)))] : undefined;
+    return { place, strength: 1.2 - (place - 1) * 0.055, outAt, endT };
+  });
+}
+
+function lobbyOpponent(seat: LobbySeat, o: (typeof OPPONENTS)[number], stage: string, r: () => number): Opponent {
+  const t = stageIndex(stage);
+  const prog = (until: number) => Math.max(0, Math.min(1, (t - 20) / Math.max(1, until - 20)));
+  let hp: number;
+  if (seat.outAt !== undefined) hp = t >= seat.outAt ? 0 : Math.max(2, Math.round(100 * (1 - Math.pow(prog(seat.outAt), 1.3)) - r() * 3));
+  else {
+    const endHp = 14 + (8 - seat.place) * 9;
+    hp = Math.max(endHp, Math.round(100 - (100 - endHp) * prog(seat.endT) - r() * 3));
+  }
+  const level = Math.min(9, t < 20 ? 3 : t < 30 ? 4 + (t >= 25 ? 1 : 0) : t < 40 ? 6 + (seat.strength > 1.05 && t >= 35 ? 1 : 0) : t < 50 ? 7 + (seat.strength > 0.95 ? 1 : 0) : 8 + (seat.strength > 1.05 ? 1 : 0));
+  const base = t < 20 ? 3 : t < 30 ? 8 + (t - 20) * 1.3 : t < 40 ? 17 + (t - 30) * 1.6 : t < 50 ? 30 + (t - 40) * 2.4 : 46 + (t - 50) * 1.5;
+  return {
+    id: o.id,
+    name: o.name,
+    hp,
+    level,
+    boardValue: hp === 0 ? 0 : Math.round(base * seat.strength + r() * 3),
+    eliminatedAt: seat.outAt !== undefined && t >= seat.outAt ? stage : undefined,
+  };
+}
+
 function copies(pieces: Piece[]): Record<string, number> {
   const out: Record<string, number> = {};
   for (const p of pieces) out[p.unit] = (out[p.unit] ?? 0) + copiesOf(p.star);
   return out;
 }
 
+export interface GameMeta {
+  id: string;
+  seed: number;
+  placement: number;
+  patch: string;
+  playedAt: string;
+  durationMin: number;
+  lobby?: "sample"; // the original hand-tuned lobby for the sample game
+}
+
 export function buildSampleGame(): GameRecord {
-  const r = rng(1729);
+  return simulate(SCRIPT, {
+    id: "sample",
+    seed: 1729,
+    placement: 8,
+    patch: "Patch 18.5",
+    playedAt: "2026-10-30T22:41:00-04:00",
+    durationMin: 31,
+    lobby: "sample",
+  });
+}
+
+// Runs a script through the real economy rules and builds the recorder's record.
+export function simulate(script: Step[], meta: GameMeta): GameRecord {
+  const r = rng(meta.seed);
+  const lobby = meta.lobby === "sample" ? null : lobbyPlan(script, meta.placement);
   const rounds: RoundSnapshot[] = [];
   let gold = 0;
   let hp = 100;
@@ -169,8 +239,8 @@ export function buildSampleGame(): GameRecord {
   let prevCopies: Record<string, number> = {};
   let prevPieces: Piece[] = [];
 
-  for (let i = 0; i < SCRIPT.length; i++) {
-    const s = SCRIPT[i];
+  for (let i = 0; i < script.length; i++) {
+    const s = script[i];
     const t = stageIndex(s.stage);
 
     // income at the start of the round
@@ -198,26 +268,8 @@ export function buildSampleGame(): GameRecord {
     const startLevel = level;
     const startXp = xp;
 
-    // planning phase
-    const rerolls = s.rerolls ?? 0;
-    const xpBought = s.xp ?? 0;
-    // XP first so the rolldown happens at the new level
-    xp += xpBought * 4;
-    gold -= xpBought * 4;
-    while (level < 9 && xp >= XP_TO_NEXT[level]) {
-      xp -= XP_TO_NEXT[level];
-      level++;
-    }
-
-    const shops: string[][] = [];
-    for (let k = 0; k <= rerolls; k++) {
-      const shop = rollShop(level, r);
-      const forced = s.forceShop?.[k];
-      if (forced) forced.forEach((u, j) => (shop[j] = u));
-      shops.push(s.shops?.[k] ? [...s.shops[k]] : shop);
-    }
-    gold -= rerolls * 2;
-
+    // planning phase: the board change is known up front, so XP and rolls can be
+    // sized to the gold that's left
     const board = parse(s.board ?? "");
     const bench = parse(s.bench ?? "");
     const now = copies([...board, ...bench]);
@@ -248,12 +300,48 @@ export function buildSampleGame(): GameRecord {
       }
       soldGold += left * UNIT_BY_ID[u].cost;
     }
+    const paid = s.kind !== "carousel" && t > 11;
+    const buyCost = paid ? bought.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0) : 0;
+
+    let xpBought = s.xp ?? 0;
+    if (s.levelTo !== undefined) {
+      let lv = level;
+      let x = xp;
+      while (lv < s.levelTo) {
+        xpBought++;
+        x += 4;
+        while (lv < 9 && x >= XP_TO_NEXT[lv]) {
+          x -= XP_TO_NEXT[lv];
+          lv++;
+        }
+      }
+    }
+    const spare = gold - xpBought * 4 - buyCost + (paid ? soldGold : 0);
+    const rerolls = s.rerolls ?? (s.rollTo !== undefined ? Math.max(0, Math.min(12, Math.floor((spare - s.rollTo) / 2))) : 0);
+    // XP first so the rolldown happens at the new level
+    xp += xpBought * 4;
+    gold -= xpBought * 4;
+    while (level < 9 && xp >= XP_TO_NEXT[level]) {
+      xp -= XP_TO_NEXT[level];
+      level++;
+    }
+
+    const shops: string[][] = [];
+    for (let k = 0; k <= rerolls; k++) {
+      const shop = rollShop(level, r);
+      const forced = s.forceShop?.[k];
+      if (forced) forced.forEach((u, j) => (shop[j] = u));
+      shops.push(s.shops?.[k] ? [...s.shops[k]] : shop);
+    }
+    gold -= rerolls * 2;
+
     // carousel picks are free
-    if (s.kind !== "carousel" && t > 11) {
-      gold -= bought.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0);
+    if (paid) {
+      gold -= buyCost;
       gold += soldGold;
     }
-    if (gold < 0) throw new Error(`sample game went negative gold at ${s.stage}: ${gold}`);
+    if (gold < 0) throw new Error(`${meta.id} went negative gold at ${s.stage}: ${gold}`);
+    if (board.length > level) throw new Error(`${meta.id} fields ${board.length} units at level ${level} at ${s.stage}`);
     // every unit bought must have been in a shop that round
     if (s.kind !== "carousel") {
       const locked = new Set<string>();
@@ -266,7 +354,7 @@ export function buildSampleGame(): GameRecord {
         for (let k = seen[u] ?? 0; k < n; k++) {
           const free: [number, number][] = [];
           shops.forEach((shop, si) => shop.forEach((x, j) => !locked.has(`${si}:${j}`) && !need[x] && free.push([si, j])));
-          if (!free.length) throw new Error(`no shop slot for ${u} at ${s.stage}`);
+          if (!free.length) throw new Error(`${meta.id}: no shop slot for ${u} at ${s.stage}`);
           const [si, j] = free[Math.floor(r() * free.length)];
           shops[si][j] = u;
           locked.add(`${si}:${j}`);
@@ -283,7 +371,7 @@ export function buildSampleGame(): GameRecord {
 
     // HP never goes up: each opponent's HP is capped at its previous value
     const roster = OPPONENTS.map((o, j) => {
-      const op = opponentAt(o, s.stage, j, r);
+      const op = lobby ? lobbyOpponent(lobby[j], o, s.stage, r) : opponentAt(o, s.stage, j, r);
       const prev = rounds[rounds.length - 1]?.roster[j];
       return prev ? { ...op, hp: Math.min(op.hp, prev.hp) } : op;
     });
@@ -318,14 +406,14 @@ export function buildSampleGame(): GameRecord {
   }
 
   return {
-    id: "sample",
+    id: meta.id,
     player: "you",
-    placement: 8,
-    patch: "Patch 18.5",
+    placement: meta.placement,
+    patch: meta.patch,
     setName: "Set 18",
     queue: "Ranked",
-    playedAt: "2026-10-30T22:41:00-04:00",
-    durationMin: 31,
+    playedAt: meta.playedAt,
+    durationMin: meta.durationMin,
     source: "recorder",
     rounds,
   };
