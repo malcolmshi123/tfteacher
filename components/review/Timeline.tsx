@@ -101,26 +101,33 @@ export function Timeline({
         p.damage > 0 ? <circle key={`d${i}`} cx={cx(i)} cy={hpY(after(p))} r={2.6} fill="var(--bg)" stroke="var(--hp)" strokeWidth={1.6} /> : null,
       )}
 
-      {/* gold */}
+      {/* gold: solid is what you took into combat, the faint cap is what you spent that round */}
       <text x={PAD_L} y={GOLD_TOP - (compact ? 14 : 8)} fontSize={FS} fill="var(--ink-2)">
-        Gold at round start
+        Gold into combat
       </text>
+      <g transform={`translate(${PAD_L + (compact ? 150 : 128)}, ${GOLD_TOP - (compact ? 14 : 8) - FS * 0.75})`}>
+        <rect x={0} y={0} width={10} height={10} rx={2} fill="var(--gold)" opacity={0.85} />
+        <text x={16} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">Held</text>
+        <rect x={compact ? 66 : 58} y={0} width={10} height={10} rx={2} fill="var(--gold)" fillOpacity={0.14} stroke="var(--gold)" strokeOpacity={0.45} strokeDasharray="2 2" />
+        <text x={compact ? 82 : 74} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">Spent</text>
+      </g>
       <line x1={PAD_L} x2={W - PAD_R} y1={goldY(50)} y2={goldY(50)} stroke="var(--gold)" strokeOpacity={0.35} strokeDasharray="2 4" />
       <text x={PAD_L - 8} y={goldY(50) + FS / 3} textAnchor="end" fontSize={FS - 0.5} fill="var(--muted)" className="tnum">
         50
       </text>
-      {series.map((p, i) => (
-        <rect
-          key={`g${i}`}
-          x={cx(i) - step * 0.3}
-          y={goldY(p.gold)}
-          width={step * 0.6}
-          height={GOLD_TOP + GOLD_H - goldY(p.gold)}
-          rx={1.5}
-          fill="var(--gold)"
-          opacity={selected === p.stage ? 1 : hl.has(p.stage) ? 0.85 : 0.45}
-        />
-      ))}
+      {series.map((p, i) => {
+        const on = selected === p.stage ? 1 : hl.has(p.stage) ? 0.85 : 0.45;
+        const x = cx(i) - step * 0.3;
+        const w = step * 0.6;
+        return (
+          <g key={`g${i}`}>
+            {p.gold > p.goldEnd && (
+              <rect x={x + 0.5} y={goldY(p.gold) + 0.5} width={w - 1} height={goldY(p.goldEnd) - goldY(p.gold) - 1} rx={1.5} fill="var(--gold)" fillOpacity={0.12 * on + 0.04} stroke="var(--gold)" strokeOpacity={0.5 * on + 0.1} strokeDasharray="2 2" />
+            )}
+            <rect x={x} y={goldY(p.goldEnd)} width={w} height={GOLD_TOP + GOLD_H - goldY(p.goldEnd)} rx={1.5} fill="var(--gold)" opacity={on} />
+          </g>
+        );
+      })}
 
       {/* fight strip */}
       {series.map((p, i) => {
@@ -173,7 +180,7 @@ export function Timeline({
       {onSelect &&
         series.map((p, i) => (
           <rect key={`t${i}`} x={cx(i) - step / 2} y={0} width={step} height={H} fill="transparent" className="cursor-pointer" onClick={() => onSelect(p.stage)}>
-            <title>{`${p.stage}: ${after(p)} HP, ${p.gold} gold, level ${p.level}`}</title>
+            <title>{`${p.stage}: ${after(p)} HP, ${p.gold} gold at start, ${p.goldEnd} into combat, level ${p.level}`}</title>
           </rect>
         ))}
     </svg>

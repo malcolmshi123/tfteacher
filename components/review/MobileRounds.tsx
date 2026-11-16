@@ -75,8 +75,19 @@ export function MobileRounds({
           ) : null,
         )}
         {series.map((p, i) => {
-          const h = (p.gold / maxGold) * GH;
-          return <rect key={i} x={x(i) - 4} y={H + 10 + GH - h} width={8} height={h} rx={1.5} fill="var(--gold)" opacity={i === si ? 1 : 0.5} />;
+          // solid: gold taken into combat; dashed cap: gold spent that round
+          const held = (p.goldEnd / maxGold) * GH;
+          const start = (p.gold / maxGold) * GH;
+          const base = H + 10 + GH;
+          const on = i === si ? 1 : 0.5;
+          return (
+            <g key={i}>
+              {start > held && (
+                <rect x={x(i) - 3.5} y={base - start + 0.5} width={7} height={start - held - 1} rx={1.5} fill="var(--gold)" fillOpacity={0.12 * on + 0.04} stroke="var(--gold)" strokeOpacity={0.5 * on + 0.1} strokeDasharray="2 2" />
+              )}
+              <rect x={x(i) - 4} y={base - held} width={8} height={held} rx={1.5} fill="var(--gold)" opacity={on} />
+            </g>
+          );
         })}
         {si >= 0 && (
           <>
@@ -87,8 +98,12 @@ export function MobileRounds({
       </svg>
 
       <div className="mt-1 flex justify-between px-1 text-[11px] text-[var(--muted)]">
-        <span>Gold at round start</span>
-        {si >= 0 && <span className="tnum text-[var(--gold)]">{series[si].gold} gold at {selected}</span>}
+        <span className="flex items-center gap-3">
+          Gold into combat
+          <span className="flex items-center gap-1.5"><span className="block h-2.5 w-2.5 rounded-[2px] bg-[var(--gold)]" />Held</span>
+          <span className="flex items-center gap-1.5"><span className="block h-2.5 w-2.5 rounded-[2px] border border-dashed border-[var(--gold)] bg-[color-mix(in_oklab,var(--gold)_14%,transparent)]" />Spent</span>
+        </span>
+        {si >= 0 && <span className="tnum text-[var(--gold)]">{series[si].goldEnd} of {series[si].gold} at {selected}</span>}
       </div>
       <div className="relative">
       <div ref={strip} className="-mx-3 mt-3 flex snap-x snap-mandatory scroll-pl-3 gap-1.5 overflow-x-auto px-3 pb-1 [scrollbar-width:none]" role="list" aria-label="Rounds">
