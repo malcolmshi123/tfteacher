@@ -33,3 +33,17 @@ describe("retrieval", () => {
     expect(retrieve(facts, "what happened at 4-5?")[0].stage).toBe("4-5");
   });
 });
+
+describe("the review's own text passes the claim check", () => {
+  for (const f of review.findings) {
+    it(f.id, () => {
+      const text = [f.title + ".", f.detail, ...(f.lines ?? []).map((l) => l + ".")].join(" ");
+      const bad = checkAnswer(text, facts).filter((s) => !s.ok);
+      expect(bad.map((b) => `${b.text} [${b.unsupported.join(",")}]`)).toEqual([]);
+    });
+  }
+  it("headline and summary", () => {
+    const bad = checkAnswer(`${review.headline} ${review.summary}`, facts).filter((s) => !s.ok);
+    expect(bad.map((b) => `${b.text} [${b.unsupported.join(",")}]`)).toEqual([]);
+  });
+});

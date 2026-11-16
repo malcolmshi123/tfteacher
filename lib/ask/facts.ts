@@ -56,8 +56,17 @@ export function buildFacts(review: Review): Fact[] {
     if (r.itemBench.length) out.push(fact(`i-${r.stage}`, r.stage, `${r.stage} unused components on bench: ${r.itemBench.map((x) => ITEMS[x]).join(", ")}.`));
   });
 
+  // Findings are facts too. The finding's own round gets its whole text (advice is
+  // searchable but its numbers never count). Every other round it touches gets
+  // only the evidence lines and cites that name that round.
   for (const f of findings) {
-    out.push(fact(`f-${f.id}`, f.focus, `${f.title}. ${f.detail} ${(f.lines ?? []).join(". ")} Advice: ${f.advice}`));
+    const claims = `${f.title}. ${f.detail} ${(f.lines ?? []).join(". ")}`;
+    out.push({ ...fact(`f-${f.id}`, f.focus, `${claims} Advice: ${f.advice}`), numbers: numbersIn(claims) });
+    const perStage = new Map<string, string[]>();
+    for (const l of f.lines ?? []) for (const st of l.match(/\d-\d/g) ?? []) perStage.set(st, [...(perStage.get(st) ?? []), l]);
+    for (const c of f.cites) perStage.set(c.stage, [...(perStage.get(c.stage) ?? []), `${c.stage} ${c.label}`]);
+    perStage.delete(f.focus);
+    for (const [st, ls] of perStage) out.push({ ...fact(`f-${f.id}@${st}`, st, ls.join(". ")), words: [] });
   }
   return out;
 }

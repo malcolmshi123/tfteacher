@@ -319,7 +319,7 @@ export function analyze(game: GameRecord): Review {
     game.placement <= 4
       ? `Top 4. Here is what kept it from being a win.`
       : streak && streakEndHp !== undefined && last.goldEnd >= 10
-        ? `You placed ${ordinal(game.placement)}: a loss streak left you at ${streakEndHp} HP by ${streak.focus}, and you went out holding ${last.goldEnd} gold.`
+        ? `You placed ${ordinal(game.placement)}: a loss streak left you at ${streakEndHp} HP by ${streak.focus}, and you went out at ${last.stage} holding ${last.goldEnd} gold.`
         : top.length
           ? `You placed ${ordinal(game.placement)}. ${top[0].title}.`
           : `You placed ${ordinal(game.placement)}. Here is what made the difference.`;
