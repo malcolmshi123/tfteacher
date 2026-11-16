@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { SiteFooter, SiteNav } from "@/components/SiteChrome";
 
-export const metadata = { title: "How reviews are checked · Afterboard" };
+export const metadata = { title: "How reviews are checked · TFTeacher" };
 
 const SOURCES = [
   {

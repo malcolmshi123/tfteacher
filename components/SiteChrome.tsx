@@ -8,7 +8,7 @@ export function Logo({ className = "" }: { className?: string }) {
         <path d="M5 8.5h4.5v4H14v3h3.5V19H21" fill="none" stroke="var(--brand)" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" />
         <circle cx="14" cy="12.5" r="2.1" fill="var(--hp)" />
       </svg>
-      <span className="text-[16px] font-semibold tracking-tight text-[var(--ink)]">Afterboard</span>
+      <span className="text-[16px] font-semibold tracking-tight text-[var(--ink)]">TFTeacher</span>
     </Link>
   );
 }
@@ -79,7 +79,7 @@ export function SiteFooter() {
         <div className="max-w-sm">
           <Logo />
           <p className="mt-3 text-[13px] leading-relaxed text-[var(--muted)]">
-            Afterboard isn&apos;t endorsed by Riot Games and doesn&apos;t reflect the views or opinions of Riot Games or anyone
+            TFTeacher isn&apos;t endorsed by Riot Games and doesn&apos;t reflect the views or opinions of Riot Games or anyone
             officially involved in producing or managing Riot Games properties. Riot Games and all associated properties are
             trademarks or registered trademarks of Riot Games, Inc.
           </p>

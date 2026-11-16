@@ -22,7 +22,7 @@ export default function Home() {
               Find out why you placed 6th.
             </h1>
             <p className="mt-5 max-w-[480px] text-[17px] leading-relaxed text-[var(--ink-2)]">
-              Afterboard records every round of your Teamfight Tactics game. When it ends, you get the few decisions that
+              TFTeacher records every round of your Teamfight Tactics game. When it ends, you get the few decisions that
               cost you placements, each one tied to the round it happened in.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -110,7 +110,7 @@ export default function Home() {
                 <p className="mt-5 text-[14px] leading-relaxed text-[var(--ink-2)]">Where you ended up, and nothing about how you got there.</p>
               </div>
               <div className="rounded-2xl border border-[var(--line-2)] bg-[var(--panel-2)] p-6">
-                <div className="text-[13px] font-medium text-[var(--brand)]">What Afterboard sees at 4-2 alone</div>
+                <div className="text-[13px] font-medium text-[var(--brand)]">What TFTeacher sees at 4-2 alone</div>
                 <div className="mt-5 space-y-2">
                   {r42.shops.slice(0, 3).map((shop, si) => (
                     <div key={si} className="flex items-center gap-3">

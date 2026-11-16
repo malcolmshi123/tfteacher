@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { SiteFooter, SiteNav } from "@/components/SiteChrome";
 
-export const metadata = { title: "Desktop app · Afterboard" };
+export const metadata = { title: "Desktop app · TFTeacher" };
 
 export default async function Download({ searchParams }: { searchParams: Promise<{ joined?: string; error?: string }> }) {
   const { joined, error } = await searchParams;

@@ -2,7 +2,7 @@ import { SiteFooter, SiteNav } from "@/components/SiteChrome";
 import { UnitToken } from "@/components/UnitToken";
 import { NOTES, PATCH, radar, type CompVerdict, type NoteLine } from "@/lib/patch/radar";
 
-export const metadata = { title: "Patch Radar · Afterboard" };
+export const metadata = { title: "Patch Radar · TFTeacher" };
 
 const TONE = {
   stronger: { color: "var(--good)", label: "Stronger for you" },

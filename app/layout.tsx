@@ -6,7 +6,7 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Afterboard",
+  title: "TFTeacher",
   description: "Round-by-round reviews of your Teamfight Tactics games. Every claim points at the round it came from.",
 };
 

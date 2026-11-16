@@ -4,7 +4,7 @@ import { ReviewView } from "@/components/review/ReviewView";
 import { buildSampleGame } from "@/lib/game/sample";
 import { analyze } from "@/lib/review/engine";
 
-export const metadata = { title: "Game review · Afterboard" };
+export const metadata = { title: "Game review · TFTeacher" };
 
 export default async function ReviewPage({
   params,

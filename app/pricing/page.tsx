@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { SiteFooter, SiteNav } from "@/components/SiteChrome";
 
-export const metadata = { title: "Pricing · Afterboard" };
+export const metadata = { title: "Pricing · TFTeacher" };
 
 const FREE = [
   "3 round-by-round reviews a week",
