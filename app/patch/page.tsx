@@ -15,8 +15,9 @@ const TONE = {
 
 export default function PatchPage() {
   const verdicts = radar();
-  // lines that touch every comp are shown once, above the comps
-  const shared = NOTES.filter((n) => verdicts.every((v) => v.lines.some((l) => l.id === n.id)));
+  // lines that touch two or more of your comps are shown once, above the cards
+  const touches = (id: string) => verdicts.filter((v) => v.lines.some((l) => l.id === id)).map((v) => v.comp.name);
+  const shared = NOTES.filter((n) => touches(n.id).length >= 2);
   const sharedIds = new Set(shared.map((n) => n.id));
   const games = verdicts.reduce((a, v) => a + v.comp.games, 0);
   // headline from the verdicts: most played comp first, then the rest
@@ -77,10 +78,10 @@ export default function PatchPage() {
 
         {shared.length > 0 && (
           <section className="mt-10 rounded-2xl border border-[var(--line)] bg-[var(--panel)] px-5 py-4">
-            <div className="text-[13px] text-[var(--muted)]">Touches all your comps</div>
-            <ul className="mt-2 space-y-2">
+            <div className="text-[13px] font-medium text-[var(--ink)]">Shared by more than one of your comps</div>
+            <ul className="mt-3 space-y-2">
               {shared.map((n) => (
-                <NoteRow key={n.id} n={n} />
+                <NoteRow key={n.id} n={n} note={touches(n.id).length === verdicts.length ? "All your comps" : touches(n.id).join(", ")} />
               ))}
             </ul>
           </section>
@@ -177,7 +178,19 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
         })()}
       </div>
       <div className="p-6">
-        <p className="max-w-[620px] text-[16px] font-medium leading-relaxed text-[var(--ink)]">{v.why}</p>
+        {(() => {
+          const cut = v.why.indexOf(". ");
+          const lead = cut > 0 ? v.why.slice(0, cut + 1) : v.why;
+          const rest = cut > 0 ? v.why.slice(cut + 2) : "";
+          const hidden = v.lines.filter((l) => hide.has(l.id)).length;
+          return (
+            <>
+              <p className="max-w-[620px] text-[17px] font-semibold leading-snug text-[var(--ink)]">{lead}</p>
+              {rest && <p className="mt-2 max-w-[620px] text-[14px] leading-relaxed text-[var(--ink-2)]">{rest}</p>}
+              {hidden > 0 && <p className="mt-2 text-[13px] text-[var(--muted)]">Also counts {hidden} shared change{hidden === 1 ? "" : "s"} listed above.</p>}
+            </>
+          );
+        })()}
         <ul className="mt-5 space-y-2">
           {v.lines
             .filter((l) => !hide.has(l.id))
@@ -190,11 +203,14 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
   );
 }
 
-function NoteRow({ n }: { n: NoteLine }) {
+function NoteRow({ n, note }: { n: NoteLine; note?: string }) {
   return (
     <li className="flex items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--bg)] px-4 py-2.5 text-[14px]">
       <Dir d={n.direction} />
-      <span className="tnum flex-1 text-[var(--ink-2)]">{n.text}</span>
+      <span className="tnum flex-1 text-[var(--ink-2)]">
+        {n.text}
+        {note && <span className="block text-[12px] text-[var(--muted)]">{note}</span>}
+      </span>
       <Delta n={n} />
     </li>
   );
@@ -215,8 +231,9 @@ function Meter({ score }: { score: number }) {
           style={{ background: color, width: `${pct}%`, left: clamped < 0 ? `${50 - pct}%` : "50%" }}
         />
       </div>
-      <div className="mt-1.5 flex justify-between text-[11px] text-[var(--muted)]">
+      <div className="tnum mt-1.5 flex justify-between text-[12px] text-[var(--muted)]">
         <span>Weaker</span>
+        <span style={{ color }}>{score === 0 ? "even" : `${score > 0 ? "+" : "−"}${Math.abs(score)} net`}</span>
         <span>Stronger</span>
       </div>
     </div>

@@ -269,7 +269,6 @@ export function analyze(game: GameRecord): Review {
     }
   }
   if (idleReport.length) {
-    const total = idleReport.reduce((a, x) => a + x.rounds, 0);
     findings.push({
       id: "idle-items",
       kind: "idle-items",
@@ -377,7 +376,7 @@ export function analyze(game: GameRecord): Review {
   };
   const good = opener ? `won your first ${opener.stages.length} player fights` : "";
   const bad = worst ? mistake(worst) : `died on ${last.stage}`;
-  const story = good ? `${good}, but ${bad}` : bad;
+  const story = bad;
 
   const headline = streakStory
     ? `You placed ${place}: a loss streak left you at ${streakEndHp} HP after ${streak!.focus}, and you died on ${last.stage} holding ${last.goldEnd} gold.`
@@ -398,7 +397,7 @@ export function analyze(game: GameRecord): Review {
     const lost = fights.filter((r) => r.outcome === "loss").length;
     summary =
       game.placement > 1
-        ? `You lost ${lost} of ${fights.length} player fights and died on ${last.stage}${last.goldEnd >= 10 ? ` holding ${last.goldEnd} gold` : ""}.`
+        ? `${good ? `You ${good}, lost ${lost} of ${fights.length} overall` : `You lost ${lost} of ${fights.length} player fights`} and died on ${last.stage}${last.goldEnd >= 10 ? ` holding ${last.goldEnd} gold` : ""}.`
         : `You lost ${lost} of ${fights.length} player fights and won the lobby.`;
   }
 

@@ -39,6 +39,9 @@ export function buildFacts(review: Review): Fact[] {
   out.push(fact("g-place", "game", `Placed ${game.placement} of 8 in ${game.queue}, ${game.patch}, ${game.durationMin} minutes, died on ${last.stage}.`));
   const fights = game.rounds.filter((r) => r.kind === "pvp");
   out.push(fact("g-fights", "game", `Lost ${fights.filter((r) => r.outcome === "loss").length} of ${fights.length} player fights.`));
+  let opening = 0;
+  while (opening < fights.length && fights[opening].outcome === "win") opening++;
+  if (opening) out.push(fact("g-opener", "game", `Won the first ${opening} player fights.`));
   out.push(fact("g-rolls", "game", `Rerolled ${game.rounds.reduce((a, r) => a + r.rerolls, 0)} times in the whole game.`));
 
   game.rounds.forEach((r, i) => {
