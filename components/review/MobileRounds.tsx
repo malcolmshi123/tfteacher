@@ -19,7 +19,7 @@ export function MobileRounds({
   const strip = useRef<HTMLDivElement>(null);
   const hl = new Set(highlight ?? []);
   const W = 340;
-  const H = 140;
+  const H = 156;
   const L = 26; // room for HP labels
   const GH = 48;
   const maxGold = Math.max(60, ...series.map((p) => p.gold));
@@ -62,14 +62,14 @@ export function MobileRounds({
         {[0, 50, 100].map((v) => (
           <g key={v}>
             <line x1={L} x2={W} y1={y(v)} y2={y(v)} stroke="var(--line)" strokeDasharray={v ? "2 4" : undefined} />
-            <text x={L - 6} y={y(v) + 4} textAnchor="end" fontSize="11" fill="var(--muted)" className="tnum">{v}</text>
+            <text x={L - 6} y={y(v) + 4} textAnchor="end" fontSize="12" fill="var(--ink-2)" className="tnum">{v}</text>
           </g>
         ))}
         <path d={lobby} fill="none" stroke="var(--ink-2)" strokeOpacity={0.55} strokeWidth={1.25} strokeDasharray="3 3" />
         <path d={line} fill="none" stroke="var(--hp)" strokeWidth={2.25} strokeLinejoin="round" />
         {series.map((p, i) =>
           p.stage.endsWith("-1") && p.stage !== "1-1" ? (
-            <text key={`t${i}`} x={x(i)} y={H + 10 + GH + 14} textAnchor="middle" fontSize="11" fill={p.stage === selected ? "var(--ink)" : "var(--muted)"} className="tnum">
+            <text key={`t${i}`} x={x(i)} y={H + 10 + GH + 14} textAnchor="middle" fontSize="12" fill={p.stage === selected ? "var(--ink)" : "var(--ink-2)"} className="tnum">
               {p.stage}
             </text>
           ) : null,
@@ -97,13 +97,13 @@ export function MobileRounds({
         )}
       </svg>
 
-      <div className="mt-1 flex justify-between px-1 text-[11px] text-[var(--muted)]">
+      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 px-1 text-[12px] text-[var(--muted)]">
         <span className="flex items-center gap-3">
           Gold into combat
           <span className="flex items-center gap-1.5"><span className="block h-2.5 w-2.5 rounded-[2px] bg-[var(--gold)]" />Held</span>
           <span className="flex items-center gap-1.5"><span className="block h-2.5 w-2.5 rounded-[2px] border border-dashed border-[var(--gold)] bg-[color-mix(in_oklab,var(--gold)_14%,transparent)]" />Spent</span>
         </span>
-        {si >= 0 && <span className="tnum text-[var(--gold)]">{series[si].goldEnd} of {series[si].gold} into combat at {selected}</span>}
+        {si >= 0 && <span className="tnum w-full text-[var(--gold)]">{series[si].goldEnd} of {series[si].gold} into combat at {selected}</span>}
       </div>
       <div className="relative">
       <div ref={strip} className="-mx-3 mt-3 flex snap-x snap-mandatory scroll-pl-3 gap-1.5 overflow-x-auto px-3 pb-1 [scrollbar-width:none]" role="list" aria-label="Rounds">

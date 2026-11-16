@@ -384,8 +384,6 @@ export function analyze(game: GameRecord): Review {
     : `You placed ${place}: you ${story}.`;
 
   const totalRolls = R.reduce((a, r) => a + r.rerolls, 0);
-  const r41 = R.find((r) => r.stage === "4-1");
-  const lobbyHp41 = r41 ? series[R.indexOf(r41)].lobbyHp : undefined;
   let summary = "";
   if (peakHpLoss) {
     const k = R.findIndex((r) => r.stage === peakHpLoss.focus);
@@ -415,7 +413,18 @@ export function analyze(game: GameRecord): Review {
     summary,
     stats: [
       { label: "Fights lost", value: `${R.filter((r) => r.kind === "pvp" && r.outcome === "loss").length} of ${R.filter((r) => r.kind === "pvp").length}`, note: "player fights" },
-      { label: "HP after 4-1", value: String(r41 ? Math.max(0, r41.hp - r41.damageTaken) : "n/a"), note: lobbyHp41 !== undefined ? `lobby median ${lobbyHp41}` : undefined },
+      // the HP stat follows the round this game turned on: the streak's end, else the costliest mistake
+      (() => {
+        const keyStage = streak?.focus ?? worst?.focus ?? "4-1";
+        const k = R.findIndex((r) => r.stage === keyStage);
+        if (k < 0) return { label: "HP after 4-1", value: "n/a" };
+        const pt = series[k];
+        return {
+          label: `HP after ${keyStage}`,
+          value: String(Math.max(0, R[k].hp - R[k].damageTaken)),
+          note: pt.lobbyAlive >= 4 ? `lobby median ${pt.lobbyHp}` : `${pt.lobbyAlive} others left`,
+        };
+      })(),
       { label: "Rerolls", value: String(totalRolls), note: "whole game" },
       { label: "Gold at death", value: String(last.goldEnd), note: `unspent at ${last.stage}` },
     ],

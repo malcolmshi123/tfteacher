@@ -80,7 +80,7 @@ export function Timeline({
       {[0, 50, 100].map((v) => (
         <g key={v}>
           <line x1={PAD_L} x2={W - PAD_R} y1={hpY(v)} y2={hpY(v)} stroke="var(--line)" strokeDasharray={v === 0 ? undefined : "2 4"} />
-          <text x={PAD_L - 8} y={hpY(v) + FS / 3} textAnchor="end" fontSize={FS - 0.5} fill="var(--muted)" className="tnum">
+          <text x={PAD_L - 8} y={hpY(v) + FS / 3} textAnchor="end" fontSize={FS} fill="var(--ink-2)" className="tnum">
             {v}
           </text>
         </g>
@@ -96,6 +96,16 @@ export function Timeline({
       </g>}
 
       <path d={hpArea} fill="url(#hpFill)" />
+      {(() => {
+        // say why the lobby line stops early
+        const lastLive = series.reduce((k, p, i) => (p.lobbyAlive >= 4 ? i : k), -1);
+        if (compact || lastLive < 0 || lastLive === series.length - 1) return null;
+        return (
+          <text x={cx(lastLive)} y={HP_TOP + HP_H + 15} textAnchor="end" fontSize={FS - 1} fill="var(--muted)">
+            Lobby median ends: under 4 left
+          </text>
+        );
+      })()}
       <path d={lobbyPath} fill="none" stroke="var(--ink-2)" strokeOpacity={0.6} strokeWidth={1.5} strokeDasharray="3 3" />
       <path d={hpPath} fill="none" stroke="var(--hp)" strokeWidth={2.25} strokeLinejoin="round" />
       {series.map((p, i) =>
@@ -113,10 +123,10 @@ export function Timeline({
         <text x={compact ? 82 : 74} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">Spent</text>
       </g>}
       <line x1={PAD_L} x2={W - PAD_R} y1={goldY(50)} y2={goldY(50)} stroke="var(--gold)" strokeOpacity={0.35} strokeDasharray="2 4" />
-      <text x={PAD_L - 8} y={goldY(50) + FS / 3} textAnchor="end" fontSize={FS - 0.5} fill="var(--muted)" className="tnum">
+      <text x={PAD_L - 8} y={goldY(50) + FS / 3} textAnchor="end" fontSize={FS} fill="var(--ink-2)" className="tnum">
         50
       </text>
-      <text x={PAD_L - 8} y={goldY(0) + FS / 3} textAnchor="end" fontSize={FS - 0.5} fill="var(--muted)" className="tnum">
+      <text x={PAD_L - 8} y={goldY(0) + FS / 3} textAnchor="end" fontSize={FS} fill="var(--ink-2)" className="tnum">
         0
       </text>
       {series.map((p, i) => {

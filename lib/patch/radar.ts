@@ -113,7 +113,7 @@ export interface PatchPick {
 
 export const PATCH_SUMMARY: { lead: string; tryThese: PatchPick[]; avoid: PatchPick[] } = {
   lead:
-    "18.5 leans toward AP and sustain. Fae, AP 4-costs and Taric got stronger, while Blackthorn, Rapidfire and boards with 7 or more Riftbeasts lost some of their top end. Kha'Zix and Azir were nerfed directly.",
+    "18.5 leans toward AP and sustain. Fae, AP 4-costs and Taric got stronger, while Blackthorn, Rapidfire and boards with 7 or more Riftbeasts lost some of their top end. Among units, Kha'Zix, Azir and Mama Beak lost damage and Sentinel's stun got shorter.",
   tryThese: [
     {
       name: "Fae boards",

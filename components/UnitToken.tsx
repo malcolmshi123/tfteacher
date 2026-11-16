@@ -60,7 +60,6 @@ export function UnitToken({
           alt={u.name}
           width={size}
           height={size}
-          loading="lazy"
           className="block h-full w-full object-cover"
           style={{ borderRadius: "inherit" }}
         />

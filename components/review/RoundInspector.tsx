@@ -33,7 +33,7 @@ export function RoundInspector({
     r.bought.length >= 5
       ? `Rolldown: your board went from ${prevPt?.boardValue ?? 0} to ${pt.boardValue} gold of units.`
       : r.kind === "pvp" && r.outcome === "loss" && r.hp <= 40 && r.goldEnd >= 20
-        ? `Lost at ${r.hp} HP while holding ${r.goldEnd} gold.`
+        ? `Started at ${r.hp} HP and lost ${r.damageTaken} while holding ${r.goldEnd} gold.`
         : r.xpBought >= 3
           ? `Spent ${r.xpBought * 4} gold on XP${r.level < pt.lobbyLevel ? ", still a level behind the lobby" : ""}.`
           : here.find((f) => !f.positive)?.title;
@@ -103,14 +103,20 @@ export function RoundInspector({
           </Section>
         )}
 
-        {(r.bench.length > 0 || r.itemBench.length > 0) && (
+        {r.bench.length > 0 && (
           <Section title="Bench">
             <div className="flex flex-wrap items-center gap-2 pt-2">
               {r.bench.map((p, i) => (
                 <UnitToken key={i} piece={p} size={36} showName={false} />
               ))}
-              {r.itemBench.map((it) => (
-                <ItemChip key={it} id={it} />
+            </div>
+          </Section>
+        )}
+        {r.itemBench.length > 0 && (
+          <Section title="Spare item components">
+            <div className="flex flex-wrap items-center gap-2 pt-2">
+              {r.itemBench.map((it, i) => (
+                <ItemChip key={i} id={it} />
               ))}
             </div>
           </Section>
@@ -130,7 +136,7 @@ export function RoundInspector({
         )}
 
         {r.kind !== "carousel" && r.shops.length > 0 && (
-          <Section title={r.rerolls ? `Shops seen · free shop and ${r.rerolls} roll${r.rerolls === 1 ? "" : "s"}` : "Shop seen"}>
+          <Section title={`Shops seen · ${r.rerolls ? `free shop and ${r.rerolls} roll${r.rerolls === 1 ? "" : "s"}` : "free shop only"}`}>
             <div className="space-y-2 pt-1">
               {r.shops.map((shop, si) => (
                 <div key={si} className="flex items-center gap-3">

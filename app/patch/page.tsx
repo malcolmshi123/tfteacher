@@ -1,6 +1,7 @@
 import { SiteFooter, SiteNav } from "@/components/SiteChrome";
 import { UnitToken } from "@/components/UnitToken";
 import { allGames } from "@/lib/game/games";
+import { ordinal } from "@/lib/review/engine";
 import { NOTES, PATCH, PATCH_SUMMARY, changePct, radar, type CompVerdict, type NoteLine, type PatchPick } from "@/lib/patch/radar";
 
 export const metadata = { title: "Patch Radar · TFTeacher" };
@@ -164,7 +165,7 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
           const avg = since.reduce((a, b) => a + b, 0) / since.length;
           return (
             <p className="tnum mt-4 rounded-lg bg-[var(--panel-2)] px-3 py-2 text-[13px] text-[var(--ink-2)]">
-              On {PATCH.to} so far: {since.length} game{since.length === 1 ? "" : "s"}, avg place {avg.toFixed(1)}
+              On {PATCH.to} so far: {since.length === 1 ? `1 game, placed ${ordinal(since[0])}` : `${since.length} games, avg place ${avg.toFixed(1)}`}
               <span style={{ color: avg > v.comp.avgPlace ? "var(--hp)" : "var(--good)" }}>
                 {" "}({avg > v.comp.avgPlace ? "worse" : "better"} than {v.comp.avgPlace.toFixed(1)} on {PATCH.from})
               </span>
