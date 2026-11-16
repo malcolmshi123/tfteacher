@@ -189,7 +189,7 @@ export default function Home() {
                     <span className="block h-2 w-2 rounded-full bg-[var(--hp)]" />
                     Recording round {r32.stage}
                   </span>
-                  <span className="tnum text-[var(--muted)]">{r32.hp} HP · {r32.gold} gold</span>
+                  <span className="tnum text-[var(--muted)]">started at {r32.hp} HP · {r32.gold} gold</span>
                 </div>
               }
             >

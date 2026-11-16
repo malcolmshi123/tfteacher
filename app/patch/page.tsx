@@ -46,7 +46,7 @@ export default function PatchPage() {
               Every trait and champion change in {PATCH.to}, checked against the {games} ranked games you played on {PATCH.from}.
             </p>
             <p className="mt-2 text-[13px] leading-relaxed text-[var(--muted)]">
-              Trait changes count only at breakpoints your board reaches. Values per star level are averaged. Augments, items and
+              Trait changes count only at breakpoints your board reaches. Values per star level are averaged. The bar weighs each change by its size. Augments, items and
               mid-patch updates aren&apos;t included. Pro view; Free shows your most played comp.
             </p>
           </div>
@@ -143,7 +143,7 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
           {t.label}
         </div>
         <h3 className="mt-2 text-[22px] font-semibold tracking-tight">{v.comp.name}</h3>
-        <Meter score={v.score} />
+        <Meter score={v.score} buffs={v.lines.filter((l) => l.direction === "buff").length} nerfs={v.lines.filter((l) => l.direction === "nerf").length} />
         <div className="mt-5 grid grid-cols-4 gap-x-2 gap-y-3 justify-items-center">
           {v.comp.core.map((u) => (
             <UnitToken key={u} unitId={u} size={44} />
@@ -217,7 +217,7 @@ function NoteRow({ n, note }: { n: NoteLine; note?: string }) {
 }
 
 // Net size of the patch for this comp: weighted buffs minus nerfs, on a -8..8 scale.
-function Meter({ score }: { score: number }) {
+function Meter({ score, buffs, nerfs }: { score: number; buffs: number; nerfs: number }) {
   const clamped = Math.max(-8, Math.min(8, score));
   const pct = (Math.abs(clamped) / 8) * 50;
   const color = score > 0 ? "var(--good)" : score < 0 ? "var(--hp)" : "var(--muted)";
@@ -233,7 +233,9 @@ function Meter({ score }: { score: number }) {
       </div>
       <div className="tnum mt-1.5 flex justify-between text-[12px] text-[var(--muted)]">
         <span>Weaker</span>
-        <span style={{ color }}>{score === 0 ? "even" : `${score > 0 ? "+" : "−"}${Math.abs(score)} net`}</span>
+        <span style={{ color }}>
+          {nerfs} nerf{nerfs === 1 ? "" : "s"} · {buffs} buff{buffs === 1 ? "" : "s"}
+        </span>
         <span>Stronger</span>
       </div>
     </div>
