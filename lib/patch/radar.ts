@@ -1,4 +1,4 @@
-import { COMP_LABELS, UNIT_BY_ID } from "../game/set";
+import { UNIT_BY_ID } from "../game/set";
 
 // Patch Radar: match the lines of a patch's notes against the comps a player
 // actually plays. Every verdict lists the note lines it came from.
@@ -10,12 +10,14 @@ export interface NoteLine {
   text: string;
   direction: "buff" | "nerf" | "adjust";
   weight: number; // rough size of the change, 1 to 3
+  minUnits?: number; // trait lines: the breakpoint the change applies at
 }
 
 export interface PlayedComp {
   id: string;
   name: string;
-  core: string[]; // unit ids
+  carry: string; // unit id of the main carry
+  core: string[]; // unit ids, by cost
   traits: string[];
   games: number;
   avgPlace: number;
@@ -31,50 +33,73 @@ export interface CompVerdict {
   why: string;
 }
 
-export const PATCH = { from: "18.2", to: "18.3", date: "2026-11-12" };
+// Patch 18.5, from Riot's notes (published Oct 20, live Oct 21, 2026). Trait
+// and champion changes only: augments, wisps and items aren't matched to comps.
+export const PATCH = { from: "18.4", to: "18.5", date: "Oct 21, 2026" };
 
 export const NOTES: NoteLine[] = [
-  { id: "u-khazix-1", section: "Units", target: "khazix", text: "Kha'Zix ability damage 240/360/560 to 220/330/520", direction: "nerf", weight: 2 },
-  { id: "u-khazix-2", section: "Units", target: "khazix", text: "Kha'Zix health 750 to 700", direction: "nerf", weight: 2 },
-  { id: "u-masteryi-1", section: "Units", target: "masteryi", text: "Master Yi ability shield 250/325/450 to 280/360/500", direction: "buff", weight: 1 },
-  { id: "u-ahri-1", section: "Units", target: "ahri", text: "Ahri mana 90 to 80", direction: "buff", weight: 2 },
-  { id: "u-vi-1", section: "Units", target: "vi", text: "Vi health 750 to 800", direction: "buff", weight: 1 },
-  { id: "u-morgana-1", section: "Units", target: "morgana", text: "Morgana ability damage 280/420/1200 to 260/390/1200", direction: "nerf", weight: 1 },
-  { id: "u-rammus-1", section: "Units", target: "rammus", text: "Rammus armor 45 to 50", direction: "buff", weight: 1 },
-  { id: "t-blossom-1", section: "Traits", target: "Blossom", text: "Blossom (3) Attack Damage and Ability Power 12% to 10%", direction: "nerf", weight: 3 },
-  { id: "t-juggernaut-1", section: "Traits", target: "Juggernaut", text: "Juggernaut (2) Juggernaut Durability 20% to 22%", direction: "buff", weight: 1 },
-  { id: "t-inferno-1", section: "Traits", target: "Inferno", text: "Inferno (2) Burn duration 3 to 4 seconds", direction: "buff", weight: 2 },
-  { id: "i-bow-1", section: "Items", target: "bow", text: "Quickbow attack speed 15% to 12%", direction: "nerf", weight: 1 },
-  { id: "s-shop-1", section: "Systems", target: "odds-8", text: "Level 8 shop odds for 4-costs 24% to 22%", direction: "nerf", weight: 1 },
+  { id: "t-blackthorn-1", section: "Traits", target: "Blackthorn", text: "Blackthorn (6) enhanced bonus 60% to 50%", direction: "nerf", weight: 2, minUnits: 6 },
+  { id: "t-blackthorn-2", section: "Traits", target: "Blackthorn", text: "Blackthorn base AP sacrifice damage amp 12% to 10%", direction: "nerf", weight: 1, minUnits: 2 },
+  { id: "t-elderwood-1", section: "Traits", target: "Elderwood", text: "Elderwood (9) summon bonus health 140% to 125%", direction: "nerf", weight: 2, minUnits: 9 },
+  { id: "t-fae-1", section: "Traits", target: "Fae", text: "Fae (2/4) heal 2.5/4% to 3/5%", direction: "buff", weight: 2, minUnits: 2 },
+  { id: "t-fae-2", section: "Traits", target: "Fae", text: "Fae 4th Pixie threshold 30000 to 25000", direction: "buff", weight: 1, minUnits: 2 },
+  { id: "t-fae-3", section: "Traits", target: "Fae", text: "Fae 5th Pixie threshold 70000 to 60000", direction: "buff", weight: 1, minUnits: 2 },
+  { id: "t-fae-4", section: "Traits", target: "Fae", text: "Fae 6th Pixie threshold 110000 to 100000", direction: "buff", weight: 1, minUnits: 2 },
+  { id: "t-flora-1", section: "Traits", target: "Flora Fatalis", text: "Flora Fatalis max health healing 8% to 7%", direction: "nerf", weight: 1, minUnits: 1 },
+  { id: "t-rapidfire-1", section: "Traits", target: "Rapidfire", text: "Rapidfire attack speed per attack 3/5/8/12% to 3/5/7/10%", direction: "nerf", weight: 2, minUnits: 2 },
+  { id: "t-riftbeast-1", section: "Traits", target: "Riftbeast", text: "Riftbeast (7) AD and AP 6% to 5%", direction: "nerf", weight: 2, minUnits: 7 },
+  { id: "u-caitlyn-1", section: "Units", target: "caitlyn", text: "Caitlyn empowered auto damage 190/285/470 to 200/300/490", direction: "buff", weight: 1 },
+  { id: "u-azir-1", section: "Units", target: "azir", text: "Azir ability damage 46/69/110 to 43/65/105", direction: "nerf", weight: 2 },
+  { id: "u-khazix-1", section: "Units", target: "khazix", text: "Kha'Zix damage 255/360/515 to 250/345/500", direction: "nerf", weight: 2 },
+  { id: "u-khazix-2", section: "Units", target: "khazix", text: "Kha'Zix isolated damage 285/410/605 to 280/390/590", direction: "nerf", weight: 2 },
+  { id: "u-mamabeak-1", section: "Units", target: "mamabeak", text: "Mama Beak mana lock ends about 1 second sooner", direction: "buff", weight: 1 },
+  { id: "u-mamabeak-2", section: "Units", target: "mamabeak", text: "Mama Beak ability damage 22/33/52 to 20/30/50", direction: "nerf", weight: 2 },
+  { id: "u-masteryi-1", section: "Units", target: "masteryi", text: "Master Yi (AD) starting attack damage 60 to 63", direction: "buff", weight: 1 },
+  { id: "u-masteryi-2", section: "Units", target: "masteryi", text: "Master Yi (AP) ability damage 125/190/285 to 135/200/320", direction: "buff", weight: 2 },
+  { id: "u-tristana-1", section: "Units", target: "tristana", text: "Tristana mana 60 to 50", direction: "buff", weight: 2 },
+  { id: "u-tristana-2", section: "Units", target: "tristana", text: "Tristana damage per attack 10/15/25 to 12/18/28", direction: "buff", weight: 2 },
+  { id: "u-brambleback-1", section: "Units", target: "brambleback", text: "Brambleback Alpha Mark heal 4% to 5%", direction: "buff", weight: 2 },
+  { id: "u-brambleback-2", section: "Units", target: "brambleback", text: "Brambleback armor ignore 20% to 25%", direction: "buff", weight: 2 },
+  { id: "u-malphite-1", section: "Units", target: "malphite", text: "Malphite shield 700/850 to 735/885", direction: "buff", weight: 1 },
+  { id: "u-morgana-1", section: "Units", target: "morgana", text: "Morgana initial curse damage 60/90 to 70/105", direction: "buff", weight: 2 },
+  { id: "u-morgana-2", section: "Units", target: "morgana", text: "Morgana curse bonus damage 22/33 to 25/38", direction: "buff", weight: 2 },
+  { id: "u-sentinel-1", section: "Units", target: "sentinel", text: "Sentinel stun duration 1 to 0.5 seconds", direction: "nerf", weight: 2 },
+  { id: "u-sentinel-2", section: "Units", target: "sentinel", text: "Sentinel shield 350/450 to 375/475", direction: "buff", weight: 1 },
+  { id: "u-sett-1", section: "Units", target: "sett", text: "Sett heal 225/275 to 250/300", direction: "buff", weight: 1 },
+  { id: "u-sivir-1", section: "Units", target: "sivir", text: "Sivir ability damage 200/300 to 220/330", direction: "buff", weight: 2 },
+  { id: "u-sivir-2", section: "Units", target: "sivir", text: "Sivir bounce damage 20% to 18% of the first hit", direction: "nerf", weight: 1 },
+  { id: "u-soraka-1", section: "Units", target: "soraka", text: "Soraka first star damage 225/335 to 235/355", direction: "buff", weight: 1 },
+  { id: "u-soraka-2", section: "Units", target: "soraka", text: "Soraka extra star damage 100/150 to 110/165", direction: "buff", weight: 1 },
+  { id: "u-alune-1", section: "Units", target: "alune", text: "Alune Moonshard damage 55/83 to 58/88", direction: "buff", weight: 1 },
+  { id: "u-alune-2", section: "Units", target: "alune", text: "Alune attack speed 0.8 to 0.85", direction: "buff", weight: 1 },
+  { id: "u-alune-3", section: "Units", target: "alune", text: "Alune Attuned durability 7% to 5%", direction: "nerf", weight: 1 },
+  { id: "u-ashe-1", section: "Units", target: "ashe", text: "Ashe damage over time 9/14 to 11/16", direction: "buff", weight: 2 },
+  { id: "u-taric-1", section: "Units", target: "taric", text: "Taric resists 65 to 70", direction: "buff", weight: 1 },
+  { id: "u-taric-2", section: "Units", target: "taric", text: "Taric empowered attack damage 100/150 to 130/200", direction: "buff", weight: 2 },
 ];
 
-// Comps are named the way players name them: the biggest trait, then the carry.
-// Names come from the board, so any set works without a hand-kept list.
-export function compTraits(core: string[]): string[] {
+// active trait counts for a board
+export function traitCounts(core: string[]): Map<string, number> {
   const n = new Map<string, number>();
   for (const id of core) for (const tr of UNIT_BY_ID[id]?.traits ?? []) n.set(tr, (n.get(tr) ?? 0) + 1);
-  return [...n].filter(([, c]) => c >= 2).sort((a, b) => b[1] - a[1]).map(([tr]) => tr);
+  return n;
 }
 
-export function compName(core: string[]): string {
-  const carry = UNIT_BY_ID[core[0]]?.name ?? core[0];
-  const traits = compTraits(core);
-  // players name some trait pairs as one word (Lunar + Elderwood is "Lunarwood")
-  const present = new Set(core.flatMap((id) => UNIT_BY_ID[id]?.traits ?? []));
-  const blend = COMP_LABELS.find((l) => l.traits.every((tr) => present.has(tr)));
-  if (blend) return `${blend.label} ${carry}`;
-  const top = traits[0];
-  return top ? `${top} ${carry}` : carry;
+export function compTraits(core: string[]): string[] {
+  return [...traitCounts(core)].filter(([, c]) => c >= 2).sort((a, b) => b[1] - a[1]).map(([tr]) => tr);
 }
 
-function comp(id: string, core: string[], games: number, avgPlace: number, top4: number, flex?: string[]): PlayedComp {
-  return { id, name: compName(core), core, traits: compTraits(core), games, avgPlace, top4, flex };
+// Comp boards and names follow TFT Academy's Set 18 comp pages. Games and
+// results are this sample player's from patch 18.4.
+function comp(id: string, name: string, carry: string, core: string[], games: number, avgPlace: number, top4: number, flex?: string[]): PlayedComp {
+  const board = [...core].sort((p, q) => (UNIT_BY_ID[p]?.cost ?? 0) - (UNIT_BY_ID[q]?.cost ?? 0));
+  return { id, name, carry, core: board, traits: compTraits(board), games, avgPlace, top4, flex };
 }
 
 export const MY_COMPS: PlayedComp[] = [
-  comp("c1", ["khazix", "hecarim", "diana", "fiddlesticks", "soraka"], 14, 3.9, 57, ["azir", "ezreal", "kennen", "aphelios", "alune", "sentinel", "taric", "alistar", "gnar"]),
-  comp("c2", ["ahri", "masteryi", "yunara", "ashe"], 9, 4.4, 44),
-  comp("c3", ["amumu", "vi", "sejuani", "rammus"], 6, 4.8, 33),
+  comp("c1", "Lunarwood Kha'Zix", "khazix", ["ornn", "leblanc", "khazix", "hecarim", "diana", "fiddlesticks", "soraka"], 9, 4.4, 44, ["azir", "ezreal", "kennen", "aphelios", "alune", "sentinel", "taric", "alistar", "gnar"]),
+  comp("c2", "Ahri Morgana", "ahri", ["pebbles", "karma", "krug", "sentinel", "sett", "ahri", "morgana", "taric"], 6, 3.8, 67),
+  comp("c3", "Tempo Riftbeast", "brambleback", ["pebbles", "murkwolf", "krug", "sentinel", "brambleback", "gnar", "taric", "elderdragon"], 4, 4.5, 50),
 ];
 
 // "62 to 56" -> -9.7. Tiered values ("250/325/450 to 280/360/500") average the
@@ -95,13 +120,11 @@ function list(xs: string[]) {
 
 export function radar(comps = MY_COMPS, notes = NOTES): CompVerdict[] {
   return comps.map((comp) => {
-    const lines = notes.filter(
-      (n) =>
-        comp.core.includes(n.target) ||
-        comp.traits.includes(n.target) ||
-        (n.section === "Units" && comp.core.some((u) => UNIT_BY_ID[u]?.traits.includes(n.target))) ||
-        // shop odds for a cost tier touch every comp built around that tier
-        (n.target.startsWith("odds-") && comp.core.some((u) => UNIT_BY_ID[u]?.cost === 4)),
+    const counts = traitCounts(comp.core);
+    // a unit line counts if the unit is on the board; a trait line only if the
+    // board reaches the breakpoint it changes
+    const lines = notes.filter((n) =>
+      n.section === "Units" ? comp.core.includes(n.target) : n.section === "Traits" ? (counts.get(n.target) ?? 0) >= (n.minUnits ?? 1) : false,
     );
     const score = lines.reduce((a, n) => a + (n.direction === "buff" ? n.weight : n.direction === "nerf" ? -n.weight : 0), 0);
     const buffs = lines.filter((n) => n.direction === "buff");
@@ -111,12 +134,22 @@ export function radar(comps = MY_COMPS, notes = NOTES): CompVerdict[] {
     const why =
       verdict === "weaker"
         ? (() => {
-            const carry = nerfs.filter((x) => x.target === comp.core[0]).length;
-            const other = nerfs.length - carry;
-            return `Your main carry ${name(comp.core[0])} was nerfed in ${carry} line${carry === 1 ? "" : "s"}${other ? `, and the shared change above hits it too` : ""}. Expect it to place lower until you adjust items or the board around it.`;
+            const uniq = (xs: string[]) => xs.filter((v, i, a) => a.indexOf(v) === i);
+            const carry = nerfs.filter((x) => x.target === comp.carry).length;
+            const other = uniq(nerfs.filter((x) => x.target !== comp.carry).map((x) => name(x.target)));
+            const buffed = uniq(buffs.map((x) => name(x.target)));
+            const lead = carry ? `Your main carry ${name(comp.carry)} was nerfed in ${carry} line${carry === 1 ? "" : "s"}` : `${list(other)} got weaker`;
+            const more = carry && other.length ? `, and ${list(other)} took a smaller hit` : "";
+            const offset = buffed.length ? ` ${list(buffed)} got buffed, but not enough to make up for it.` : "";
+            return `${lead}${more}.${offset} Expect it to place lower until you adjust items or the board around it.`;
           })()
         : verdict === "stronger"
-          ? `${list(buffs.map((b) => name(b.target)).filter((v, i, a) => a.indexOf(v) === i))} all got stronger.${nerfs.length ? ` The one hit is shared by every comp: ${nerfs.map((x) => x.text).join("; ")}.` : " Nothing in the comp was nerfed."}`
+          ? (() => {
+              // units with lines both ways aren't called "stronger"; their nerf is spelled out
+              const nerfed = new Set(nerfs.map((x) => x.target));
+              const up = buffs.map((b) => b.target).filter((t, i, a) => a.indexOf(t) === i && !nerfed.has(t)).map(name);
+              return `${list(up)} got stronger.${nerfs.length ? ` One line went the other way: ${nerfs.map((x) => x.text).join("; ")}.` : " Nothing in the comp was nerfed."}`;
+            })()
           : verdict === "mixed"
             ? (() => {
                 const big = [...lines].sort((p, q) => Math.abs(changePct(q.text) ?? 0) - Math.abs(changePct(p.text) ?? 0))[0];

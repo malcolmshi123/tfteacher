@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { Finding, Review } from "@/lib/review/engine";
+import { ordinal, type Finding, type Review } from "@/lib/review/engine";
 import { AskPanel } from "./AskPanel";
 import { MobileRounds } from "./MobileRounds";
 import { RoundInspector } from "./RoundInspector";
@@ -46,7 +46,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div className="max-w-[760px]">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-[var(--muted)]">
-            <span className="tnum rounded-md bg-[color-mix(in_oklab,var(--hp)_16%,var(--panel-2))] px-1.5 py-0.5 font-semibold text-[var(--hp)] md:hidden">{game.placement}th of 8</span>
+            <span className="tnum rounded-md bg-[color-mix(in_oklab,var(--hp)_16%,var(--panel-2))] px-1.5 py-0.5 font-semibold text-[var(--hp)] md:hidden">{ordinal(game.placement)} of 8</span>
             <span>{game.queue}</span>
             <Dot />
             <span>{game.patch}</span>
@@ -65,9 +65,9 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
           <p className="mt-3 max-w-[640px] text-[15px] leading-relaxed text-[var(--ink-2)]">{review.summary}</p>
         </div>
         <div className="hidden shrink-0 items-center gap-3 rounded-2xl border md:flex border-[var(--line)] bg-[var(--panel)] py-3 pl-3 pr-5">
-          <span className="tnum flex h-14 w-14 items-center justify-center rounded-xl bg-[color-mix(in_oklab,var(--hp)_16%,var(--panel-2))] text-[24px] font-semibold text-[var(--hp)]">
-            {game.placement}
-            <span className="-ml-1 self-start pt-3 text-[12px] font-medium">th</span>
+          <span className="tnum flex h-14 w-14 items-center justify-center rounded-xl bg-[color-mix(in_oklab,var(--hp)_16%,var(--panel-2))] font-semibold text-[var(--hp)]">
+            <span className="text-[24px] leading-none">{game.placement}</span>
+            <span className="ml-[2px] self-start pt-[13px] text-[11px] leading-none">{ordinal(game.placement).slice(String(game.placement).length)}</span>
           </span>
           <div>
             <div className="text-[13px] text-[var(--ink-2)]">of 8 players</div>

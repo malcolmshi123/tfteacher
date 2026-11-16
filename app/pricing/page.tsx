@@ -102,7 +102,7 @@ function TrendsPreview() {
     <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
       <div className="flex items-baseline justify-between gap-3">
         <h3 className="text-[15px] font-semibold">Pro trends: HP lost per game, by stage</h3>
-        <span className="text-[12px] text-[var(--muted)]">Sample account, last 29 games</span>
+        <span className="text-[12px] text-[var(--muted)]">Sample account, last 19 games</span>
       </div>
       <div className="mt-6 space-y-3">
         {TREND.map((t) => (

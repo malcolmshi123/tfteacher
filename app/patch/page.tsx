@@ -19,6 +19,11 @@ export default function PatchPage() {
   const sharedIds = new Set(shared.map((n) => n.id));
   const rest = NOTES.filter((n) => !used.has(n.id));
   const games = verdicts.reduce((a, v) => a + v.comp.games, 0);
+  // headline from the verdicts: most played comp first, then the rest
+  const [main, ...others] = verdicts;
+  const word = (x: CompVerdict) => (x.verdict === "weaker" ? "nerfed" : x.verdict === "stronger" ? "buffed" : x.verdict === "mixed" ? "mixed" : "unchanged");
+  const same = others.every((o) => word(o) === word(others[0]));
+  const headline = `Your most played comp got ${word(main)}.${others.length ? (same ? ` Your other ${others.length === 2 ? "two" : others.length} got ${word(others[0])}.` : "") : ""}`;
 
   return (
     <>
@@ -27,18 +32,18 @@ export default function PatchPage() {
         <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_300px] md:items-end">
           <div className="max-w-[720px]">
             <p className="text-[13px] text-[var(--muted)]">
-              Patch {PATCH.from} to {PATCH.to} · released Nov 12 ·{" "}
+              Patch {PATCH.from} to {PATCH.to} · live {PATCH.date} ·{" "}
               <a href="#rest" className="text-[var(--ink-2)] underline-offset-2 hover:underline">
-                all {NOTES.length} lines
+                {NOTES.length} trait and champion changes
               </a>
             </p>
             <h1 className="mt-3 text-[28px] font-semibold leading-[1.15] tracking-[-0.02em] text-balance md:text-[36px]">
-              Your best comp got weaker this patch. One you play less got better.
+              {headline}
             </h1>
             <p className="mt-3 text-[15px] leading-relaxed text-[var(--ink-2)]">
-              We matched all {NOTES.length} lines of the patch notes against the {games} games you played last patch. This is the
-              Pro view; Free shows your most played comp. Only
-              the lines that touch your comps are below, each shown with the size of the change.
+              We checked every trait and champion change in patch {PATCH.to} against the {games} ranked games you played on {PATCH.from}.
+              A trait change only counts if your board reaches that breakpoint. This is the Pro view; Free shows your most played comp.
+              Augments, items and the mid-patch updates aren&apos;t included.
             </p>
           </div>
           <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-4">
@@ -115,7 +120,7 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
         </div>
         <h3 className="mt-2 text-[22px] font-semibold tracking-tight">{v.comp.name}</h3>
         <Meter score={v.score} />
-        <div className="mt-4 flex gap-1">
+        <div className="mt-5 grid grid-cols-4 gap-x-2 gap-y-3 justify-items-center">
           {v.comp.core.map((u) => (
             <UnitToken key={u} unitId={u} size={44} />
           ))}
@@ -159,10 +164,10 @@ function NoteRow({ n }: { n: NoteLine }) {
   );
 }
 
-// Net size of the patch for this comp: weighted buffs minus nerfs, on a -6..6 scale.
+// Net size of the patch for this comp: weighted buffs minus nerfs, on a -8..8 scale.
 function Meter({ score }: { score: number }) {
-  const clamped = Math.max(-6, Math.min(6, score));
-  const pct = (Math.abs(clamped) / 6) * 50;
+  const clamped = Math.max(-8, Math.min(8, score));
+  const pct = (Math.abs(clamped) / 8) * 50;
   const color = score > 0 ? "var(--good)" : score < 0 ? "var(--hp)" : "var(--muted)";
   return (
     <div className="mt-3" aria-label={`Net patch effect ${score > 0 ? "+" : ""}${score}`}>
