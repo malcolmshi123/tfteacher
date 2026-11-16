@@ -1,11 +1,10 @@
-import { ITEMS, UNIT_BY_ID, UNIT_MARK } from "@/lib/game/set";
+import { ITEMS, UNIT_BY_ID } from "@/lib/game/set";
 import type { Piece } from "@/lib/game/types";
-import { TraitGlyph } from "./TraitGlyph";
 
 const COST_VAR = ["", "var(--c1)", "var(--c2)", "var(--c3)", "var(--c4)", "var(--c5)"];
 
-// Units are drawn in code: a cost-colored tile with the unit's main trait crest,
-// its second trait in the corner, star pips and item slots. No game art.
+// A unit tile: the champion icon from Riot's public game data, a cost-colored
+// border like the game uses, star pips and item slots.
 export function UnitToken({
   piece,
   unitId,
@@ -24,36 +23,30 @@ export function UnitToken({
   const color = COST_VAR[u.cost];
   const star = piece?.star ?? 0;
   const small = size < 36;
-  const border =
-    state === "missed" ? "inset 0 0 0 2px var(--hp)" : state === "bought" ? "inset 0 0 0 2.5px var(--ink)" : `inset 0 0 0 1.5px color-mix(in oklab, ${color} 75%, transparent)`;
   return (
     <div className="flex flex-col items-center gap-1.5" style={{ width: size + (showName ? 10 : 0), opacity: state === "dim" ? 0.55 : 1 }}>
       <div
-        className="relative grid place-items-center"
+        className="relative"
         style={{
           width: size,
           height: size,
-          borderRadius: Math.max(7, size * 0.22),
-          background:
-            state === "missed"
-              ? `linear-gradient(160deg, color-mix(in oklab, var(--hp) 32%, var(--panel-2)), color-mix(in oklab, var(--hp) 12%, var(--panel)))`
-              : `radial-gradient(120% 90% at 30% 15%, color-mix(in oklab, ${color} 38%, var(--panel-2)) 0%, color-mix(in oklab, ${color} 12%, var(--panel)) 70%)`,
-          boxShadow: border,
+          borderRadius: Math.max(6, size * 0.18),
+          boxShadow: `0 0 0 ${small ? 1.5 : 2}px ${state === "missed" ? "var(--hp)" : color}`,
         }}
         title={`${u.name} · ${u.cost}-cost · ${u.traits.join(", ")}`}
       >
-        {/* each unit: its own letter as the main mark, main trait as a crest behind it */}
-        <span className="absolute inset-0 grid place-items-center opacity-30">
-          <TraitGlyph trait={u.traits[0]} size={size * 0.78} color={`color-mix(in oklab, ${color} 70%, white)`} />
-        </span>
-        <span className="relative font-semibold leading-none" style={{ fontSize: size * (UNIT_MARK[id].length > 1 ? 0.34 : 0.42), color: `color-mix(in oklab, ${color} 35%, white)`, textShadow: "0 1px 2px rgba(0,0,0,0.6)" }}>
-          {UNIT_MARK[id]}
-        </span>
-        {!small && (
-          <span className="absolute bottom-[3px] right-[3px] opacity-70">
-            <TraitGlyph trait={u.traits[1]} size={Math.max(9, size * 0.22)} color={`color-mix(in oklab, ${color} 45%, var(--ink-2))`} />
-          </span>
-        )}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`/units/${id}.png`}
+          alt={u.name}
+          width={size}
+          height={size}
+          loading="lazy"
+          className="block h-full w-full object-cover"
+          style={{ borderRadius: "inherit", filter: state === "missed" ? "saturate(0.6)" : undefined }}
+        />
+        {state === "missed" && <span className="absolute inset-0" style={{ borderRadius: "inherit", background: "color-mix(in oklab, var(--hp) 28%, transparent)" }} />}
+        {state === "bought" && <span className="absolute inset-0" style={{ borderRadius: "inherit", boxShadow: "inset 0 0 0 2.5px var(--ink)" }} />}
         {star > 0 && (
           <span className="absolute -top-[7px] left-1/2 flex -translate-x-1/2 gap-[3px] rounded-full bg-[var(--bg)] px-1 py-[2px]">
             {Array.from({ length: star }).map((_, i) => (

@@ -24,7 +24,7 @@ function rng(seed: number) {
   };
 }
 
-type BoardSpec = string; // "garrick:2:vest,belt brann:2 ..."
+type BoardSpec = string; // "sejuani:2:vest,belt leona:2 ..."
 
 function parse(spec: string): Piece[] {
   if (!spec.trim()) return [];
@@ -53,32 +53,32 @@ interface Step {
 }
 
 const SCRIPT: Step[] = [
-  { stage: "1-1", kind: "carousel", outcome: "none", dmg: 0, board: "brann:1:edge" },
-  { stage: "1-2", kind: "pve", outcome: "win", dmg: 0, board: "brann:1:edge ilsa:1", goldDrop: 1 },
-  { stage: "1-3", kind: "pve", outcome: "win", dmg: 0, board: "brann:1:edge ilsa:1 corvo:1", itemBench: "vest", goldDrop: 1 },
-  { stage: "1-4", kind: "pve", outcome: "win", dmg: 0, board: "brann:1:edge ilsa:1 corvo:1", bench: "brann:1", itemBench: "vest,bow", goldDrop: 2 },
-  { stage: "2-1", kind: "pvp", outcome: "win", dmg: 0, xp: 1, board: "brann:2:edge ilsa:1 corvo:1 garrick:1", itemBench: "vest,bow" },
-  { stage: "2-2", kind: "pvp", outcome: "win", dmg: 0, board: "brann:2:edge ilsa:1:bow corvo:1 garrick:1:vest", bench: "pell:1" },
-  { stage: "2-3", kind: "pvp", outcome: "loss", dmg: 5, board: "brann:2:edge ilsa:1:bow corvo:1 garrick:1:vest", bench: "pell:1" },
-  { stage: "2-4", kind: "carousel", outcome: "none", dmg: 0, board: "brann:2:edge ilsa:1:bow corvo:1 garrick:1:vest", bench: "pell:1", itemBench: "rod" },
-  { stage: "2-5", kind: "pvp", outcome: "loss", dmg: 6, xp: 2, board: "brann:2:edge ilsa:1:bow garrick:1:vest vessa:1 noor:1", bench: "pell:1", itemBench: "rod" },
-  { stage: "2-6", kind: "pvp", outcome: "loss", dmg: 5, board: "brann:2:edge ilsa:1:bow garrick:1:vest vessa:1 noor:1", bench: "pell:1", itemBench: "rod" },
-  { stage: "2-7", kind: "pve", outcome: "win", dmg: 0, board: "brann:2:edge ilsa:1:bow garrick:1:vest vessa:1 noor:1", bench: "pell:1", itemBench: "rod,tear", goldDrop: 3 },
-  { stage: "3-1", kind: "pvp", outcome: "loss", dmg: 7, xp: 3, board: "brann:2:edge garrick:2:vest vessa:1:bow noor:1 dax:1 liora:1", itemBench: "rod,tear" },
-  { stage: "3-2", kind: "pvp", outcome: "loss", dmg: 8, xp: 4, board: "brann:2:edge garrick:2:vest vessa:1:bow noor:1 dax:1 liora:1", bench: "dax:1", itemBench: "rod,tear", forceShop: { 0: ["dax"] } },
-  { stage: "3-3", kind: "pvp", outcome: "loss", dmg: 9, board: "brann:2:edge garrick:2:vest vessa:1:bow noor:1 dax:1 liora:1", bench: "dax:1", itemBench: "rod,tear", forceShop: { 0: ["dax"] } },
-  { stage: "3-4", kind: "carousel", outcome: "none", dmg: 0, board: "brann:2:edge garrick:2:vest vessa:1:bow noor:1 dax:1 liora:1", bench: "dax:1", itemBench: "rod,tear,belt" },
-  { stage: "3-5", kind: "pvp", outcome: "loss", dmg: 9, board: "brann:2:edge garrick:2:vest vessa:1:bow noor:1 dax:1 liora:1", bench: "dax:1", itemBench: "rod,tear,belt" },
-  { stage: "3-6", kind: "pvp", outcome: "loss", dmg: 10, xp: 3, board: "brann:2:edge garrick:2:vest vessa:1:bow noor:1 dax:1 liora:1", bench: "dax:1", itemBench: "rod,tear,belt" },
-  { stage: "3-7", kind: "pve", outcome: "win", dmg: 0, board: "brann:2:edge garrick:2:vest vessa:1:bow noor:1 dax:1 liora:1", bench: "dax:1", itemBench: "rod,tear,belt,glove", goldDrop: 4 },
-  { stage: "4-1", kind: "pvp", outcome: "loss", dmg: 12, xp: 4, board: "brann:2:edge garrick:2:vest,belt vessa:1:bow noor:1 dax:1 liora:1:rod,tear kestrel:1", bench: "dax:1", itemBench: "glove" },
-  { stage: "4-2", kind: "pvp", outcome: "win", dmg: 0, rerolls: 4, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove ysolde:1", bench: "kestrel:1 thane:1", forceShop: { 2: ["kestrel"] } },
-  { stage: "4-3", kind: "pvp", outcome: "loss", dmg: 11, rerolls: 2, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove ysolde:1", bench: "kestrel:1 thane:1" },
-  { stage: "4-4", kind: "carousel", outcome: "none", dmg: 0, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove ysolde:1", bench: "kestrel:1 thane:1", itemBench: "staff" },
-  { stage: "4-5", kind: "pvp", outcome: "loss", dmg: 13, rerolls: 3, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove ysolde:1", bench: "kestrel:1 thane:1", itemBench: "staff" },
-  { stage: "4-6", kind: "pvp", outcome: "win", dmg: 0, rerolls: 2, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove ysolde:1", bench: "kestrel:1 thane:1", itemBench: "staff" },
-  { stage: "4-7", kind: "pve", outcome: "win", dmg: 0, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove ysolde:1", bench: "kestrel:1 thane:1", itemBench: "staff,cloak", goldDrop: 3 },
-  { stage: "5-1", kind: "pvp", outcome: "loss", dmg: 15, rerolls: 4, board: "garrick:2:vest,belt vessa:2:bow noor:2 dax:2 liora:2:rod,tear kestrel:1:glove ysolde:1", bench: "kestrel:1 thane:1", itemBench: "staff,cloak" },
+  { stage: "1-1", kind: "carousel", outcome: "none", dmg: 0, board: "leona:1:edge" },
+  { stage: "1-2", kind: "pve", outcome: "win", dmg: 0, board: "leona:1:edge xayah:1", goldDrop: 1 },
+  { stage: "1-3", kind: "pve", outcome: "win", dmg: 0, board: "leona:1:edge xayah:1 reksai:1", itemBench: "vest", goldDrop: 1 },
+  { stage: "1-4", kind: "pve", outcome: "win", dmg: 0, board: "leona:1:edge xayah:1 reksai:1", bench: "leona:1", itemBench: "vest,bow", goldDrop: 2 },
+  { stage: "2-1", kind: "pvp", outcome: "win", dmg: 0, xp: 1, board: "leona:2:edge xayah:1 reksai:1 sejuani:1", itemBench: "vest,bow" },
+  { stage: "2-2", kind: "pvp", outcome: "win", dmg: 0, board: "leona:2:edge xayah:1:bow reksai:1 sejuani:1:vest", bench: "varus:1" },
+  { stage: "2-3", kind: "pvp", outcome: "loss", dmg: 5, board: "leona:2:edge xayah:1:bow reksai:1 sejuani:1:vest", bench: "varus:1" },
+  { stage: "2-4", kind: "carousel", outcome: "none", dmg: 0, board: "leona:2:edge xayah:1:bow reksai:1 sejuani:1:vest", bench: "varus:1", itemBench: "rod" },
+  { stage: "2-5", kind: "pvp", outcome: "loss", dmg: 6, xp: 2, board: "leona:2:edge xayah:1:bow sejuani:1:vest yunara:1 kayle:1", bench: "varus:1", itemBench: "rod" },
+  { stage: "2-6", kind: "pvp", outcome: "loss", dmg: 5, board: "leona:2:edge xayah:1:bow sejuani:1:vest yunara:1 kayle:1", bench: "varus:1", itemBench: "rod" },
+  { stage: "2-7", kind: "pve", outcome: "win", dmg: 0, board: "leona:2:edge xayah:1:bow sejuani:1:vest yunara:1 kayle:1", bench: "varus:1", itemBench: "rod,tear", goldDrop: 3 },
+  { stage: "3-1", kind: "pvp", outcome: "loss", dmg: 7, xp: 3, board: "leona:2:edge sejuani:2:vest yunara:1:bow kayle:1 vi:1 masteryi:1", itemBench: "rod,tear" },
+  { stage: "3-2", kind: "pvp", outcome: "loss", dmg: 8, xp: 4, board: "leona:2:edge sejuani:2:vest yunara:1:bow kayle:1 vi:1 masteryi:1", bench: "vi:1", itemBench: "rod,tear", forceShop: { 0: ["vi"] } },
+  { stage: "3-3", kind: "pvp", outcome: "loss", dmg: 9, board: "leona:2:edge sejuani:2:vest yunara:1:bow kayle:1 vi:1 masteryi:1", bench: "vi:1", itemBench: "rod,tear", forceShop: { 0: ["vi"] } },
+  { stage: "3-4", kind: "carousel", outcome: "none", dmg: 0, board: "leona:2:edge sejuani:2:vest yunara:1:bow kayle:1 vi:1 masteryi:1", bench: "vi:1", itemBench: "rod,tear,belt" },
+  { stage: "3-5", kind: "pvp", outcome: "loss", dmg: 9, board: "leona:2:edge sejuani:2:vest yunara:1:bow kayle:1 vi:1 masteryi:1", bench: "vi:1", itemBench: "rod,tear,belt" },
+  { stage: "3-6", kind: "pvp", outcome: "loss", dmg: 10, xp: 3, board: "leona:2:edge sejuani:2:vest yunara:1:bow kayle:1 vi:1 masteryi:1", bench: "vi:1", itemBench: "rod,tear,belt" },
+  { stage: "3-7", kind: "pve", outcome: "win", dmg: 0, board: "leona:2:edge sejuani:2:vest yunara:1:bow kayle:1 vi:1 masteryi:1", bench: "vi:1", itemBench: "rod,tear,belt,glove", goldDrop: 4 },
+  { stage: "4-1", kind: "pvp", outcome: "loss", dmg: 12, xp: 4, board: "leona:2:edge sejuani:2:vest,belt yunara:1:bow kayle:1 vi:1 masteryi:1:rod,tear aphelios:1", bench: "vi:1", itemBench: "glove" },
+  { stage: "4-2", kind: "pvp", outcome: "win", dmg: 0, rerolls: 4, board: "sejuani:2:vest,belt yunara:2:bow kayle:2 vi:2 masteryi:2:rod,tear aphelios:1:glove ahri:1", bench: "aphelios:1 amumu:1", forceShop: { 2: ["aphelios"] } },
+  { stage: "4-3", kind: "pvp", outcome: "loss", dmg: 11, rerolls: 2, board: "sejuani:2:vest,belt yunara:2:bow kayle:2 vi:2 masteryi:2:rod,tear aphelios:1:glove ahri:1", bench: "aphelios:1 amumu:1" },
+  { stage: "4-4", kind: "carousel", outcome: "none", dmg: 0, board: "sejuani:2:vest,belt yunara:2:bow kayle:2 vi:2 masteryi:2:rod,tear aphelios:1:glove ahri:1", bench: "aphelios:1 amumu:1", itemBench: "staff" },
+  { stage: "4-5", kind: "pvp", outcome: "loss", dmg: 13, rerolls: 3, board: "sejuani:2:vest,belt yunara:2:bow kayle:2 vi:2 masteryi:2:rod,tear aphelios:1:glove ahri:1", bench: "aphelios:1 amumu:1", itemBench: "staff" },
+  { stage: "4-6", kind: "pvp", outcome: "win", dmg: 0, rerolls: 2, board: "sejuani:2:vest,belt yunara:2:bow kayle:2 vi:2 masteryi:2:rod,tear aphelios:1:glove ahri:1", bench: "aphelios:1 amumu:1", itemBench: "staff" },
+  { stage: "4-7", kind: "pve", outcome: "win", dmg: 0, board: "sejuani:2:vest,belt yunara:2:bow kayle:2 vi:2 masteryi:2:rod,tear aphelios:1:glove ahri:1", bench: "aphelios:1 amumu:1", itemBench: "staff,cloak", goldDrop: 3 },
+  { stage: "5-1", kind: "pvp", outcome: "loss", dmg: 15, rerolls: 4, board: "sejuani:2:vest,belt yunara:2:bow kayle:2 vi:2 masteryi:2:rod,tear aphelios:1:glove ahri:1", bench: "aphelios:1 amumu:1", itemBench: "staff,cloak" },
 ];
 
 const OPPONENTS: { id: string; name: string; place: number; strength: number }[] = [
@@ -288,7 +288,7 @@ export function buildSampleGame(): GameRecord {
     player: "you",
     placement: 8,
     patch: "Patch 18.3",
-    setName: "Sample Set",
+    setName: "Set 18",
     queue: "Ranked",
     playedAt: "2026-11-15T22:41:00-05:00",
     durationMin: 31,

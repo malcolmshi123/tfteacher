@@ -1,33 +1,33 @@
 import type { Cost, UnitDef } from "./types";
 
-// A fictional sample set. The product is set-agnostic: real data comes from the
-// static data of whatever set is live, in this same shape.
+// Units from TFT Set 18, from Riot's public game data (via CommunityDragon).
+// The product is set-agnostic: each set's units load in this same shape.
 
-export const SET_NAME = "Sample Set";
+export const SET_NAME = "Set 18";
 
 export const UNITS: UnitDef[] = [
-  { id: "brann", name: "Brann", cost: 1, traits: ["Ironclad", "Warden"] },
-  { id: "ilsa", name: "Ilsa", cost: 1, traits: ["Tidecaller", "Sharpshot"] },
-  { id: "corvo", name: "Corvo", cost: 1, traits: ["Duelist", "Ashen"] },
-  { id: "mira", name: "Mira", cost: 1, traits: ["Sparkwright", "Runebound"] },
-  { id: "tobin", name: "Tobin", cost: 1, traits: ["Warden", "Ashen"] },
-  { id: "pell", name: "Pell", cost: 1, traits: ["Sharpshot", "Ironclad"] },
-  { id: "vessa", name: "Vessa", cost: 2, traits: ["Tidecaller", "Duelist"] },
-  { id: "garrick", name: "Garrick", cost: 2, traits: ["Ironclad", "Bastion"] },
-  { id: "noor", name: "Noor", cost: 2, traits: ["Runebound", "Sharpshot"] },
-  { id: "sable", name: "Sable", cost: 2, traits: ["Ashen", "Sparkwright"] },
-  { id: "rook", name: "Rook", cost: 2, traits: ["Warden", "Bastion"] },
-  { id: "liora", name: "Liora", cost: 3, traits: ["Tidecaller", "Runebound"] },
-  { id: "dax", name: "Dax", cost: 3, traits: ["Duelist", "Ironclad"] },
-  { id: "eshe", name: "Eshe", cost: 3, traits: ["Sparkwright", "Sharpshot"] },
-  { id: "halvar", name: "Halvar", cost: 3, traits: ["Bastion", "Ashen"] },
-  { id: "quill", name: "Quill", cost: 3, traits: ["Runebound", "Warden"] },
-  { id: "ysolde", name: "Ysolde", cost: 4, traits: ["Tidecaller", "Bastion"] },
-  { id: "kestrel", name: "Kestrel", cost: 4, traits: ["Sharpshot", "Duelist"] },
-  { id: "ombra", name: "Ombra", cost: 4, traits: ["Ashen", "Runebound"] },
-  { id: "thane", name: "Thane", cost: 4, traits: ["Ironclad", "Warden"] },
-  { id: "aurel", name: "Aurel", cost: 5, traits: ["Sparkwright", "Bastion"] },
-  { id: "nyx", name: "Nyx", cost: 5, traits: ["Tidecaller", "Ashen"] },
+  { id: "leona", name: "Leona", cost: 1, traits: ["Solar", "Defender"] },
+  { id: "xayah", name: "Xayah", cost: 1, traits: ["Elderwood", "Fae", "Rapidfire"] },
+  { id: "reksai", name: "Rek'Sai", cost: 1, traits: ["Blackthorn", "Brawler"] },
+  { id: "veigar", name: "Veigar", cost: 1, traits: ["Blackthorn", "Sprykin", "Spellweaver"] },
+  { id: "ornn", name: "Ornn", cost: 1, traits: ["Elderwood", "Defender"] },
+  { id: "varus", name: "Varus", cost: 1, traits: ["Inferno", "Rapidfire"] },
+  { id: "yunara", name: "Yunara", cost: 2, traits: ["Blossom", "Executioner"] },
+  { id: "sejuani", name: "Sejuani", cost: 2, traits: ["Solar", "Juggernaut"] },
+  { id: "kayle", name: "Kayle", cost: 2, traits: ["Solar", "Rapidfire"] },
+  { id: "teemo", name: "Teemo", cost: 2, traits: ["Sprykin", "Invoker"] },
+  { id: "shen", name: "Shen", cost: 2, traits: ["Inferno", "Defender"] },
+  { id: "masteryi", name: "Master Yi", cost: 3, traits: ["Blossom", "Adaptor"] },
+  { id: "vi", name: "Vi", cost: 3, traits: ["Primal", "Juggernaut"] },
+  { id: "mamabeak", name: "Mama Beak", cost: 3, traits: ["Riftbeast", "Summoner", "Rapidfire"] },
+  { id: "rammus", name: "Rammus", cost: 3, traits: ["Sprykin", "Defender"] },
+  { id: "cassiopeia", name: "Cassiopeia", cost: 3, traits: ["Coven", "Spellweaver"] },
+  { id: "ahri", name: "Ahri", cost: 4, traits: ["Blossom", "Spellweaver"] },
+  { id: "aphelios", name: "Aphelios", cost: 4, traits: ["Lunar", "Rapidfire"] },
+  { id: "morgana", name: "Morgana", cost: 4, traits: ["Coven", "Invoker"] },
+  { id: "amumu", name: "Amumu", cost: 4, traits: ["Inferno", "Juggernaut"] },
+  { id: "kennen", name: "Kennen", cost: 5, traits: ["Inferno", "Executioner"] },
+  { id: "ashe", name: "Ashe", cost: 5, traits: ["Blossom", "Hunter"] },
 ];
 
 // Short mark drawn on each unit tile: the first letter, or two letters when

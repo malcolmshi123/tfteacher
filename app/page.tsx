@@ -4,6 +4,7 @@ import { UnitToken } from "@/components/UnitToken";
 import { Timeline } from "@/components/review/Timeline";
 import { buildSampleGame } from "@/lib/game/sample";
 import { analyze } from "@/lib/review/engine";
+import { MY_COMPS } from "@/lib/patch/radar";
 
 export default function Home() {
   const review = analyze(buildSampleGame());
@@ -183,7 +184,7 @@ export default function Home() {
               title="Check Patch Radar on patch day"
               visual={
                 <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--line)] bg-[var(--panel)] px-4 py-3 text-[13px]">
-                  <span className="text-[var(--ink)]">Kestrel Sharpshot</span>
+                  <span className="text-[var(--ink)]">{MY_COMPS[0].name}</span>
                   <span className="shrink-0 text-[12px] font-medium text-[var(--hp)]">Weaker for you</span>
                 </div>
               }
@@ -208,9 +209,9 @@ export default function Home() {
             </div>
             <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
               <p className="text-[15px] leading-relaxed text-[var(--ink)]">
-                &ldquo;You entered <Cite stage="4-3">at {r43.hp} HP</Cite>, fought holding <Cite stage="4-3">{r43.goldEnd} gold</Cite> and lost{" "}
-                <Cite stage="4-3">{r43.damageTaken} HP</Cite>. Two rounds later you entered <Cite stage="4-5">at {r45.hp} HP</Cite> and still fought
-                holding <Cite stage="4-5">{r45.goldEnd} gold</Cite>.&rdquo;
+                &ldquo;You entered at <Cite stage="4-3">{r43.hp} HP</Cite>, fought holding <Cite>{r43.goldEnd} gold</Cite> and lost{" "}
+                <Cite>{r43.damageTaken} HP</Cite>. Two rounds later you entered at <Cite stage="4-5">{r45.hp} HP</Cite> and still fought holding{" "}
+                <Cite>{r45.goldEnd} gold</Cite>.&rdquo;
               </p>
               <div className="mt-5 flex items-center gap-2 text-[12px] text-[var(--muted)]">
                 <span className="block h-1.5 w-1.5 rounded-full bg-[var(--good)]" />5 numbers, all match the recording
@@ -251,10 +252,12 @@ function Step({ title, children, visual }: { title: string; children: React.Reac
   );
 }
 
-function Cite({ stage, children }: { stage: string; children: React.ReactNode }) {
+// A checked number. The round shows on the first number from that round only.
+function Cite({ stage, children }: { stage?: string; children: React.ReactNode }) {
   return (
     <span className="tnum whitespace-nowrap rounded-md border border-[var(--line-2)] bg-[var(--bg)] px-1.5 py-0.5 text-[14px]">
-      <span className="font-medium">{stage}</span> <span className="text-[var(--ink-2)]">{children}</span>
+      {stage && <span className="mr-1.5 font-medium text-[var(--brand)]">{stage}</span>}
+      <span className="text-[var(--ink)]">{children}</span>
     </span>
   );
 }

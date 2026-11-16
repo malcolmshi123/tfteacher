@@ -4,7 +4,7 @@ import { UNIT_BY_ID } from "../game/set";
 // actually plays. Every verdict lists the note lines it came from.
 
 export interface NoteLine {
-  id: string; // stable anchor, e.g. "u-kestrel-1"
+  id: string; // stable anchor, e.g. "u-aphelios-1"
   section: "Units" | "Traits" | "Items" | "Systems";
   target: string; // unit id, trait name, item id or system key
   text: string;
@@ -33,24 +33,42 @@ export interface CompVerdict {
 export const PATCH = { from: "18.2", to: "18.3", date: "2026-11-12" };
 
 export const NOTES: NoteLine[] = [
-  { id: "u-kestrel-1", section: "Units", target: "kestrel", text: "Kestrel attack damage 62 to 56", direction: "nerf", weight: 2 },
-  { id: "u-kestrel-2", section: "Units", target: "kestrel", text: "Kestrel ability bonus attacks 4 to 3", direction: "nerf", weight: 2 },
-  { id: "u-liora-1", section: "Units", target: "liora", text: "Liora ability shield 250/325/450 to 280/360/500", direction: "buff", weight: 1 },
-  { id: "u-ysolde-1", section: "Units", target: "ysolde", text: "Ysolde mana 90 to 80", direction: "buff", weight: 2 },
-  { id: "u-dax-1", section: "Units", target: "dax", text: "Dax health 750 to 800", direction: "buff", weight: 1 },
-  { id: "u-ombra-1", section: "Units", target: "ombra", text: "Ombra ability damage 280/420/1200 to 260/390/1200", direction: "nerf", weight: 1 },
-  { id: "u-halvar-1", section: "Units", target: "halvar", text: "Halvar armor 45 to 50", direction: "buff", weight: 1 },
-  { id: "t-tidecaller-1", section: "Traits", target: "Tidecaller", text: "Tidecaller (4) bonus mana regen 4 to 3", direction: "nerf", weight: 3 },
-  { id: "t-ironclad-1", section: "Traits", target: "Ironclad", text: "Ironclad (2) armor 20 to 25", direction: "buff", weight: 1 },
-  { id: "t-ashen-1", section: "Traits", target: "Ashen", text: "Ashen (3) burn 1% to 1.5% max health", direction: "buff", weight: 2 },
+  { id: "u-aphelios-1", section: "Units", target: "aphelios", text: "Aphelios attack damage 62 to 56", direction: "nerf", weight: 2 },
+  { id: "u-aphelios-2", section: "Units", target: "aphelios", text: "Aphelios ability bonus attacks 4 to 3", direction: "nerf", weight: 2 },
+  { id: "u-masteryi-1", section: "Units", target: "masteryi", text: "Master Yi ability shield 250/325/450 to 280/360/500", direction: "buff", weight: 1 },
+  { id: "u-ahri-1", section: "Units", target: "ahri", text: "Ahri mana 90 to 80", direction: "buff", weight: 2 },
+  { id: "u-vi-1", section: "Units", target: "vi", text: "Vi health 750 to 800", direction: "buff", weight: 1 },
+  { id: "u-morgana-1", section: "Units", target: "morgana", text: "Morgana ability damage 280/420/1200 to 260/390/1200", direction: "nerf", weight: 1 },
+  { id: "u-rammus-1", section: "Units", target: "rammus", text: "Rammus armor 45 to 50", direction: "buff", weight: 1 },
+  { id: "t-blossom-1", section: "Traits", target: "Blossom", text: "Blossom (3) Attack Damage and Ability Power 12% to 10%", direction: "nerf", weight: 3 },
+  { id: "t-juggernaut-1", section: "Traits", target: "Juggernaut", text: "Juggernaut (2) Juggernaut Durability 20% to 22%", direction: "buff", weight: 1 },
+  { id: "t-inferno-1", section: "Traits", target: "Inferno", text: "Inferno (2) Burn duration 3 to 4 seconds", direction: "buff", weight: 2 },
   { id: "i-bow-1", section: "Items", target: "bow", text: "Quickbow attack speed 15% to 12%", direction: "nerf", weight: 1 },
   { id: "s-shop-1", section: "Systems", target: "odds-8", text: "Level 8 shop odds for 4-costs 24% to 22%", direction: "nerf", weight: 1 },
 ];
 
+// Comps are named the way players name them: the biggest trait, then the carry.
+// Names come from the board, so any set works without a hand-kept list.
+export function compTraits(core: string[]): string[] {
+  const n = new Map<string, number>();
+  for (const id of core) for (const tr of UNIT_BY_ID[id]?.traits ?? []) n.set(tr, (n.get(tr) ?? 0) + 1);
+  return [...n].filter(([, c]) => c >= 2).sort((a, b) => b[1] - a[1]).map(([tr]) => tr);
+}
+
+export function compName(core: string[]): string {
+  const carry = UNIT_BY_ID[core[0]]?.name ?? core[0];
+  const top = compTraits(core)[0];
+  return top ? `${top} ${carry}` : carry;
+}
+
+function comp(id: string, core: string[], games: number, avgPlace: number, top4: number): PlayedComp {
+  return { id, name: compName(core), core, traits: compTraits(core), games, avgPlace, top4 };
+}
+
 export const MY_COMPS: PlayedComp[] = [
-  { id: "c1", name: "Kestrel Sharpshot", core: ["kestrel", "eshe", "noor", "ilsa"], traits: ["Sharpshot", "Duelist"], games: 14, avgPlace: 3.9, top4: 57 },
-  { id: "c2", name: "Tidecaller Liora", core: ["liora", "ysolde", "vessa", "nyx"], traits: ["Tidecaller", "Runebound"], games: 9, avgPlace: 4.4, top4: 44 },
-  { id: "c3", name: "Ironclad Bastion", core: ["dax", "garrick", "thane", "halvar"], traits: ["Ironclad", "Bastion"], games: 6, avgPlace: 4.8, top4: 33 },
+  comp("c1", ["aphelios", "mamabeak", "kayle", "xayah"], 14, 3.9, 57),
+  comp("c2", ["ahri", "masteryi", "yunara", "ashe"], 9, 4.4, 44),
+  comp("c3", ["amumu", "vi", "sejuani", "rammus"], 6, 4.8, 33),
 ];
 
 // "62 to 56" -> -9.7. Tiered values ("250/325/450 to 280/360/500") average the

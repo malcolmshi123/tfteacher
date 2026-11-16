@@ -90,7 +90,7 @@ describe("ordering", () => {
     expect([...sev].sort((a, b) => a - b)).toEqual(sev);
   });
   it("board value counts copies", () => {
-    expect(boardValue([{ unit: "kestrel", star: 2, items: [] }])).toBe(12);
+    expect(boardValue([{ unit: "aphelios", star: 2, items: [] }])).toBe(12);
   });
 });
 
