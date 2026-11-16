@@ -49,6 +49,23 @@ export function SiteNav({ active }: { active?: string }) {
           >
             Get the app
           </Link>
+          <details className="group relative md:hidden">
+            <summary aria-label="Menu" className="grid h-9 w-9 cursor-pointer list-none place-items-center rounded-lg border border-[var(--line)] text-[var(--ink-2)] [&::-webkit-details-marker]:hidden">
+              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden>
+                <path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+              </svg>
+            </summary>
+            <nav className="absolute right-0 top-11 w-52 rounded-xl border border-[var(--line)] bg-[var(--panel)] p-1.5 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.8)]">
+              {NAV.map((n) => (
+                <Link key={n.href} href={n.href} className={`block rounded-lg px-3 py-2.5 text-[15px] ${active === n.href ? "bg-[var(--panel-2)] text-[var(--ink)]" : "text-[var(--ink-2)]"}`}>
+                  {n.label}
+                </Link>
+              ))}
+              <Link href="/pricing" className="block rounded-lg px-3 py-2.5 text-[15px] text-[var(--ink-2)]">
+                Sign in
+              </Link>
+            </nav>
+          </details>
         </div>
       </div>
     </header>

@@ -46,7 +46,17 @@ export default function PatchPage() {
                 ))}
               </div>
             </div>
-            <div className="mt-2 text-[12px] leading-snug text-[var(--muted)]">Share of your games, colored by what this patch did to each comp.</div>
+            <ul className="mt-3 space-y-1.5 text-[12px]">
+              {verdicts.map((v) => (
+                <li key={v.comp.id} className="flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-2 text-[var(--ink-2)]">
+                    <span className="block h-2 w-2 rounded-full" style={{ background: TONE[v.verdict].color }} />
+                    {v.comp.name}
+                  </span>
+                  <span className="tnum text-[var(--muted)]">{v.comp.games} games</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
@@ -87,7 +97,7 @@ function CompCard({ v }: { v: CompVerdict }) {
         <h3 className="mt-2 text-[22px] font-semibold tracking-tight">{v.comp.name}</h3>
         <div className="mt-4 flex gap-1">
           {v.comp.core.map((u) => (
-            <UnitToken key={u} unitId={u} size={44} state={v.lines.some((l) => l.target === u) ? "normal" : "dim"} />
+            <UnitToken key={u} unitId={u} size={44} />
           ))}
         </div>
         <dl className="tnum mt-5 grid grid-cols-3 gap-4 text-[13px]">
@@ -122,8 +132,8 @@ function NoteRow({ n }: { n: NoteLine }) {
     <li className="flex items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--bg)] px-4 py-2.5 text-[14px]">
       <Dir d={n.direction} />
       <span className="tnum flex-1 text-[var(--ink-2)]">{n.text}</span>
-      <a href={`#${n.id}`} className="shrink-0 text-[12px] text-[var(--muted)] hover:text-[var(--ink)]">
-        {n.section} note
+      <a href={`#${n.id}`} className="shrink-0 rounded-md px-2 py-1 text-[12px] text-[var(--ink-2)] transition-colors hover:bg-[var(--panel-2)] hover:text-[var(--ink)]">
+        Patch note ↗
       </a>
     </li>
   );

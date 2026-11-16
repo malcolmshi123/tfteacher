@@ -50,7 +50,7 @@ export default function Home() {
                 <span className="text-[12px] text-[var(--muted)]">{review.game.durationMin} min</span>
               </div>
               <div className="mt-3">
-                <Timeline series={review.series} highlight={top.stages} selected={top.focus} compact />
+                <Timeline series={review.series} highlight={top.stages} selected={top.focus} compact width={560} />
               </div>
               <div className="mt-3 rounded-2xl border border-[var(--line)] bg-[var(--panel-2)] p-4">
                 <div className="flex items-start gap-3">
@@ -90,7 +90,24 @@ export default function Home() {
                     <UnitToken key={i} piece={p} size={42} />
                   ))}
                 </div>
-                <p className="mt-6 text-[14px] leading-relaxed text-[var(--ink-2)]">6th place, level 7, eight units. Nothing about how you got there.</p>
+                <dl className="tnum mt-5 grid grid-cols-3 gap-3 text-[13px]">
+                  <div>
+                    <dt className="text-[var(--muted)]">Placement</dt>
+                    <dd className="text-[18px] font-semibold">6th</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[var(--muted)]">Level</dt>
+                    <dd className="text-[18px] font-semibold">{last.level}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[var(--muted)]">Units</dt>
+                    <dd className="text-[18px] font-semibold">{last.board.length}</dd>
+                  </div>
+                </dl>
+                <div className="mt-5 rounded-xl border border-dashed border-[var(--line-2)] px-4 py-6 text-center text-[13px] text-[var(--muted)]">
+                  No shops, no gold, no HP. Nothing from rounds 1-1 to {last.stage}.
+                </div>
+                <p className="mt-5 text-[14px] leading-relaxed text-[var(--ink-2)]">Where you ended up, and nothing about how you got there.</p>
               </div>
               <div className="rounded-2xl border border-[var(--line-2)] bg-[var(--panel-2)] p-6">
                 <div className="text-[13px] font-medium text-[var(--brand)]">What Afterboard sees at 4-2 alone</div>

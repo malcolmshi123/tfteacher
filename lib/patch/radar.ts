@@ -53,6 +53,10 @@ export const MY_COMPS: PlayedComp[] = [
   { id: "c3", name: "Ironclad Bastion", core: ["dax", "garrick", "thane", "halvar"], traits: ["Ironclad", "Bastion"], games: 6, avgPlace: 4.8, top4: 33 },
 ];
 
+function list(xs: string[]) {
+  return xs.length <= 1 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`;
+}
+
 export function radar(comps = MY_COMPS, notes = NOTES): CompVerdict[] {
   return comps.map((comp) => {
     const lines = notes.filter(
@@ -70,7 +74,7 @@ export function radar(comps = MY_COMPS, notes = NOTES): CompVerdict[] {
       verdict === "weaker"
         ? `Your main carry ${name(comp.core[0])} lost damage in ${nerfs.length} line${nerfs.length > 1 ? "s" : ""}. This was your best comp; expect it to place lower until you adjust items or the board around it.`
         : verdict === "stronger"
-          ? `${buffs.map((b) => name(b.target)).filter((v, i, a) => a.indexOf(v) === i).join(" and ")} got stronger and nothing in the core was hit.`
+          ? `${list(buffs.map((b) => name(b.target)).filter((v, i, a) => a.indexOf(v) === i))} all got stronger, and nothing in the comp was nerfed.`
           : verdict === "mixed"
             ? `Buffs and nerfs roughly cancel out. Play it the same way and watch the first few games.`
             : "Nothing in this comp changed.";
