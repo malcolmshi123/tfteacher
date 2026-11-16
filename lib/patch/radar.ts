@@ -113,7 +113,7 @@ export interface PatchPick {
 
 export const PATCH_SUMMARY: { lead: string; tryThese: PatchPick[]; avoid: PatchPick[] } = {
   lead:
-    "18.5 leans toward AP and sustain. Fae, AP 4-costs and Taric got stronger, while Blackthorn, Rapidfire and boards with 7 or more Riftbeasts lost some of their top end. Among units, Kha'Zix, Azir and Mama Beak lost damage and Sentinel's stun got shorter.",
+    "18.5 leans toward AP and sustain. Fae, AP 4-costs and Taric got stronger, while Blackthorn, Rapidfire, Flora Fatalis healing and the top breakpoints of Elderwood (9) and Riftbeast (7) lost some power. Among units, Kha'Zix, Azir and Mama Beak lost damage and Sentinel's stun got shorter.",
   tryThese: [
     {
       name: "Fae boards",
@@ -202,7 +202,13 @@ export function radar(comps = MY_COMPS, notes = NOTES): CompVerdict[] {
               // units with lines both ways aren't called "stronger"; their nerf is spelled out
               const nerfed = new Set(nerfs.map((x) => x.target));
               const up = buffs.map((b) => b.target).filter((t, i, a) => a.indexOf(t) === i && !nerfed.has(t)).map(name);
-              return `${list(up)} got stronger.${nerfs.length ? ` One line went the other way: ${nerfs.map((x) => x.text).join("; ")}.` : " Nothing in the comp was nerfed."}`;
+              // a unit with lines both ways is called mixed, naming what went each way
+              const mixed = [...nerfed].filter((t) => buffs.some((b) => b.target === t));
+              const mixedText = mixed
+                .map((t) => ` ${name(t)} is mixed: ${nerfs.filter((x) => x.target === t).map((x) => x.text.replace(`${name(t)} `, "")).join("; ")}, but ${buffs.filter((x) => x.target === t).map((x) => x.text.replace(`${name(t)} `, "")).join("; ")}.`)
+                .join("");
+              const pure = nerfs.filter((x) => !mixed.includes(x.target));
+              return `${list(up)} got stronger.${mixedText}${pure.length ? ` One line went the other way: ${pure.map((x) => x.text).join("; ")}.` : ""}${nerfs.length ? "" : " Nothing in the comp was nerfed."}`;
             })()
           : verdict === "mixed"
             ? (() => {

@@ -102,7 +102,7 @@ export function Timeline({
         if (compact || lastLive < 0 || lastLive === series.length - 1) return null;
         return (
           <text x={cx(lastLive)} y={HP_TOP + HP_H + 15} textAnchor="end" fontSize={FS - 1} fill="var(--muted)">
-            Lobby median ends: under 4 left
+            Lobby median ends here: {series[lastLive + 1].lobbyAlive} opponents left
           </text>
         );
       })()}
@@ -117,10 +117,8 @@ export function Timeline({
         Gold into combat
       </text>
       {compact && <g transform={`translate(${PAD_L + 150}, ${GOLD_TOP - 14 - FS * 0.75})`}>
-        <rect x={0} y={0} width={10} height={10} rx={2} fill="var(--gold)" opacity={0.85} />
-        <text x={16} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">Held</text>
-        <rect x={compact ? 66 : 58} y={0} width={10} height={10} rx={2} fill="var(--gold)" fillOpacity={0.14} stroke="var(--gold)" strokeOpacity={0.45} strokeDasharray="2 2" />
-        <text x={compact ? 82 : 74} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">Spent</text>
+        <rect x={0} y={0} width={10} height={10} rx={2} fill="var(--gold)" fillOpacity={0.14} stroke="var(--gold)" strokeOpacity={0.6} strokeDasharray="2 2" />
+        <text x={16} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">Spent that round</text>
       </g>}
       <line x1={PAD_L} x2={W - PAD_R} y1={goldY(50)} y2={goldY(50)} stroke="var(--gold)" strokeOpacity={0.35} strokeDasharray="2 4" />
       <text x={PAD_L - 8} y={goldY(50) + FS / 3} textAnchor="end" fontSize={FS} fill="var(--ink-2)" className="tnum">

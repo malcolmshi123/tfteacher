@@ -100,8 +100,7 @@ export function MobileRounds({
       <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 px-1 text-[12px] text-[var(--muted)]">
         <span className="flex items-center gap-3">
           Gold into combat
-          <span className="flex items-center gap-1.5"><span className="block h-2.5 w-2.5 rounded-[2px] bg-[var(--gold)]" />Held</span>
-          <span className="flex items-center gap-1.5"><span className="block h-2.5 w-2.5 rounded-[2px] border border-dashed border-[var(--gold)] bg-[color-mix(in_oklab,var(--gold)_14%,transparent)]" />Spent</span>
+          <span className="flex items-center gap-1.5"><span className="block h-2.5 w-2.5 rounded-[2px] border border-dashed border-[var(--gold)] bg-[color-mix(in_oklab,var(--gold)_14%,transparent)]" />Spent that round</span>
         </span>
         {si >= 0 && <span className="tnum w-full text-[var(--gold)]">{series[si].goldEnd} of {series[si].gold} into combat at {selected}</span>}
       </div>

@@ -58,6 +58,7 @@ export default function Pricing() {
         </section>
 
         <section className="mt-16 grid gap-x-12 gap-y-8 border-t border-[var(--line)] pt-12 md:grid-cols-2">
+          <h2 className="text-[22px] font-semibold tracking-tight md:col-span-2">Questions</h2>
           <Faq q="Can I get banned for using this?">
             The app only reads the game&apos;s official event feed, saves it, and shows nothing until the game is over. It does
             not read game memory and gives no advice while you play.
@@ -84,7 +85,7 @@ const COMPARE: [string, string, string][] = [
   ["Round-by-round reviews", "3 a week", "Unlimited"],
   ["Final-board reviews", "Yes", "Yes"],
   ["Questions per review", "3", "Unlimited"],
-  ["Patch Radar", "Most played comp", "Every comp"],
+  ["Patch Radar", "Top comp", "Every comp"],
   ["Trends across games", "No", "Yes"],
   ["History", "20 games", "All games"],
 ];
@@ -99,12 +100,12 @@ const TREND = [
 function TrendsPreview() {
   const max = Math.max(...TREND.map((t) => t.hp));
   return (
-    <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
+    <div className="flex h-full flex-col rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
       <div className="flex items-baseline justify-between gap-3">
         <h3 className="text-[15px] font-semibold">Pro trends: HP lost per game, by stage</h3>
-        <span className="text-[12px] text-[var(--muted)]">Sample account, 19 games on patch 18.4</span>
+        <span className="text-[13px] text-[var(--ink-2)]">Sample account, 19 games on patch 18.4</span>
       </div>
-      <div className="mt-6 space-y-3">
+      <div className="mb-6 mt-6 space-y-3">
         {TREND.map((t) => (
           <div key={t.stage} className="grid grid-cols-[72px_1fr_44px] items-center gap-3 text-[13px]">
             <span className="text-[var(--ink-2)]">{t.stage}</span>
@@ -115,7 +116,7 @@ function TrendsPreview() {
           </div>
         ))}
       </div>
-      <p className="mt-6 border-t border-[var(--line)] pt-4 text-[14px] leading-relaxed text-[var(--ink-2)]">
+      <p className="mt-auto border-t border-[var(--line)] pt-4 text-[14px] leading-relaxed text-[var(--ink-2)]">
         Stage 3 costs this player the most HP per game. Their reviews point at the same habit: long loss streaks through stage 3 that leave too little HP for stage 4.
       </p>
     </div>
@@ -124,7 +125,7 @@ function TrendsPreview() {
 
 function Plan({ name, price, cadence, note, items, cta, href, featured }: { name: string; price: string; cadence: string; note?: string; items: string[]; cta: string; href: string; featured?: boolean }) {
   return (
-    <div className={`flex flex-col rounded-2xl border p-7 ${featured ? "border-[color-mix(in_oklab,var(--brand)_60%,var(--line))] bg-[linear-gradient(180deg,color-mix(in_oklab,var(--brand)_9%,var(--panel-2)),var(--panel-2)_45%)] shadow-[0_30px_80px_-40px_color-mix(in_oklab,var(--brand)_40%,transparent)]" : "border-[var(--line)] bg-[var(--panel)]"}`}>
+    <div className={`flex flex-col rounded-2xl border p-7 ${featured ? "border-[color-mix(in_oklab,var(--brand)_60%,var(--line))] bg-[linear-gradient(180deg,color-mix(in_oklab,var(--brand)_9%,var(--panel-2)),var(--panel-2)_45%)]" : "border-[var(--line)] bg-[var(--panel)]"}`}>
       <div className="flex items-center justify-between">
         <h2 className="text-[18px] font-semibold">{name}</h2>
 

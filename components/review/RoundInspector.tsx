@@ -51,7 +51,7 @@ export function RoundInspector({
 
   return (
     <div className={bare ? "" : "rounded-2xl border border-[var(--line)] bg-[var(--panel)]"}>
-      <div className="flex items-center justify-between gap-4 border-b border-[var(--line)] px-4 py-4 sm:px-5">
+      <div className={`flex items-center justify-between gap-4 border-b border-[var(--line)] px-4 py-4 sm:px-5 sticky top-0 z-10 bg-[var(--panel)] ${bare ? "" : "rounded-t-2xl"}`}>
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-0.5">
           <h3 className="tnum whitespace-nowrap text-[22px] font-semibold tracking-tight">Round {r.stage}</h3>
           <span className={`text-[13px] ${r.outcome === "loss" ? "text-[var(--hp)]" : r.outcome === "win" ? "text-[var(--good)]" : "text-[var(--muted)]"}`}>

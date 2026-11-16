@@ -106,7 +106,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
             </Key>
             <Key color="var(--gold)">Gold into combat</Key>
             <Key color="transparent" spent>
-              Spent
+              Spent that round
             </Key>
             <span className="mx-1 h-3 w-px self-center bg-[var(--line-2)]" aria-hidden />
             <Key color="var(--good)">Won</Key>
@@ -147,7 +147,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
             <AskPanel gameId={game.id} onCite={openRound} suggested={suggestions} />
           </div>
         </section>
-        <aside className="hidden lg:sticky lg:top-20 lg:block lg:self-start">
+        <aside className="hidden lg:sticky lg:top-20 lg:block lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-y-auto lg:rounded-2xl">
           <RoundInspector game={game} stage={round} series={series} findings={findings} onPick={setRound} />
         </aside>
       </div>
@@ -156,7 +156,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
       {sheet && (
         <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label={`Round ${round}`}>
           <button aria-label="Close" className="absolute inset-0 bg-black/85 backdrop-blur-[6px]" onClick={() => setSheet(false)} />
-          <div className="absolute inset-x-0 bottom-0 max-h-[86dvh] overflow-y-auto rounded-t-2xl border-t border-[var(--line-2)] bg-[var(--panel)] pb-6 pt-2 shadow-[0_-20px_60px_rgba(0,0,0,0.6)]">
+          <div className="absolute inset-x-0 bottom-0 max-h-[68dvh] overflow-y-auto rounded-t-2xl border-t border-[var(--line-2)] bg-[var(--panel)] pb-6 pt-2 shadow-[0_-20px_60px_rgba(0,0,0,0.6)]">
             <div className="sticky top-0 z-10 flex items-center justify-between bg-[var(--panel)] px-4 pb-1 pt-1">
               <span className="w-9" />
               <span className="block h-1 w-10 rounded-full bg-[var(--ink-2)] opacity-40" aria-hidden />
@@ -190,13 +190,13 @@ function FindingCard({ f, active, lead, onClick, onCite, children }: { f: Findin
       <div className="flex items-start gap-3">
         <span className="mt-[7px] hidden h-2 w-2 shrink-0 rounded-full sm:block" style={{ background: tone }} />
         <div className="min-w-0 flex-1">
-          <div className={`flex items-start justify-between gap-x-3 gap-y-2 ${lead ? "flex-col-reverse sm:flex-row" : ""}`}>
+          <div className={`flex flex-col-reverse items-start justify-between gap-x-3 gap-y-2 sm:flex-row`}>
             <h3 className={`${lead ? "text-[18px] sm:text-[20px]" : "text-[16px]"} font-semibold leading-snug tracking-tight`}>{f.title}</h3>
             <span className="tnum shrink-0 rounded-full px-2 py-0.5 text-[12px] font-medium" style={{ color: tone, background: `color-mix(in oklab, ${tone} 13%, transparent)` }}>
               {label}
             </span>
           </div>
-          <p className={`mt-2 ${lead ? "text-[15px]" : "text-[14px]"} leading-relaxed text-[var(--ink-2)] ${quiet ? "hidden lg:block" : ""}`}>{f.detail}</p>
+          <p className={`mt-2 ${lead ? "text-[15px]" : "text-[14px]"} leading-relaxed text-[var(--ink-2)]`}>{f.detail}</p>
           {quiet && (
             <span className="mt-2 inline-flex items-center gap-1 text-[13px] text-[var(--muted)] group-hover:text-[var(--ink-2)]">
               {f.positive ? "Show rounds" : "Show rounds and fix"}

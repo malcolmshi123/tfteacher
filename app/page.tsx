@@ -36,8 +36,8 @@ export default function Home() {
       <SiteNav />
       <main>
         {/* hero */}
-        <section className="mx-auto grid max-w-[1240px] gap-10 px-4 pb-16 pt-12 md:px-6 md:pt-20 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:items-center lg:gap-14">
-          <div>
+        <section className="mx-auto grid max-w-[1240px] gap-10 px-4 pb-16 pt-12 md:px-6 md:pt-20 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:items-start lg:gap-14">
+          <div className="lg:pt-14">
             <h1 className="text-[40px] font-semibold leading-[1.04] tracking-[-0.035em] text-balance md:text-[56px]">
               Find out why you went 8th.
             </h1>
@@ -53,7 +53,7 @@ export default function Home() {
                 See a sample review
               </Link>
             </div>
-            <p className="mt-4 text-[13px] text-[var(--muted)]">Free for 3 reviews a week. Works with any set.</p>
+            <p className="mt-4 text-[14px] text-[var(--ink-2)]">Free for 3 reviews a week. Works with any set.</p>
           </div>
 
           {/* hero visual: a real slice of the sample review */}
@@ -147,7 +147,7 @@ export default function Home() {
                 </div>
                 <dl className="tnum mt-5 grid grid-cols-3 gap-3 text-[13px]">
                   <div>
-                    <dt className="text-[var(--muted)]">HP</dt>
+                    <dt className="text-[var(--muted)]">HP entering</dt>
                     <dd className="text-[18px] font-semibold text-[var(--hp)]">{r41.hp}</dd>
                   </div>
                   <div>
