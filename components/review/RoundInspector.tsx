@@ -43,6 +43,16 @@ export function RoundInspector({
     }),
   );
 
+  const prevPt = series[idx - 1];
+  const takeaway =
+    r.bought.length >= 5
+      ? `Rolldown: ${r.rerolls} rerolls and ${r.bought.length} units bought took your board from ${prevPt?.boardValue ?? 0} to ${pt.boardValue}.`
+      : r.kind === "pvp" && r.outcome === "loss" && r.hp <= 40 && r.goldEnd >= 20
+        ? `Lost at ${r.hp} HP while holding ${r.goldEnd} gold.`
+        : r.xpBought >= 3
+          ? `Spent ${r.xpBought * 4} gold on XP${r.level < pt.lobbyLevel ? ", still a level behind the lobby" : ""}.`
+          : here.find((f) => !f.positive)?.title;
+
   const result =
     r.kind === "carousel"
       ? "Shared draft"
@@ -66,6 +76,8 @@ export function RoundInspector({
           <NavBtn disabled={idx >= game.rounds.length - 1} onClick={() => game.rounds[idx + 1] && onPick(game.rounds[idx + 1].stage)} label="Next round">›</NavBtn>
         </div>
       </div>
+
+      {takeaway && <p className="border-b border-[var(--line)] px-4 py-3 text-[14px] leading-snug text-[var(--ink)] sm:px-5">{takeaway}</p>}
 
       <dl className="grid grid-cols-2 border-b border-[var(--line)] sm:grid-cols-4">
         <Stat k="HP" v={`${r.hp}`} sub={r.damageTaken ? `→ ${Math.max(0, r.hp - r.damageTaken)} after` : `lobby ${pt.lobbyHp}`} tone={r.hp < pt.lobbyHp ? "hp" : undefined} />

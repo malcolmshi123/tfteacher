@@ -59,7 +59,7 @@ export function Timeline({
       {/* highlighted rounds */}
       {series.map((p, i) =>
         hl.has(p.stage) ? (
-          <rect key={`h${i}`} x={cx(i) - step / 2} y={HP_TOP - 8} width={step} height={STRIP_TOP + STRIP_H - HP_TOP + 12} fill="var(--brand)" opacity={0.07} />
+          <rect key={`h${i}`} x={cx(i) - step / 2} y={HP_TOP - 2} width={step} height={STRIP_TOP + STRIP_H - HP_TOP + 6} fill="var(--brand)" opacity={0.07} />
         ) : null,
       )}
 
@@ -158,7 +158,7 @@ export function Timeline({
       {/* selection */}
       {series.map((p, i) =>
         p.stage === selected ? (
-          <rect key="sel" x={cx(i) - step / 2 + 1} y={HP_TOP - 8} width={step - 2} height={STRIP_TOP + STRIP_H - HP_TOP + 12} fill="none" stroke="var(--ink)" strokeOpacity={0.7} strokeWidth={1.25} rx={4} />
+          <rect key="sel" x={cx(i) - step / 2 + 1} y={HP_TOP - 2} width={step - 2} height={STRIP_TOP + STRIP_H - HP_TOP + 6} fill="none" stroke="var(--ink)" strokeOpacity={0.7} strokeWidth={1.25} rx={4} />
         ) : null,
       )}
 

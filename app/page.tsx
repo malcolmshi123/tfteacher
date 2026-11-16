@@ -50,7 +50,7 @@ export default function Home() {
                 <span className="text-[12px] text-[var(--muted)]">{review.game.durationMin} min</span>
               </div>
               <div className="mt-3">
-                <Timeline series={review.series} highlight={top.stages} selected={top.focus} compact width={560} />
+                <Timeline series={review.series} highlight={top.stages} selected={top.focus} compact width={460} />
               </div>
               <div className="mt-3 rounded-2xl border border-[var(--line)] bg-[var(--panel-2)] p-4">
                 <div className="flex items-start gap-3">
