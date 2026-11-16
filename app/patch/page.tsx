@@ -1,6 +1,6 @@
 import { SiteFooter, SiteNav } from "@/components/SiteChrome";
 import { UnitToken } from "@/components/UnitToken";
-import { NOTES, PATCH, changePct, radar, type CompVerdict, type NoteLine } from "@/lib/patch/radar";
+import { NOTES, PATCH, PATCH_SUMMARY, changePct, radar, type CompVerdict, type NoteLine, type PatchPick } from "@/lib/patch/radar";
 
 export const metadata = { title: "Patch Radar · TFTeacher" };
 
@@ -13,11 +13,9 @@ const TONE = {
 
 export default function PatchPage() {
   const verdicts = radar();
-  const used = new Set(verdicts.flatMap((v) => v.lines.map((l) => l.id)));
   // lines that touch every comp are shown once, above the comps
   const shared = NOTES.filter((n) => verdicts.every((v) => v.lines.some((l) => l.id === n.id)));
   const sharedIds = new Set(shared.map((n) => n.id));
-  const rest = NOTES.filter((n) => !used.has(n.id));
   const games = verdicts.reduce((a, v) => a + v.comp.games, 0);
   // headline from the verdicts: most played comp first, then the rest
   const [main, ...others] = verdicts;
@@ -90,22 +88,42 @@ export default function PatchPage() {
         </div>
 
         <section id="rest" className="mt-12 scroll-mt-20">
-          <h2 className="text-[15px] font-medium">Rest of the patch</h2>
-          <p className="mt-1 text-[13px] text-[var(--muted)]">These lines don&apos;t touch anything you play.</p>
-          <ul className="mt-4 divide-y divide-[var(--line)] rounded-2xl border border-[var(--line)] bg-[var(--panel)]">
-            {rest.map((n) => (
-              <li key={n.id} className="flex items-center gap-4 px-5 py-3 text-[14px]">
-                <Dir d={n.direction} />
-                <span className="hidden w-20 shrink-0 text-[12px] text-[var(--muted)] sm:block">{n.section}</span>
-                <span className="tnum flex-1 text-[var(--ink-2)]">{n.text}</span>
-                <Delta n={n} />
-              </li>
-            ))}
-          </ul>
+          <h2 className="text-[20px] font-semibold tracking-tight">The rest of {PATCH.to}</h2>
+          <p className="mt-2 max-w-[760px] text-[15px] leading-relaxed text-[var(--ink-2)]">{PATCH_SUMMARY.lead}</p>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <PickList title="Worth trying" tone="var(--good)" picks={PATCH_SUMMARY.tryThese} />
+            <PickList title="Worth avoiding" tone="var(--hp)" picks={PATCH_SUMMARY.avoid} />
+          </div>
         </section>
       </main>
       <SiteFooter />
     </>
+  );
+}
+
+function PickList({ title, tone, picks }: { title: string; tone: string; picks: PatchPick[] }) {
+  return (
+    <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-5">
+      <div className="flex items-center gap-2 text-[13px] font-medium" style={{ color: tone }}>
+        <span className="block h-2 w-2 rounded-full" style={{ background: tone }} />
+        {title}
+      </div>
+      <ul className="mt-4 divide-y divide-[var(--line)]">
+        {picks.map((pk) => (
+          <li key={pk.name} className="py-4 first:pt-0 last:pb-0">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h3 className="text-[16px] font-semibold tracking-tight">{pk.name}</h3>
+              <div className="flex gap-1.5">
+                {pk.units.map((u) => (
+                  <UnitToken key={u} unitId={u} size={28} showName={false} />
+                ))}
+              </div>
+            </div>
+            <p className="mt-2 text-[14px] leading-relaxed text-[var(--ink-2)]">{pk.why}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 

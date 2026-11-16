@@ -200,7 +200,7 @@ export default function Home() {
               title="Read the review when you die"
               visual={
                 <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--line)] bg-[var(--panel)] px-4 py-3 text-[13px]">
-                  <span className="truncate text-[var(--ink)]">Eliminated at {last.stage} holding {last.goldEnd} gold</span>
+                  <span className="truncate text-[var(--ink)]">Died on {last.stage} holding {last.goldEnd} gold</span>
                   <span className="tnum shrink-0 rounded-full bg-[color-mix(in_oklab,var(--hp)_13%,transparent)] px-2 py-0.5 text-[12px] text-[var(--hp)]">{review.game.placement}th</span>
                 </div>
               }

@@ -71,7 +71,7 @@ export default function ReviewsPage() {
                   <div className="min-w-0">
                     <div className="truncate text-[16px] font-semibold">{COMP_NAME[comp]}</div>
                     <div className="tnum mt-1 text-[13px] text-[var(--muted)]">
-                      {when.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/New_York" })} · {game.durationMin} min · out at{" "}
+                      {when.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/New_York" })} · {game.durationMin} min ·{" "}
                       {game.rounds[game.rounds.length - 1].stage}
                     </div>
                   </div>

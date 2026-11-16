@@ -102,6 +102,60 @@ export const MY_COMPS: PlayedComp[] = [
   comp("c3", "Tempo Riftbeast", "brambleback", ["pebbles", "murkwolf", "krug", "sentinel", "brambleback", "gnar", "taric", "elderdragon"], 4, 4.5, 50),
 ];
 
+// The patch at a glance, beyond your own comps: what the changes add up to and
+// which kinds of boards they favor. Every pick names the note lines behind it.
+export interface PatchPick {
+  name: string;
+  why: string;
+  units: string[];
+  lines: string[]; // NoteLine ids
+}
+
+export const PATCH_SUMMARY: { lead: string; tryThese: PatchPick[]; avoid: PatchPick[] } = {
+  lead:
+    "18.5 leans toward AP and sustain. Fae, AP 4-costs and Taric got stronger, while Blackthorn, Rapidfire and big Riftbeast boards lost some of their top end. Kha'Zix and Azir were nerfed directly.",
+  tryThese: [
+    {
+      name: "Fae boards",
+      why: "Fae heals more at 2 and 4 and its Pixies arrive sooner, and Tristana casts more often and hits harder.",
+      units: ["xayah", "rakan", "tristana", "lillia"],
+      lines: ["t-fae-1", "t-fae-2", "t-fae-3", "t-fae-4", "u-tristana-1", "u-tristana-2"],
+    },
+    {
+      name: "AP 4-costs: Morgana, Soraka, Sett",
+      why: "Morgana's curse and Soraka's stars deal more damage, and Sett heals more, so AP boards built around them gain the most.",
+      units: ["morgana", "soraka", "sett"],
+      lines: ["u-morgana-1", "u-morgana-2", "u-soraka-1", "u-soraka-2", "u-sett-1"],
+    },
+    {
+      name: "Taric frontlines",
+      why: "Taric gets more resists and much stronger empowered attacks, so any board that can fit him gets a sturdier front line.",
+      units: ["taric"],
+      lines: ["u-taric-1", "u-taric-2"],
+    },
+  ],
+  avoid: [
+    {
+      name: "Blackthorn and Azir",
+      why: "Blackthorn (6) gives less, its base sacrifice amp went down, and Azir deals less damage.",
+      units: ["reksai", "veigar", "warwick", "azir"],
+      lines: ["t-blackthorn-1", "t-blackthorn-2", "u-azir-1"],
+    },
+    {
+      name: "Rapidfire around Mama Beak",
+      why: "Rapidfire stacks less attack speed at 4 and 5, and Mama Beak's ability damage went down.",
+      units: ["varus", "kayle", "mamabeak", "aphelios"],
+      lines: ["t-rapidfire-1", "u-mamabeak-2"],
+    },
+    {
+      name: "Kha'Zix carries",
+      why: "Both of Kha'Zix's damage values went down, and Riot nerfed him again in the Oct 27 mid-patch update.",
+      units: ["khazix"],
+      lines: ["u-khazix-1", "u-khazix-2"],
+    },
+  ],
+};
+
 // "62 to 56" -> -9.7. Tiered values ("250/325/450 to 280/360/500") average the
 // change across tiers.
 export function changePct(text: string): number | undefined {

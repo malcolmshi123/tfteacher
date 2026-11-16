@@ -142,7 +142,7 @@ export function analyze(game: GameRecord): Review {
       id: "unspent-gold",
       kind: "unspent-gold",
       severity: last.goldEnd >= 30 ? "high" : "medium",
-      title: `Eliminated at ${last.stage} holding ${last.goldEnd} gold`,
+      title: `Died on ${last.stage} holding ${last.goldEnd} gold`,
       detail: `You started your last round with ${last.gold} gold, rolled ${last.rerolls} times and went into combat with ${last.goldEnd} left at ${last.hp} HP. That gold could not help you after this fight.`,
       advice: "When one more loss ends your game, spend down to 0 before combat: roll for upgrades first, then level if no upgrade is close.",
       stages: [last.stage],
@@ -358,7 +358,7 @@ export function analyze(game: GameRecord): Review {
       case "held-gold-low-hp":
         return `lost at ${listStages(f.stages)} under 40 HP with ${listStages(f.stages.map((s) => String(R.find((r) => r.stage === s)!.goldEnd)))} gold unspent`;
       case "unspent-gold":
-        return `went out at ${last.stage} holding ${last.goldEnd} gold`;
+        return `died on ${last.stage} holding ${last.goldEnd} gold`;
       case "missed-upgrade":
         return `passed on ${f.stages.length} upgrade${f.stages.length === 1 ? "" : "s"} the shop offered`;
       case "idle-items":
@@ -372,11 +372,11 @@ export function analyze(game: GameRecord): Review {
     }
   };
   const good = opener ? `won your first ${opener.stages.length} fights` : "";
-  const bad = worst ? mistake(worst) : `went out at ${last.stage}`;
+  const bad = worst ? mistake(worst) : `died on ${last.stage}`;
   const story = good ? `${good}, but ${bad}` : bad;
 
   const headline = streakStory
-    ? `You placed ${place}: a loss streak left you at ${streakEndHp} HP after ${streak!.focus}, and you went out at ${last.stage} holding ${last.goldEnd} gold.`
+    ? `You placed ${place}: a loss streak left you at ${streakEndHp} HP after ${streak!.focus}, and you died on ${last.stage} holding ${last.goldEnd} gold.`
     : `You placed ${place}: you ${story}.`;
 
   const totalRolls = R.reduce((a, r) => a + r.rerolls, 0);
@@ -394,10 +394,9 @@ export function analyze(game: GameRecord): Review {
   } else {
     const fights = R.filter((r) => r.kind === "pvp");
     const lost = fights.filter((r) => r.outcome === "loss").length;
-    const by = last.kind === "pvp" && last.opponent ? ` to ${last.opponent}` : "";
     summary =
       game.placement > 1
-        ? `You lost ${lost} of ${fights.length} player fights and went out at ${last.stage}${by}${last.goldEnd >= 10 ? ` holding ${last.goldEnd} gold` : ""}.`
+        ? `You lost ${lost} of ${fights.length} player fights and died on ${last.stage}${last.goldEnd >= 10 ? ` holding ${last.goldEnd} gold` : ""}.`
         : `You lost ${lost} of ${fights.length} player fights and won the lobby.`;
   }
 
