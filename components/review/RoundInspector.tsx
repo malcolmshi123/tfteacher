@@ -68,8 +68,8 @@ export function RoundInspector({
       </div>
 
       <dl className="grid grid-cols-2 border-b border-[var(--line)] sm:grid-cols-4">
-        <Stat k="HP" v={`${r.hp}`} sub={r.damageTaken ? `→ ${Math.max(0, r.hp - r.damageTaken)} · lobby ${pt.lobbyHp}` : `lobby ${pt.lobbyHp}`} tone={r.hp < pt.lobbyHp ? "hp" : undefined} />
-        <Stat k="Gold" v={`${r.gold}`} sub={`${r.goldEnd} at combat`} />
+        <Stat k="HP" v={`${r.hp}`} sub={r.damageTaken ? `→ ${Math.max(0, r.hp - r.damageTaken)} after` : `lobby ${pt.lobbyHp}`} tone={r.hp < pt.lobbyHp ? "hp" : undefined} />
+        <Stat k="Gold" v={`${r.gold}`} sub={`→ ${r.goldEnd} at fight`} />
         <Stat k="Level" v={`${r.level}`} sub={`lobby ${pt.lobbyLevel}`} tone={r.level < pt.lobbyLevel ? "hp" : r.level > pt.lobbyLevel ? "good" : undefined} />
         <Stat k="Board" v={`${pt.boardValue}`} sub={`lobby ${pt.lobbyBoardValue}`} tone={pt.boardValue < pt.lobbyBoardValue ? "hp" : "good"} />
       </dl>

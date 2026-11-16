@@ -45,6 +45,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div className="max-w-[760px]">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-[var(--muted)]">
+            <span className="tnum rounded-md bg-[color-mix(in_oklab,var(--hp)_16%,var(--panel-2))] px-1.5 py-0.5 font-semibold text-[var(--hp)] md:hidden">{game.placement}th of 8</span>
             <span>{game.queue}</span>
             <Dot />
             <span>{game.patch}</span>
@@ -59,7 +60,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
           <h1 className="mt-3 text-[28px] font-semibold leading-[1.15] tracking-[-0.02em] text-balance md:text-[36px]">{review.headline}</h1>
           <p className="mt-3 max-w-[640px] text-[15px] leading-relaxed text-[var(--ink-2)]">{review.summary}</p>
         </div>
-        <div className="flex shrink-0 items-center gap-3 rounded-2xl border border-[var(--line)] bg-[var(--panel)] py-3 pl-3 pr-5">
+        <div className="hidden shrink-0 items-center gap-3 rounded-2xl border md:flex border-[var(--line)] bg-[var(--panel)] py-3 pl-3 pr-5">
           <span className="tnum flex h-14 w-14 items-center justify-center rounded-xl bg-[color-mix(in_oklab,var(--hp)_16%,var(--panel-2))] text-[24px] font-semibold text-[var(--hp)]">
             {game.placement}
             <span className="-ml-1 self-start pt-3 text-[12px] font-medium">th</span>

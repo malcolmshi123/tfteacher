@@ -44,7 +44,7 @@ export const NOTES: NoteLine[] = [
   { id: "t-ironclad-1", section: "Traits", target: "Ironclad", text: "Ironclad (2) armor 20 to 25", direction: "buff", weight: 1 },
   { id: "t-ashen-1", section: "Traits", target: "Ashen", text: "Ashen (3) burn 1% to 1.5% max health", direction: "buff", weight: 2 },
   { id: "i-bow-1", section: "Items", target: "bow", text: "Quickbow attack speed 15% to 12%", direction: "nerf", weight: 1 },
-  { id: "s-shop-1", section: "Systems", target: "odds-8", text: "Level 8 shop odds for 4-costs 24% to 22%", direction: "adjust", weight: 1 },
+  { id: "s-shop-1", section: "Systems", target: "odds-8", text: "Level 8 shop odds for 4-costs 24% to 22%", direction: "nerf", weight: 1 },
 ];
 
 export const MY_COMPS: PlayedComp[] = [
@@ -52,6 +52,16 @@ export const MY_COMPS: PlayedComp[] = [
   { id: "c2", name: "Tidecaller Liora", core: ["liora", "ysolde", "vessa", "nyx"], traits: ["Tidecaller", "Runebound"], games: 9, avgPlace: 4.4, top4: 44 },
   { id: "c3", name: "Ironclad Bastion", core: ["dax", "garrick", "thane", "halvar"], traits: ["Ironclad", "Bastion"], games: 6, avgPlace: 4.8, top4: 33 },
 ];
+
+// "62 to 56" -> -9.7. Uses the last "a to b" pair in the line; tiered values compare the first tier.
+export function changePct(text: string): number | undefined {
+  const m = [...text.matchAll(/([\d.]+)%?(?:\/[\d.]+%?)*(?:\/([\d.]+))?%?\s+to\s+([\d.]+)%?(?:\/[\d.]+%?)*(?:\/([\d.]+))?/g)].pop();
+  if (!m) return undefined;
+  const from = Number(m[2] ?? m[1]);
+  const to = Number(m[4] ?? m[3]);
+  if (!from) return undefined;
+  return ((to - from) / from) * 100;
+}
 
 function list(xs: string[]) {
   return xs.length <= 1 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`;

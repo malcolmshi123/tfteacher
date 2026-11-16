@@ -150,14 +150,41 @@ export default function Home() {
         {/* how */}
         <section className="border-t border-[var(--line)]">
           <div className="mx-auto grid max-w-[1240px] gap-10 px-4 py-20 md:px-6 lg:grid-cols-3">
-            <Step title="Play with the app open">
+            <Step
+              title="Play with the app open"
+              visual={
+                <div className="flex items-center justify-between rounded-xl border border-[var(--line)] bg-[var(--panel)] px-4 py-3 text-[13px]">
+                  <span className="flex items-center gap-2 text-[var(--ink-2)]">
+                    <span className="block h-2 w-2 rounded-full bg-[var(--hp)]" />
+                    Recording round 3-2
+                  </span>
+                  <span className="tnum text-[var(--muted)]">77 HP · 39 gold · lvl 6</span>
+                </div>
+              }
+            >
               The desktop app saves a snapshot of each round from the game&apos;s official event feed. It never shows anything
               during the game.
             </Step>
-            <Step title="Read the review when you die">
+            <Step
+              title="Read the review when you die"
+              visual={
+                <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--line)] bg-[var(--panel)] px-4 py-3 text-[13px]">
+                  <span className="truncate text-[var(--ink)]">Eliminated at 5-1 holding 50 gold</span>
+                  <span className="tnum shrink-0 rounded-full bg-[color-mix(in_oklab,var(--hp)_13%,transparent)] px-2 py-0.5 text-[12px] text-[var(--hp)]">50 gold</span>
+                </div>
+              }
+            >
               A few findings, most costly first. Click any round to see the board, the bench and every shop you saw.
             </Step>
-            <Step title="Check Patch Radar on patch day">
+            <Step
+              title="Check Patch Radar on patch day"
+              visual={
+                <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--line)] bg-[var(--panel)] px-4 py-3 text-[13px]">
+                  <span className="text-[var(--ink)]">Kestrel Sharpshot</span>
+                  <span className="shrink-0 text-[12px] font-medium text-[var(--hp)]">Weaker for you</span>
+                </div>
+              }
+            >
               We read the patch notes against the comps you actually play and tell you which ones got better or worse.
             </Step>
           </div>
@@ -210,9 +237,10 @@ export default function Home() {
   );
 }
 
-function Step({ title, children }: { title: string; children: React.ReactNode }) {
+function Step({ title, children, visual }: { title: string; children: React.ReactNode; visual?: React.ReactNode }) {
   return (
     <div>
+      {visual && <div className="mb-5">{visual}</div>}
       <h3 className="text-[18px] font-semibold tracking-tight">{title}</h3>
       <p className="mt-2 text-[15px] leading-relaxed text-[var(--ink-2)]">{children}</p>
     </div>

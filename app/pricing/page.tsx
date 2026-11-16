@@ -23,13 +23,13 @@ export default function Pricing() {
       <SiteNav active="/pricing" />
       <main className="mx-auto max-w-[1240px] px-4 pb-24 pt-12 md:px-6 md:pt-16">
         <div className="max-w-[620px]">
-          <h1 className="text-[32px] font-semibold leading-tight tracking-[-0.02em] md:text-[40px]">Review every game, or just the bad ones.</h1>
+          <h1 className="text-balance text-[32px] font-semibold leading-tight tracking-[-0.02em] md:text-[40px]">Review every game, or just the bad ones.</h1>
           <p className="mt-3 text-[16px] leading-relaxed text-[var(--ink-2)]">Both plans use the same review engine. Pro removes the weekly limit and adds the tools for climbing over a whole patch.</p>
         </div>
 
         <div className="mt-10 grid gap-4 md:grid-cols-2">
           <Plan name="Free" price="$0" cadence="forever" note="No card needed" items={FREE} cta="Download for Windows" href="/download" />
-          <Plan name="Pro" price="$5" cadence="per month" note="or $48 a year" items={PRO} cta="Start 14 days free" href="/download?plan=pro" featured />
+          <Plan name="Pro" price="$5" cadence="per month" note="or $48 a year, 2 months free" items={PRO} cta="Start 14 days free" href="/download?plan=pro" featured />
         </div>
 
         <section className="mt-16 grid gap-x-12 gap-y-8 border-t border-[var(--line)] pt-12 md:grid-cols-2">
@@ -67,7 +67,7 @@ function Plan({ name, price, cadence, note, items, cta, href, featured }: { name
         <span className="text-[14px] text-[var(--muted)]">{cadence}</span>
       </div>
       <div className="h-5 text-[13px] text-[var(--muted)]">{note}</div>
-      <ul className="mt-6 flex-1 space-y-3">
+      <ul className="mt-6 space-y-3">
         {items.map((it) => (
           <li key={it} className="flex gap-3 text-[15px] leading-snug text-[var(--ink-2)]">
             <svg width="16" height="16" viewBox="0 0 16 16" className="mt-[2px] shrink-0" aria-hidden>
@@ -77,6 +77,7 @@ function Plan({ name, price, cadence, note, items, cta, href, featured }: { name
           </li>
         ))}
       </ul>
+      <div className="flex-1" />
       <Link
         href={href}
         className={`mt-8 rounded-xl px-5 py-3 text-center text-[15px] font-semibold transition-opacity hover:opacity-90 ${featured ? "bg-[var(--brand)] text-[#1a1306]" : "border border-[var(--line-2)] text-[var(--ink)]"}`}

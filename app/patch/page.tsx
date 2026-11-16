@@ -1,6 +1,6 @@
 import { SiteFooter, SiteNav } from "@/components/SiteChrome";
 import { UnitToken } from "@/components/UnitToken";
-import { NOTES, PATCH, radar, type CompVerdict, type NoteLine } from "@/lib/patch/radar";
+import { NOTES, PATCH, changePct, radar, type CompVerdict, type NoteLine } from "@/lib/patch/radar";
 
 export const metadata = { title: "Patch Radar · TFTeacher" };
 
@@ -24,7 +24,10 @@ export default function PatchPage() {
         <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_300px] md:items-end">
           <div className="max-w-[720px]">
             <p className="text-[13px] text-[var(--muted)]">
-              Patch {PATCH.from} to {PATCH.to} · released Nov 12
+              Patch {PATCH.from} to {PATCH.to} · released Nov 12 ·{" "}
+              <a href="#rest" className="text-[var(--ink-2)] underline-offset-2 hover:underline">
+                all {NOTES.length} lines
+              </a>
             </p>
             <h1 className="mt-3 text-[28px] font-semibold leading-[1.15] tracking-[-0.02em] text-balance md:text-[36px]">
               Your best comp got weaker this patch. One you play less got better.
@@ -66,15 +69,16 @@ export default function PatchPage() {
           ))}
         </div>
 
-        <section className="mt-12">
+        <section id="rest" className="mt-12 scroll-mt-20">
           <h2 className="text-[15px] font-medium">Rest of the patch</h2>
           <p className="mt-1 text-[13px] text-[var(--muted)]">These lines don&apos;t touch anything you play.</p>
           <ul className="mt-4 divide-y divide-[var(--line)] rounded-2xl border border-[var(--line)] bg-[var(--panel)]">
             {rest.map((n) => (
               <li key={n.id} className="flex items-center gap-4 px-5 py-3 text-[14px]">
                 <Dir d={n.direction} />
-                <span className="w-20 shrink-0 text-[12px] text-[var(--muted)]">{n.section}</span>
-                <span className="tnum text-[var(--ink-2)]">{n.text}</span>
+                <span className="hidden w-20 shrink-0 text-[12px] text-[var(--muted)] sm:block">{n.section}</span>
+                <span className="tnum flex-1 text-[var(--ink-2)]">{n.text}</span>
+                <Delta n={n} />
               </li>
             ))}
           </ul>
@@ -116,7 +120,7 @@ function CompCard({ v }: { v: CompVerdict }) {
         </dl>
       </div>
       <div className="p-6">
-        <p className="max-w-[620px] text-[15px] leading-relaxed text-[var(--ink)]">{v.why}</p>
+        <p className="max-w-[620px] text-[16px] font-medium leading-relaxed text-[var(--ink)]">{v.why}</p>
         <ul className="mt-5 space-y-2">
           {v.lines.map((l) => (
             <NoteRow key={l.id} n={l} />
@@ -132,10 +136,20 @@ function NoteRow({ n }: { n: NoteLine }) {
     <li className="flex items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--bg)] px-4 py-2.5 text-[14px]">
       <Dir d={n.direction} />
       <span className="tnum flex-1 text-[var(--ink-2)]">{n.text}</span>
-      <a href={`#${n.id}`} className="shrink-0 rounded-md px-2 py-1 text-[12px] text-[var(--ink-2)] transition-colors hover:bg-[var(--panel-2)] hover:text-[var(--ink)]">
-        Patch note ↗
-      </a>
+      <Delta n={n} />
     </li>
+  );
+}
+
+function Delta({ n }: { n: NoteLine }) {
+  const pct = changePct(n.text);
+  if (pct === undefined) return null;
+  const c = n.direction === "buff" ? "var(--good)" : n.direction === "nerf" ? "var(--hp)" : "var(--muted)";
+  return (
+    <span className="tnum w-16 shrink-0 text-right text-[13px] font-medium" style={{ color: c }}>
+      {pct > 0 ? "+" : "−"}
+      {Math.abs(pct).toFixed(Math.abs(pct) < 10 ? 1 : 0)}%
+    </span>
   );
 }
 
