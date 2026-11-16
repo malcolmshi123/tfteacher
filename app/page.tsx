@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { SiteFooter, SiteNav } from "@/components/SiteChrome";
-import { UnitToken } from "@/components/UnitToken";
+import { HighlightSwatch, UnitToken } from "@/components/UnitToken";
 import { Timeline } from "@/components/review/Timeline";
 import { buildSampleGame } from "@/lib/game/sample";
 import { analyze, boardValue, shopMarks } from "@/lib/review/engine";
@@ -20,11 +20,11 @@ export default function Home() {
     const key = `${si}:${k}`;
     return marks.bought.has(key) ? "bought" : marks.missed.has(key) ? "missed" : flex.has(u) ? "flex" : "dim";
   };
-  const missedNames = [...new Set([...marks.missed].map((key) => { const [si, k] = key.split(":").map(Number); return UNIT_BY_ID[r41.shops[si][k]].name; }))];
+  const anyMissed = marks.missed.size > 0;
   const xpCost = r41.xpBought * 4;
   const rollCost = r41.rerolls * 2;
   const buyCost = r41.bought.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0);
-  const soldFor = r41.sold.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0);
+  const soldFor = r41.soldGold;
   const soldNames = [...new Set(r41.sold.map((u) => UNIT_BY_ID[u].name))].join(", ");
   const last = review.game.rounds[review.game.rounds.length - 1];
   const r32 = review.game.rounds.find((r) => r.stage === "3-2")!;
@@ -137,7 +137,7 @@ export default function Home() {
                   {r41.shops.map((shop, si) => (
                     <div key={si} className="flex items-center gap-3">
                       <span className="w-12 text-[11px] text-[var(--muted)]">{si === 0 ? "Free" : `Roll ${si}`}</span>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2.5">
                         {shop.map((u, k) => (
                           <UnitToken key={k} unitId={u} size={28} showName={false} state={slotState(si, k, u)} />
                         ))}
@@ -161,10 +161,10 @@ export default function Home() {
                     <dd className="text-[18px] font-semibold">{r41.rerolls}</dd>
                   </div>
                 </dl>
-                <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1.5 text-[12px] text-[var(--ink-2)]">
-                  <span className="flex items-center gap-1.5"><span className="block h-3 w-3 rounded-[3px] shadow-[0_0_0_1.5px_var(--panel-2),0_0_0_3px_var(--ink)]" />Bought</span>
-                  {missedNames.length > 0 && <span className="flex items-center gap-1.5"><span className="block h-3 w-3 rounded-[3px] bg-[color-mix(in_oklab,var(--hp)_45%,transparent)] shadow-[0_0_0_1.5px_var(--hp)]" />Missed 2-star ({missedNames.join(", ")})</span>}
-                  <span className="flex items-center gap-1.5"><span className="block h-3 w-3 rounded-[3px] shadow-[0_0_0_1.5px_var(--panel-2),0_0_0_3px_var(--brand)]" />Flex option for this board</span>
+                <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[12px] text-[var(--ink-2)] [&>span]:gap-2">
+                  <span className="flex items-center gap-1.5"><HighlightSwatch state="bought" />Bought</span>
+                  {anyMissed && <span className="flex items-center gap-1.5"><HighlightSwatch state="missed" />Missed</span>}
+                  <span className="flex items-center gap-1.5"><HighlightSwatch state="flex" />Flex option</span>
                 </div>
                 <p className="tnum mt-3 text-[13px] text-[var(--muted)]">
                   {r41.gold} gold: {xpCost > 0 && <>{xpCost} on XP, </>}{rollCost} on {r41.rerolls} rerolls, {buyCost} on {r41.bought.length} units, plus {soldFor} for selling{" "}
@@ -189,7 +189,7 @@ export default function Home() {
                     <span className="block h-2 w-2 rounded-full bg-[var(--hp)]" />
                     Recording round {r32.stage}
                   </span>
-                  <span className="tnum text-[var(--muted)]">{r32.hp} HP entering · {r32.gold} gold</span>
+                  <span className="tnum text-[var(--muted)]">{r32.hp} HP · {r32.gold} gold</span>
                 </div>
               }
             >
@@ -212,7 +212,7 @@ export default function Home() {
               visual={
                 <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--line)] bg-[var(--panel)] px-4 py-3 text-[13px]">
                   <span className="text-[var(--ink)]">{MY_COMPS[0].name}</span>
-                  <span className="shrink-0 text-[12px] font-medium text-[var(--hp)]">Weaker for you</span>
+                  <span className="shrink-0 text-[12px] font-medium text-[var(--hp)]">Nerfed</span>
                 </div>
               }
             >
@@ -236,8 +236,8 @@ export default function Home() {
             </div>
             <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
               <p className="text-[15px] leading-relaxed text-[var(--ink)]">
-                &ldquo;You entered at <Cite stage="4-3">{r43.hp} HP</Cite>, fought holding <Cite>{r43.goldEnd} gold</Cite> and lost{" "}
-                <Cite>{r43.damageTaken} HP</Cite>. Two rounds later you entered at <Cite stage="4-5">{r45.hp} HP</Cite> and still fought holding{" "}
+                &ldquo;You entered <Cite round>4-3</Cite> at <Cite>{r43.hp} HP</Cite>, fought holding <Cite>{r43.goldEnd} gold</Cite> and lost{" "}
+                <Cite>{r43.damageTaken} HP</Cite>. Two rounds later you entered <Cite round>4-5</Cite> at <Cite>{r45.hp} HP</Cite> and still fought holding{" "}
                 <Cite>{r45.goldEnd} gold</Cite>.&rdquo;
               </p>
               <div className="mt-5 flex items-center gap-2 text-[12px] text-[var(--muted)]">
@@ -279,12 +279,11 @@ function Step({ title, children, visual }: { title: string; children: React.Reac
   );
 }
 
-// A checked number. The round shows on the first number from that round only.
-function Cite({ stage, children }: { stage?: string; children: React.ReactNode }) {
+// A checked value: a round (in brand color) or a number from that round.
+function Cite({ round, children }: { round?: boolean; children: React.ReactNode }) {
   return (
-    <span className="tnum whitespace-nowrap rounded-md border border-[var(--line-2)] bg-[var(--bg)] px-1.5 py-0.5 text-[14px]">
-      {stage && <span className="mr-1.5 font-medium text-[var(--brand)]">{stage}</span>}
-      <span className="text-[var(--ink)]">{children}</span>
+    <span className={`tnum whitespace-nowrap rounded-md border border-[var(--line-2)] bg-[var(--bg)] px-1.5 py-0.5 text-[14px] ${round ? "font-medium text-[var(--brand)]" : "text-[var(--ink)]"}`}>
+      {children}
     </span>
   );
 }

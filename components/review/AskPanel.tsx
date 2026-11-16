@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { AskResult } from "@/lib/ask/answer";
 
-const SUGGESTED = ["Should I have rolled at 4-1?", "Why did I lose at 4-5?", "What should I change next game?"];
+const SUGGESTED = ["Should I have rolled at 4-3?", "Why did I lose at 4-5?", "What should I change next game?"];
 
 export function AskPanel({ gameId, onCite }: { gameId: string; onCite: (stage: string) => void }) {
   const [q, setQ] = useState("");

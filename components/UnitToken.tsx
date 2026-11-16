@@ -5,6 +5,19 @@ const COST_VAR = ["", "var(--c1)", "var(--c2)", "var(--c3)", "var(--c4)", "var(-
 
 // A unit tile: the champion icon from Riot's public game data, a cost-colored
 // border like the game uses, star pips and item slots.
+// Highlight ring colors, shared with the legends that explain them.
+export const HIGHLIGHT: Partial<Record<string, string>> = { bought: "var(--ink)", missed: "var(--hp)", flex: "var(--brand)" };
+
+// A legend swatch: just the highlight ring.
+export function HighlightSwatch({ state }: { state: "bought" | "missed" | "flex" }) {
+  return (
+    <span
+      className="block h-[17px] w-[17px] rounded-[4px]"
+      style={{ boxShadow: `inset 0 0 0 2px ${HIGHLIGHT[state]}` }}
+    />
+  );
+}
+
 export function UnitToken({
   piece,
   unitId,
@@ -23,6 +36,7 @@ export function UnitToken({
   const color = COST_VAR[u.cost];
   const star = piece?.star ?? 0;
   const small = size < 36;
+  const b = small ? 1.5 : 2;
   return (
     <div className="flex flex-col items-center gap-1.5" style={{ width: size + (showName ? 10 : 0), opacity: state === "dim" ? 0.55 : 1 }}>
       <div
@@ -32,7 +46,10 @@ export function UnitToken({
           height: size,
           borderRadius: Math.max(6, size * 0.18),
           marginBottom: piece?.items.length ? Math.round(size * 0.18) : 0,
-          boxShadow: state === "bought" ? `0 0 0 2px var(--panel-2), 0 0 0 4px var(--ink)` : state === "flex" ? `0 0 0 2px var(--panel-2), 0 0 0 4px var(--brand)` : `0 0 0 ${small ? 1.5 : 2}px ${state === "missed" ? "var(--hp)" : color}`,
+          // the cost border always shows; a highlight is a second ring outside it
+          boxShadow: HIGHLIGHT[state]
+            ? `0 0 0 ${b}px ${color}, 0 0 0 ${b + 1.5}px var(--panel-2), 0 0 0 ${b + 3.5}px ${HIGHLIGHT[state]}`
+            : `0 0 0 ${b}px ${color}`,
         }}
         title={`${u.name} · ${u.cost}-cost · ${u.traits.join(", ")}`}
       >
@@ -44,10 +61,8 @@ export function UnitToken({
           height={size}
           loading="lazy"
           className="block h-full w-full object-cover"
-          style={{ borderRadius: "inherit", filter: state === "missed" ? "saturate(0.6)" : undefined }}
+          style={{ borderRadius: "inherit" }}
         />
-        {state === "missed" && <span className="absolute inset-0" style={{ borderRadius: "inherit", background: "color-mix(in oklab, var(--hp) 28%, transparent)" }} />}
-        {state === "bought" && <span className="absolute inset-0" style={{ borderRadius: "inherit", boxShadow: "inset 0 0 0 2.5px var(--ink)" }} />}
         {star > 0 && (
           <span className="absolute -top-[7px] left-1/2 flex -translate-x-1/2 gap-[3px] rounded-full bg-[var(--bg)] px-1 py-[2px]">
             {Array.from({ length: star }).map((_, i) => (
@@ -55,7 +70,6 @@ export function UnitToken({
             ))}
           </span>
         )}
-        {state === "missed" && <Badge color="var(--hp)">2★</Badge>}
 
         {piece && piece.items.length > 0 && (
           <span className="absolute left-1/2 flex -translate-x-1/2 gap-[2px]" style={{ bottom: -Math.round(size * 0.16) }}>
@@ -67,14 +81,6 @@ export function UnitToken({
       </div>
       {showName && <span className="mt-0.5 text-[11px] leading-none text-[var(--ink-2)]">{u.name}</span>}
     </div>
-  );
-}
-
-function Badge({ color, children }: { color: string; children: React.ReactNode }) {
-  return (
-    <span className="absolute -right-[6px] -top-[6px] grid h-[15px] min-w-[15px] place-items-center rounded-full px-[3px] text-[8.5px] font-bold leading-none text-[var(--bg)]" style={{ background: color, boxShadow: "0 0 0 2px var(--panel)" }}>
-      {children}
-    </span>
   );
 }
 

@@ -21,7 +21,7 @@ describe("sample game economy", () => {
     }
   });
   it("never fields more units than the player's level", () => {
-    for (const r of game.rounds) expect(r.board.length, r.stage).toBeLessThanOrEqual(r.level + (r.xpBought ? 1 : 0));
+    for (const r of game.rounds) expect(r.board.length, r.stage).toBeLessThanOrEqual(r.level);
   });
   it("only buys units that were in a shop that round", () => {
     for (const r of game.rounds) {

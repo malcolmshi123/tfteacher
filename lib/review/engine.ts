@@ -187,7 +187,7 @@ export function analyze(game: GameRecord): Review {
         stages: R.slice(best.from, best.to + 1).map((r) => r.stage),
         focus: span[span.length - 1].stage,
         cites: [
-          { stage: first, label: `${span[0].hp} HP entering` },
+          { stage: first, label: `at ${span[0].hp} HP` },
           { stage: lastS, label: `${endHp} HP after combat` },
           { stage: first, label: `to ${lastS}, +${earned} streak gold` },
         ],
@@ -246,8 +246,11 @@ export function analyze(game: GameRecord): Review {
   const idleReport: { item: string; from: string; to: string; rounds: number }[] = [];
   for (let i = 0; i < R.length; i++) {
     const r = R[i];
+    // each copy of a component is tracked on its own ("rod#0", "rod#1")
     const seen = new Set<string>();
-    for (const it of r.itemBench) {
+    const n: Record<string, number> = {};
+    for (const base of r.itemBench) {
+      const it = `${base}#${(n[base] = (n[base] ?? -1) + 1)}`;
       seen.add(it);
       if (!idle[it]) idle[it] = { from: r.stage, rounds: 0 };
       idle[it].rounds++;
@@ -255,7 +258,7 @@ export function analyze(game: GameRecord): Review {
     for (const it of Object.keys(idle)) {
       if (!seen.has(it) || i === R.length - 1) {
         if (idle[it].rounds >= 4)
-          idleReport.push({ item: it, from: idle[it].from, to: R[seen.has(it) ? i : i - 1].stage, rounds: idle[it].rounds });
+          idleReport.push({ item: it.split("#")[0], from: idle[it].from, to: R[seen.has(it) ? i : i - 1].stage, rounds: idle[it].rounds });
         delete idle[it];
       }
     }
@@ -277,7 +280,11 @@ export function analyze(game: GameRecord): Review {
   }
 
   // 6. Level tempo against the lobby
-  const behind = series.filter((p) => p.kind === "pvp" && p.stage >= "3-1" && p.level < p.lobbyLevel);
+  // slow-rolling a reroll comp on 7 is a plan, not a missed level: skip rounds at
+  // level 7+ where the bench holds extra copies of a board unit costing 3 or less
+  const rerolling = (r: RoundSnapshot) =>
+    r.level >= 7 && r.bench.some((b) => UNIT_BY_ID[b.unit].cost <= 3 && r.board.some((p) => p.unit === b.unit));
+  const behind = series.filter((p, i) => p.kind === "pvp" && p.stage >= "3-1" && p.level < p.lobbyLevel && !rerolling(R[i]));
   if (behind.length >= 3) {
     const worst = behind.reduce((a, b) => (b.lobbyBoardValue - b.boardValue > a.lobbyBoardValue - a.boardValue ? b : a));
     findings.push({

@@ -151,6 +151,12 @@ export const COST_LABEL: Record<Cost, string> = {
   1: "1-cost", 2: "2-cost", 3: "3-cost", 4: "4-cost", 5: "5-cost",
 };
 
+// What a unit sells for: its copies at cost, minus 1 for a 2 or 3-star of
+// cost 2 or more (a 2-star 2-cost sells for 5, not 6).
+export function sellValue(cost: number, star: number) {
+  return copiesOf(star) * cost - (star >= 2 && cost >= 2 ? 1 : 0);
+}
+
 export function copiesOf(star: number) {
   return star === 1 ? 1 : star === 2 ? 3 : 9;
 }

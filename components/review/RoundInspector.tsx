@@ -1,15 +1,9 @@
 "use client";
 
-import { ItemChip, UnitToken } from "@/components/UnitToken";
-import { UNIT_BY_ID, copiesOf } from "@/lib/game/set";
+import { HighlightSwatch, ItemChip, UnitToken } from "@/components/UnitToken";
+import { UNIT_BY_ID } from "@/lib/game/set";
 import type { GameRecord } from "@/lib/game/types";
-import type { Finding, SeriesPoint } from "@/lib/review/engine";
-
-function owned(pieces: { unit: string; star: number }[]) {
-  const o: Record<string, number> = {};
-  for (const p of pieces) o[p.unit] = (o[p.unit] ?? 0) + copiesOf(p.star);
-  return o;
-}
+import { shopMarks, type Finding, type SeriesPoint } from "@/lib/review/engine";
 
 export function RoundInspector({
   game,
@@ -30,20 +24,9 @@ export function RoundInspector({
   const r = game.rounds[idx];
   const prev = game.rounds[idx - 1];
   const pt = series[idx];
-  const prevOwned = prev ? owned([...prev.board, ...prev.bench]) : {};
   const here = findings.filter((f) => f.stages.includes(stage));
-  // mark exactly as many shop slots "bought" as copies were bought, first seen first
-  const toMark: Record<string, number> = {};
-  for (const u of r.bought) toMark[u] = (toMark[u] ?? 0) + 1;
-  const boughtSlot = r.shops.map((shop) =>
-    shop.map((u) => {
-      if ((toMark[u] ?? 0) > 0) {
-        toMark[u]--;
-        return true;
-      }
-      return false;
-    }),
-  );
+  // bought and missed slots, the same walk the review and the landing use
+  const marks = prev ? shopMarks(prev, r) : { bought: new Set<string>(), missed: new Set<string>() };
 
   const prevPt = series[idx - 1];
   const takeaway =
@@ -107,7 +90,7 @@ export function RoundInspector({
           <p className="text-[13px] leading-relaxed text-[var(--ink-2)]">
             {[
               r.bought.length ? `Bought ${summarize(r.bought)} for ${r.bought.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0)} gold${r.bought.length > 1 ? " total" : ""}` : "",
-              r.sold.length ? `sold ${summarize(r.sold)} (+${r.sold.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0)} gold)` : "",
+              r.sold.length ? `sold ${summarize(r.sold)} (+${r.soldGold} gold)` : "",
               r.xpBought ? `bought XP ${r.xpBought}× (${r.xpBought * 4} gold)` : "",
               r.rerolls ? `rerolled ${r.rerolls}× (${r.rerolls * 2} gold)` : "",
             ]
@@ -152,19 +135,16 @@ export function RoundInspector({
                   <span className="tnum w-12 shrink-0 text-[11px] text-[var(--muted)]">{si === 0 ? "Free" : `Roll ${si}`}</span>
                   <div className="flex gap-2">
                     {shop.map((u, k) => {
-                      const missed = (prevOwned[u] ?? 0) % 3 === 2 && !r.bought.includes(u);
-                      const bought = boughtSlot[si][k];
-                      return <UnitToken key={k} unitId={u} size={34} showName={false} state={missed ? "missed" : bought ? "bought" : "normal"} />;
+                      const key = `${si}:${k}`;
+                      return <UnitToken key={k} unitId={u} size={34} showName={false} state={marks.bought.has(key) ? "bought" : marks.missed.has(key) ? "missed" : "normal"} />;
                     })}
                   </div>
                 </div>
               ))}
             </div>
             <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-[var(--muted)]">
-              {r.bought.length > 0 && <Legend color="var(--ink)">Bought</Legend>}
-              {r.shops.some((shop) => shop.some((u) => (prevOwned[u] ?? 0) % 3 === 2 && !r.bought.includes(u))) && (
-                <Legend color="var(--hp)">Would have made a 2-star</Legend>
-              )}
+              {marks.bought.size > 0 && <Legend state="bought">Bought</Legend>}
+              {marks.missed.size > 0 && <Legend state="missed">Missed: one more copy made a 2-star</Legend>}
             </p>
           </Section>
         )}
@@ -216,10 +196,10 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function Legend({ color, children }: { color: string; children: React.ReactNode }) {
+function Legend({ state, children }: { state: "bought" | "missed"; children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1.5">
-      <span className="block h-2.5 w-2.5 rounded-full" style={{ background: color }} />
+    <span className="inline-flex items-center gap-2">
+      <HighlightSwatch state={state} />
       {children}
     </span>
   );

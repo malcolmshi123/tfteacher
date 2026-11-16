@@ -5,8 +5,8 @@ import { NOTES, PATCH, changePct, radar, type CompVerdict, type NoteLine } from 
 export const metadata = { title: "Patch Radar · TFTeacher" };
 
 const TONE = {
-  stronger: { color: "var(--good)", label: "Stronger for you" },
-  weaker: { color: "var(--hp)", label: "Weaker for you" },
+  stronger: { color: "var(--good)", label: "Buffed" },
+  weaker: { color: "var(--hp)", label: "Nerfed" },
   mixed: { color: "var(--gold)", label: "Mixed" },
   unchanged: { color: "var(--muted)", label: "Unchanged" },
 } as const;
@@ -105,7 +105,7 @@ export default function PatchPage() {
 }
 
 function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
-  const t = v.verdict === "mixed" && v.score !== 0 ? { ...TONE.mixed, label: v.score < 0 ? "Mixed, leans weaker" : "Mixed, leans stronger" } : TONE[v.verdict];
+  const t = v.verdict === "mixed" && v.score !== 0 ? { ...TONE.mixed, label: v.score < 0 ? "Mixed, leans nerfed" : "Mixed, leans buffed" } : TONE[v.verdict];
   return (
     <article className="grid overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--panel)] lg:grid-cols-[400px_minmax(0,1fr)]">
       <div className="flex flex-col border-b border-[var(--line)] p-6 lg:border-b-0 lg:border-r">

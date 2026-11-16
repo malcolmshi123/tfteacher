@@ -48,7 +48,7 @@ export function buildFacts(review: Review): Fact[] {
       fact(
         `r-${r.stage}`,
         r.stage,
-        `${r.stage}: started at ${r.hp} HP with ${r.gold} gold at level ${r.level}; ${r.rerolls} rerolls, bought XP ${r.xpBought} times, went into combat with ${r.goldEnd} gold; ${result}; ${after} HP after. Board value ${p.boardValue} vs lobby median ${p.lobbyBoardValue}; lobby median level ${p.lobbyLevel}, lobby median HP ${p.lobbyHpEntering} entering and ${p.lobbyHp} after.`,
+        `${r.stage}: started at ${r.hp} HP with ${r.gold} gold at level ${r.level}; ${r.rerolls} rerolls, bought XP ${r.xpBought} times, went into combat with ${r.goldEnd} gold; ${result}; ${after} HP after. Board value ${p.boardValue} vs lobby median ${p.lobbyBoardValue}; lobby median level ${p.lobbyLevel}, lobby median HP ${p.lobbyHpEntering} at the start and ${p.lobbyHp} after combat.`,
       ),
     );
     if (r.board.length)

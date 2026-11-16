@@ -45,6 +45,7 @@ export interface RoundSnapshot {
   xpBought: number; // times "buy xp" was pressed
   bought: string[];
   sold: string[];
+  soldGold: number; // what the sold units paid back
   // state when combat starts
   board: Piece[];
   bench: Piece[];

@@ -1,4 +1,4 @@
-import { SHOP_ODDS, UNITS, UNIT_BY_ID, XP_TO_NEXT, combineItems, copiesOf } from "./set";
+import { SHOP_ODDS, UNITS, UNIT_BY_ID, XP_TO_NEXT, combineItems, copiesOf, sellValue } from "./set";
 import type {
   GameRecord,
   Opponent,
@@ -167,6 +167,7 @@ export function buildSampleGame(): GameRecord {
   let xp = 0;
   let streak = 0; // positive win streak, negative loss streak
   let prevCopies: Record<string, number> = {};
+  let prevPieces: Piece[] = [];
 
   for (let i = 0; i < SCRIPT.length; i++) {
     const s = SCRIPT[i];
@@ -230,10 +231,27 @@ export function buildSampleGame(): GameRecord {
       const d = n - (now[u] ?? 0);
       for (let k = 0; k < d; k++) sold.push(u);
     }
+    // sold pieces: the ones from last round that are gone, highest star first
+    let soldGold = 0;
+    for (const u of new Set(sold)) {
+      let left = sold.filter((x) => x === u).length;
+      const nowStars = [...board, ...bench].filter((p) => p.unit === u).map((p) => p.star as number);
+      const gone = prevPieces.filter((p) => p.unit === u).map((p) => p.star as number).sort((a, b) => b - a);
+      for (const st of nowStars) {
+        const j = gone.indexOf(st);
+        if (j >= 0) gone.splice(j, 1);
+      }
+      for (const st of gone) {
+        if (left < copiesOf(st)) continue;
+        soldGold += sellValue(UNIT_BY_ID[u].cost, st);
+        left -= copiesOf(st);
+      }
+      soldGold += left * UNIT_BY_ID[u].cost;
+    }
     // carousel picks are free
     if (s.kind !== "carousel" && t > 11) {
       gold -= bought.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0);
-      gold += sold.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0);
+      gold += soldGold;
     }
     if (gold < 0) throw new Error(`sample game went negative gold at ${s.stage}: ${gold}`);
     // every unit bought must have been in a shop that round
@@ -256,6 +274,7 @@ export function buildSampleGame(): GameRecord {
       }
     }
     prevCopies = now;
+    prevPieces = [...board, ...bench];
 
     hp -= s.dmg;
     // only player fights count toward a streak; monster rounds don't break it
@@ -275,14 +294,16 @@ export function buildSampleGame(): GameRecord {
       kind: s.kind,
       hp: startHp,
       gold: startGold,
-      level: startLevel,
-      xp: startXp,
-      xpToNext: XP_TO_NEXT[startLevel],
+      // the level you fought at, after any XP bought this round (shops roll at it too)
+      level,
+      xp,
+      xpToNext: XP_TO_NEXT[level],
       shops,
       rerolls,
       xpBought,
       bought: s.kind === "carousel" ? [] : bought,
       sold,
+      soldGold: s.kind === "carousel" ? 0 : soldGold,
       board,
       bench,
       itemBench: s.itemBench ? s.itemBench.split(",") : [],
@@ -293,6 +314,7 @@ export function buildSampleGame(): GameRecord {
       roster,
     });
     void startLevel;
+    void startXp;
   }
 
   return {
