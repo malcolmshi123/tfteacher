@@ -8,12 +8,6 @@ import { MobileRounds } from "./MobileRounds";
 import { RoundInspector } from "./RoundInspector";
 import { Timeline } from "./Timeline";
 
-const SOURCE_LABEL = {
-  recorder: "Recorded round by round by the desktop app",
-  screen: "Read from your screen recording",
-  "match-api": "Final board only (no recording)",
-} as const;
-
 // round numbers like 6-1 never split across lines
 function keepRounds(s: string) {
   return s.replace(/(\d)-(\d)/g, "$1‑$2");
@@ -74,8 +68,6 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
               {played.toLocaleDateString("en-US", { month: "short", day: "numeric" })},{" "}
               {played.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
             </span>
-            <span className="hidden lg:block"><Dot /></span>
-            <span className="hidden lg:inline">{SOURCE_LABEL[game.source]}</span>
           </div>
           <h1 className="mt-3 text-[24px] font-semibold leading-[1.2] tracking-[-0.02em] text-balance md:text-[36px] md:leading-[1.15]">
             {keepRounds(review.headline)}
@@ -85,7 +77,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
       </div>
 
       {/* stats */}
-      <dl className="mt-8 grid grid-cols-2 overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--panel)] md:grid-cols-4">
+      <dl className="mt-8 grid grid-cols-2 overflow-hidden rounded-t-2xl border border-[var(--line)] bg-[var(--panel)] md:grid-cols-4">
         {review.stats.map((s, i) => (
           <div key={s.label} className={`px-5 py-4 ${i % 2 ? "" : "border-r"} border-[var(--line)] md:border-r ${i === 3 ? "md:border-r-0" : ""} ${i < 2 ? "border-b md:border-b-0" : ""}`}>
             <dt className="text-[12px] text-[var(--muted)]">{s.label}</dt>
@@ -96,10 +88,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
       </dl>
 
       {/* timeline */}
-      <section className="mt-6 rounded-2xl border border-[var(--line)] bg-[var(--panel)] px-3 pb-3 pt-4 md:px-5">
-        <div className="mb-2 flex flex-wrap items-center justify-between gap-2 px-2 md:px-0">
-          <h2 className="text-[15px] font-medium">Every round</h2>
-        </div>
+      <section aria-label="Every round" className="rounded-b-2xl border border-t-0 border-[var(--line)] bg-[var(--panel)] px-3 pb-3 pt-4 md:px-5">
         <div className="hidden md:block">
           <Timeline series={series} selected={round} highlight={activeFinding?.stages} onSelect={openRound} />
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-[var(--line)] pt-3 text-[12px] text-[var(--ink-2)]">

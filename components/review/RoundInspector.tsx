@@ -75,7 +75,7 @@ export function RoundInspector({
 
       <div className="space-y-5 px-4 py-5 sm:px-5">
         <Section title="Board when combat started">
-          <div className="grid grid-cols-4 justify-items-center gap-y-4 pt-3">
+          <div className="flex flex-wrap justify-center gap-y-4 pt-3 [&>*]:basis-1/4">
             {r.board.map((p, i) => (
               <UnitToken key={i} piece={p} size={bare ? 34 : 38} />
             ))}
@@ -84,7 +84,7 @@ export function RoundInspector({
 
         {(r.bought.length > 0 || r.sold.length > 0 || r.xpBought > 0 || r.rerolls > 0) && (
           <Section title="Gold this round">
-            <dl className="tnum mt-2 divide-y divide-[var(--line)] rounded-xl border border-[var(--line)] text-[13px]">
+            <dl className="tnum mt-1 divide-y divide-[var(--line)] text-[13px]">
               {[
                 ["Start of round", "", `${r.gold}`],
                 ...(r.xpBought ? [["XP", `${r.xpBought} buy${r.xpBought === 1 ? "" : "s"}`, `−${r.xpBought * 4}`]] : []),
@@ -93,7 +93,7 @@ export function RoundInspector({
                 ...(r.sold.length ? [["Sold", summarizeSold(r.sold), `+${r.soldGold}`]] : []),
                 ["Into combat", "", `${r.goldEnd}`],
               ].map(([k, what, v], i, all) => (
-                <div key={k} className={`grid grid-cols-[96px_minmax(0,1fr)_44px] items-baseline gap-3 px-3 py-2 ${i === 0 || i === all.length - 1 ? "font-medium text-[var(--ink)]" : "text-[var(--ink-2)]"}`}>
+                <div key={k} className={`grid grid-cols-[96px_minmax(0,1fr)_44px] items-baseline gap-3 py-2 ${i === 0 || i === all.length - 1 ? "font-medium text-[var(--ink)]" : "text-[var(--ink-2)]"}`}>
                   <dt>{k}</dt>
                   <dd className="text-[12px] leading-snug text-[var(--muted)]">{what}</dd>
                   <dd className="text-right">{v}</dd>
@@ -192,7 +192,7 @@ function NavBtn({ children, onClick, disabled, label }: { children: React.ReactN
       aria-label={label}
       disabled={disabled}
       onClick={onClick}
-      className="grid h-11 w-11 place-items-center rounded-lg sm:h-8 sm:w-8 border border-[var(--line)] text-[18px] leading-none text-[var(--ink-2)] transition-colors hover:border-[var(--line-2)] hover:text-[var(--ink)] disabled:opacity-30"
+      className="grid h-11 w-11 place-items-center rounded-lg text-[18px] leading-none text-[var(--muted)] transition-colors hover:bg-[var(--panel-2)] hover:text-[var(--ink)] disabled:opacity-30 sm:h-8 sm:w-8"
     >
       {children}
     </button>

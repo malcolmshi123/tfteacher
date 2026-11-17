@@ -91,11 +91,11 @@ const COMPARE: [string, string, string][] = [
 ];
 
 const TREND = [
-  // averages over the 19 games: they add up to about 95 because every game but a win ends at 0 HP
+  // share of all HP lost over the 19 games, by stage; adds up to 100
   { stage: "Stage 2", hp: 9 },
-  { stage: "Stage 3", hp: 34 },
-  { stage: "Stage 4", hp: 30 },
-  { stage: "Stage 5+", hp: 22 },
+  { stage: "Stage 3", hp: 36 },
+  { stage: "Stage 4", hp: 32 },
+  { stage: "Stage 5+", hp: 23 },
 ];
 
 function TrendsPreview() {
@@ -103,7 +103,7 @@ function TrendsPreview() {
   return (
     <div className="flex h-full flex-col rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
       <div className="flex items-baseline justify-between gap-3">
-        <h3 className="text-[15px] font-semibold">Pro trends: HP lost per game, by stage</h3>
+        <h3 className="text-[15px] font-semibold">Pro trends: where your HP went, by stage</h3>
         <span className="text-[13px] text-[var(--ink-2)]">Sample account, 19 games on patch 18.4</span>
       </div>
       <div className="mb-6 mt-6 space-y-3">
@@ -113,7 +113,7 @@ function TrendsPreview() {
             <span className="h-3 overflow-hidden rounded-full bg-[var(--panel-2)]">
               <span className="block h-full rounded-full" style={{ width: `${(t.hp / max) * 100}%`, background: t.hp === max ? "var(--hp)" : "color-mix(in oklab, var(--hp) 45%, var(--panel-2))" }} />
             </span>
-            <span className="tnum text-right text-[var(--ink)]">{t.hp} HP</span>
+            <span className="tnum text-right text-[var(--ink)]">{t.hp}%</span>
           </div>
         ))}
       </div>

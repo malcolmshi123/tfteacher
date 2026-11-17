@@ -9,9 +9,9 @@ function layout(compact: boolean) {
   const PAD_L = compact ? 30 : 34;
   const PAD_R = 12;
   const HP_TOP = compact ? 34 : 42; // the lane label and its key sit in their own row above the plot
-  const HP_H = compact ? 136 : 128;
+  const HP_H = compact ? 136 : 108;
   const GOLD_TOP = HP_TOP + HP_H + (compact ? 40 : 48);
-  const GOLD_H = compact ? 56 : 64;
+  const GOLD_H = compact ? 56 : 52;
   const STRIP_TOP = GOLD_TOP + GOLD_H + 14;
   const STRIP_H = compact ? 14 : 18;
   const AXIS_Y = STRIP_TOP + STRIP_H + (compact ? 20 : 18);

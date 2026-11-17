@@ -217,10 +217,10 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
                   <tr key={k} className="border-t border-[var(--line)]">
                     <td className="py-2 text-[var(--ink-2)]">{k}</td>
                     <td className="py-2 text-right text-[var(--ink-2)]">{was}</td>
-                    <td className="py-2 text-right text-[17px] font-semibold text-[var(--ink)]">
+                    <td className={`py-2 text-right ${now.length < 5 ? "text-[15px] font-medium text-[var(--ink-2)]" : "text-[17px] font-semibold text-[var(--ink)]"}`}>
                       {is}
                       {up !== undefined && (
-                        <span className="ml-1.5 text-[12px] font-medium" style={{ color: up ? "var(--good)" : "var(--hp)" }}>
+                        <span className="ml-1.5 text-[12px] font-medium" style={{ color: now.length < 5 ? "var(--muted)" : up ? "var(--good)" : "var(--hp)" }}>
                           {up ? "better" : "worse"}
                         </span>
                       )}
