@@ -1,4 +1,5 @@
 import { WIN_GOLD, interest, passiveIncome, streakGold } from "./rules";
+import { STAGE_DAMAGE } from "../review/engine";
 import { SHOP_ODDS, UNITS, UNIT_BY_ID, XP_TO_NEXT, combineItems, copiesOf, sellValue } from "./set";
 import type {
   GameRecord,
@@ -164,9 +165,49 @@ interface LobbySeat {
   strength: number;
   outAt?: number; // stage index of the round they're knocked out in
   endT: number; // stage index of the player's last round
+  hp: Map<number, number>; // HP after each player-fight round, by stage index
 }
 
-function lobbyPlan(script: Step[], placement: number): LobbySeat[] {
+// small seeded random, so a game's lobby is the same every build
+function seeded(seed: number) {
+  let s = seed >>> 0;
+  return () => {
+    s = (s + 0x6d2b79f5) >>> 0;
+    let x = Math.imul(s ^ (s >>> 15), 1 | s);
+    x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x;
+    return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// HP after each fight for one opponent. A loss costs stage damage + 1 to 6 surviving units.
+// Losses are spread so the seat lands where its placement says: 0 at its knockout round,
+// or a placement-appropriate HP if it outlives the player.
+function hpPath(place: number, outAt: number | undefined, endT: number, fights: number[], seed: number): Map<number, number> {
+  const rnd = seeded(seed);
+  const target = outAt !== undefined ? 0 : Math.max(8, Math.round(66 - (place - 1) * 13 + rnd() * 10));
+  const until = outAt ?? endT;
+  const mine = fights.filter((x) => x <= until);
+  const path = new Map<number, number>();
+  let hp = 100;
+  mine.forEach((x, k) => {
+    const left = mine.length - k;
+    const units = 1 + Math.floor(rnd() * 5) + (x >= 50 ? 1 : 0);
+    const dmg = (STAGE_DAMAGE[Math.floor(x / 10)] ?? 0) + units;
+    const last = outAt !== undefined && x === outAt;
+    // how hard this seat has to lose from here to land on its target
+    const need = hp - target;
+    const p = last ? 1 : Math.min(0.95, Math.max(0.12, need / Math.max(1, dmg * left * 0.85)));
+    if (rnd() < p) {
+      if (last) hp = 0;
+      else hp = Math.max(outAt !== undefined ? 2 : target, hp - dmg);
+    }
+    path.set(x, hp);
+  });
+  for (const x of fights) if (x > until) path.set(x, outAt !== undefined ? 0 : hp);
+  return path;
+}
+
+function lobbyPlan(script: Step[], placement: number, seed: number): LobbySeat[] {
   const places = [1, 2, 3, 4, 5, 6, 7, 8].filter((p) => p !== placement);
   const endT = stageIndex(script[script.length - 1].stage);
   const below = places.filter((p) => p > placement).sort((a, b) => b - a); // 8th goes first
@@ -174,19 +215,16 @@ function lobbyPlan(script: Step[], placement: number): LobbySeat[] {
   return places.map((place) => {
     const k = below.indexOf(place);
     const outAt = k >= 0 ? slots[Math.min(slots.length - 1, Math.floor(((k + 1) * slots.length) / (below.length + 1)))] : undefined;
-    return { place, strength: 1.2 - (place - 1) * 0.055, outAt, endT };
+    const fights = script.filter((x) => x.kind === "pvp").map((x) => stageIndex(x.stage));
+    return { place, strength: 1.2 - (place - 1) * 0.055, outAt, endT, hp: hpPath(place, outAt, endT, fights, seed * 31 + place) };
   });
 }
 
 function lobbyOpponent(seat: LobbySeat, o: (typeof OPPONENTS)[number], stage: string, r: () => number): Opponent {
   const t = stageIndex(stage);
-  const prog = (until: number) => Math.max(0, Math.min(1, (t - 20) / Math.max(1, until - 20)));
-  let hp: number;
-  if (seat.outAt !== undefined) hp = t >= seat.outAt ? 0 : Math.max(2, Math.round(100 * (1 - Math.pow(prog(seat.outAt), 1.3)) - r() * 3));
-  else {
-    const endHp = 14 + (8 - seat.place) * 9;
-    hp = Math.max(endHp, Math.round(100 - (100 - endHp) * prog(seat.endT) - r() * 3));
-  }
+  // HP after the latest player fight at or before this round
+  let hp = 100;
+  for (const [x, v] of seat.hp) if (x <= t) hp = v;
   const level = Math.min(9, t < 20 ? 3 : t < 30 ? 4 + (t >= 25 ? 1 : 0) : t < 40 ? 6 + (seat.strength > 1.05 && t >= 35 ? 1 : 0) : t < 50 ? 7 + (seat.strength > 0.95 ? 1 : 0) : 8 + (seat.strength > 1.05 ? 1 : 0));
   const base = t < 20 ? 3 : t < 30 ? 8 + (t - 20) * 1.3 : t < 40 ? 17 + (t - 30) * 1.6 : t < 50 ? 30 + (t - 40) * 2.4 : 46 + (t - 50) * 1.5;
   return {
@@ -230,7 +268,7 @@ export function buildSampleGame(): GameRecord {
 // Runs a script through the real economy rules and builds the recorder's record.
 export function simulate(script: Step[], meta: GameMeta): GameRecord {
   const r = rng(meta.seed);
-  const lobby = meta.lobby === "sample" ? null : lobbyPlan(script, meta.placement);
+  const lobby = meta.lobby === "sample" ? null : lobbyPlan(script, meta.placement, meta.seed);
   const rounds: RoundSnapshot[] = [];
   let gold = 0;
   let hp = 100;

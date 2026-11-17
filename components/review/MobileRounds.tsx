@@ -26,7 +26,7 @@ export function MobileRounds({
   const after = (p: SeriesPoint) => Math.max(0, p.hp - p.damage);
   const y = (hp: number) => 6 + (H - 12) * (1 - hp / 100);
   const line = series.map((p, i) => `${i ? "L" : "M"}${x(i)},${y(after(p))}`).join(" ");
-  const lobby = series.filter((p) => p.lobbyAlive >= 1).map((p, i) => `${i ? "L" : "M"}${x(series.indexOf(p))},${y(p.lobbyHp)}`).join(" ");
+  const lobby = series.map((p, i) => `${i ? "L" : "M"}${x(i)},${y(p.lobbyHp)}`).join(" ");
   const si = series.findIndex((p) => p.stage === selected);
   const hlIdx = series.map((p, i) => (hl.has(p.stage) ? i : -1)).filter((i) => i >= 0);
 
@@ -49,7 +49,7 @@ export function MobileRounds({
           </span>
           <span className="flex items-center gap-1.5">
             <span className="block h-0 w-3 border-t border-dashed border-[var(--ink-2)]" />
-            Lobby median
+            Top 4 line
           </span>
         </span>
       </div>

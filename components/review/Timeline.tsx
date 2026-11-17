@@ -46,8 +46,8 @@ export function Timeline({
 
   const hpPath = series.map((p, i) => `${i ? "L" : "M"}${cx(i)},${hpY(after(p))}`).join(" ");
   const hpArea = `${hpPath} L${cx(n - 1)},${HP_TOP + HP_H} L${cx(0)},${HP_TOP + HP_H} Z`;
-  // the lobby median stops once fewer than 4 opponents are left
-  const lobbyPath = series.filter((p) => p.lobbyAlive >= 1).map((p, i) => `${i ? "L" : "M"}${cx(series.indexOf(p))},${hpY(p.lobbyHp)}`).join(" ");
+  // the Top 4 line: 4th-highest opponent HP, knocked-out players at 0
+  const lobbyPath = series.map((p, i) => `${i ? "L" : "M"}${cx(i)},${hpY(p.lobbyHp)}`).join(" ");
   const hl = new Set(highlight ?? []);
 
   // stage boundaries
@@ -104,7 +104,7 @@ export function Timeline({
         <line x1={0} x2={16} y1={0} y2={0} stroke="var(--hp)" strokeWidth={2} transform="translate(0,4)" />
         <text x={22} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">You</text>
         <line x1={compact ? 66 : 58} x2={compact ? 84 : 74} y1={4} y2={4} stroke="var(--ink-2)" strokeWidth={1.5} strokeDasharray="3 3" />
-        <text x={compact ? 90 : 80} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">Lobby median</text>
+        <text x={compact ? 90 : 80} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">Top 4 line</text>
       </g>}
 
       <path d={hpArea} fill="url(#hpFill)" />

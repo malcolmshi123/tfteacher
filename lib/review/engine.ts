@@ -58,8 +58,8 @@ export interface SeriesPoint {
   boardValue: number;
   lobbyBoardValue: number;
   lobbyLevel: number;
-  lobbyHp: number; // after this round's fights
-  lobbyHpEntering: number; // before them (the previous round's roster)
+  lobbyHp: number; // Top 4 line after this round's fights: 4th-highest opponent HP, knocked-out players at 0
+  lobbyHpEntering: number; // the same line before them (the previous round's roster)
   lobbyAlive: number; // opponents still in after this round
   lobbyAliveEntering: number;
   outcome: RoundSnapshot["outcome"];
@@ -129,6 +129,13 @@ function streakBefore(R: RoundSnapshot[]): number[] {
   return out;
 }
 
+// The HP you have to stay above to finish top 4: the 4th-highest opponent HP, with knocked-out
+// players at 0. Opponents' HP only goes down, so this line only goes down too; it is 0 once
+// four opponents are out.
+export function top4Line(opponentHp: number[]): number {
+  return [...opponentHp].map((h) => Math.max(0, h)).sort((a, b) => b - a)[3] ?? 0;
+}
+
 export function buildSeries(game: GameRecord): SeriesPoint[] {
   return game.rounds.map((r, i) => {
     const alive = r.roster.filter((o) => o.hp > 0);
@@ -143,8 +150,8 @@ export function buildSeries(game: GameRecord): SeriesPoint[] {
       boardValue: boardValue(r.board),
       lobbyBoardValue: Math.round(median(alive.map((o) => o.boardValue))),
       lobbyLevel: median(alive.map((o) => o.level)),
-      lobbyHp: Math.round(median(alive.map((o) => o.hp))),
-      lobbyHpEntering: Math.round(median(before.filter((o) => o.hp > 0).map((o) => o.hp))),
+      lobbyHp: top4Line(r.roster.map((o) => o.hp)),
+      lobbyHpEntering: top4Line(before.map((o) => o.hp)),
       lobbyAlive: alive.length,
       lobbyAliveEntering: before.filter((o) => o.hp > 0).length,
       outcome: r.outcome,
@@ -471,7 +478,7 @@ export function analyze(game: GameRecord): Review {
         return {
           label: `HP after ${keyStage}`,
           value: String(Math.max(0, R[k].hp - R[k].damageTaken)),
-          note: `lobby median ${pt.lobbyHp}`,
+          note: `top 4 line ${pt.lobbyHp}`,
         };
       })(),
       { label: "Rerolls", value: String(totalRolls), note: "whole game" },

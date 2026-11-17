@@ -66,16 +66,22 @@ describe.each(allGames().map((g) => [g.game.id, g] as const))("game %s", (_id, {
     const facts = buildFacts(review);
     for (const s of checkAnswer(`${review.headline} ${review.shortHeadline} ${review.summary}`, facts)) expect(s.unsupported, s.text).toEqual([]);
   });
-  it("takes the lobby median HP over opponents still alive", () => {
+  it("draws the Top 4 line as the 4th-highest opponent HP, which never goes up", () => {
     const s = analyze(game).series;
     game.rounds.forEach((r, i) => {
-      const alive = r.roster.filter((o) => o.hp > 0).map((o) => o.hp);
-      expect(s[i].lobbyAlive, r.stage).toBe(alive.length);
-      if (alive.length) {
-        expect(s[i].lobbyHp, r.stage).toBeGreaterThanOrEqual(Math.min(...alive));
-        expect(s[i].lobbyHp, r.stage).toBeLessThanOrEqual(Math.max(...alive));
-      }
+      const sorted = r.roster.map((o) => Math.max(0, o.hp)).sort((a, b) => b - a);
+      expect(s[i].lobbyHp, r.stage).toBe(sorted[3]);
+      if (i) expect(s[i].lobbyHp, r.stage).toBeLessThanOrEqual(s[i - 1].lobbyHp);
+      // 0 exactly when four or more opponents are out
+      expect(s[i].lobbyHp === 0, r.stage).toBe(r.roster.filter((o) => o.hp <= 0).length >= 4);
     });
+  });
+  it("never lets an opponent's HP go up", () => {
+    for (let i = 1; i < game.rounds.length; i++)
+      for (const o of game.rounds[i].roster) {
+        const prev = game.rounds[i - 1].roster.find((p) => p.id === o.id)!;
+        expect(o.hp, `${game.rounds[i].stage} ${o.id}`).toBeLessThanOrEqual(prev.hp);
+      }
   });
   it("ends on its comp's core board", () => {
     const core = MY_COMPS.find((c) => c.id === comp)!.core;
