@@ -73,7 +73,7 @@ export default async function ReviewsPage({ searchParams }: { searchParams: Prom
               );
             })}
         </nav>
-        <div className="mt-6 hidden grid-cols-[56px_220px_374px_minmax(0,1fr)_96px_16px] gap-6 px-5 pb-2 text-[12px] text-[var(--ink-2)] md:grid">
+        <div className="mt-6 hidden grid-cols-[56px_150px_380px_minmax(0,1fr)_96px_16px] gap-6 px-5 pb-2 text-[12px] text-[var(--ink-2)] md:grid">
           <span>Place</span>
           <span>Comp</span>
           <span>Final board</span>
@@ -88,7 +88,7 @@ export default async function ReviewsPage({ searchParams }: { searchParams: Prom
               <li key={game.id}>
                 <Link
                   href={`/review/${game.id}`}
-                  className="group grid grid-cols-[48px_minmax(0,1fr)] items-center gap-x-4 gap-y-3 rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-4 transition-colors hover:border-[var(--line-2)] hover:bg-[var(--panel-2)] md:grid-cols-[56px_220px_374px_minmax(0,1fr)_96px_16px] md:items-center md:gap-6 md:px-5 md:py-4"
+                  className="group grid grid-cols-[48px_minmax(0,1fr)] items-center gap-x-4 gap-y-3 rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-4 transition-colors hover:border-[var(--line-2)] hover:bg-[var(--panel-2)] md:grid-cols-[56px_150px_380px_minmax(0,1fr)_96px_16px] md:items-center md:gap-6 md:px-5 md:py-4"
                 >
                   <PlaceBadge place={game.placement} size="lg" />
                   <div className="min-w-0">
