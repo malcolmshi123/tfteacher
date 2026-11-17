@@ -2,20 +2,31 @@ import { describe, expect, it } from "vitest";
 import { allGames, gameById } from "../lib/game/games";
 import { MY_COMPS } from "../lib/patch/radar";
 import { analyze, unitsLostBy } from "../lib/review/engine";
+import { WIN_GOLD, interest, passiveIncome, streakGold } from "../lib/game/rules";
 import { buildFacts } from "../lib/ask/facts";
 import { checkAnswer } from "../lib/ask/check";
 
 // The same invariants the sample game is held to, for every game in the account.
 describe.each(allGames().map((g) => [g.game.id, g] as const))("game %s", (_id, { game, comp }) => {
   const R = game.rounds;
-  it("follows the income rules and never goes negative", () => {
-    for (let i = 1; i < R.length; i++) {
+  it("follows the income rules exactly and never goes negative", () => {
+    // passive + interest + streak gold (every round while it lasts) + 1 for a player-fight win; PvE rounds may add drops
+    let streak = 0;
+    let wonLast = false;
+    for (let i = 0; i < R.length; i++) {
       expect(R[i].goldEnd).toBeGreaterThanOrEqual(0);
-      if (R[i].stage >= "2-1") {
-        const interest = Math.min(5, Math.floor(R[i - 1].goldEnd / 10));
-        expect(R[i].gold - R[i - 1].goldEnd, R[i].stage).toBeGreaterThanOrEqual(5 + interest);
-        expect(R[i].gold - R[i - 1].goldEnd, R[i].stage).toBeLessThanOrEqual(5 + interest + 3 + 4);
+      if (i > 0) {
+        const later = R[i].stage >= "2-1";
+        const due = passiveIncome(R[i].stage) + (later ? interest(R[i - 1].goldEnd) + streakGold(Math.abs(streak)) : 0) + (wonLast ? WIN_GOLD : 0);
+        const got = R[i].gold - R[i - 1].goldEnd;
+        if (R[i].kind === "pve") {
+          expect(got, R[i].stage).toBeGreaterThanOrEqual(due);
+          expect(got, R[i].stage).toBeLessThanOrEqual(due + 4);
+        } else expect(got, R[i].stage).toBe(due);
       }
+      wonLast = R[i].kind === "pvp" && R[i].outcome === "win";
+      if (R[i].kind === "pvp" && R[i].outcome === "win") streak = streak > 0 ? streak + 1 : 1;
+      if (R[i].kind === "pvp" && R[i].outcome === "loss") streak = streak < 0 ? streak - 1 : -1;
     }
   });
   it("takes stage damage plus 1 per surviving enemy unit on every loss", () => {

@@ -14,9 +14,10 @@ describe("sample game economy", () => {
       if (r.stage >= "2-1") {
         const prev = game.rounds[i - 1];
         const interest = Math.min(5, Math.floor(prev.goldEnd / 10));
-        // income is base 5 + interest + streak (0 to 3) + monster drops
-        expect(r.gold - prev.goldEnd).toBeGreaterThanOrEqual(5 + interest);
-        expect(r.gold - prev.goldEnd).toBeLessThanOrEqual(5 + interest + 3 + 4);
+        // income is passive (4 at 2-1, then 5) + interest + streak (0 to 3) + win gold (1) + monster drops
+        const passive = r.stage === "2-1" ? 4 : 5;
+        expect(r.gold - prev.goldEnd).toBeGreaterThanOrEqual(passive + interest);
+        expect(r.gold - prev.goldEnd).toBeLessThanOrEqual(passive + interest + 3 + 1 + 4);
       }
     }
   });

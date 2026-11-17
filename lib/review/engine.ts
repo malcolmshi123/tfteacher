@@ -1,5 +1,6 @@
 import { ITEMS, UNIT_BY_ID, copiesOf } from "../game/set";
 import type { GameRecord, Piece, RoundSnapshot } from "../game/types";
+import { streakGold } from "../game/rules";
 
 // Deterministic review rules over the round timeline. Every finding carries the
 // exact rounds and numbers it used (cites), so any sentence written on top of it
@@ -116,8 +117,16 @@ function median(xs: number[]) {
   return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
 }
 
-function streakGold(n: number) {
-  return n >= 6 ? 3 : n >= 5 ? 2 : n >= 2 ? 1 : 0;
+// streak length entering each round, counted the way the game pays it
+function streakBefore(R: RoundSnapshot[]): number[] {
+  const out: number[] = [];
+  let s = 0;
+  for (const r of R) {
+    out.push(s);
+    if (r.kind === "pvp" && r.outcome === "win") s = s > 0 ? s + 1 : 1;
+    if (r.kind === "pvp" && r.outcome === "loss") s = s < 0 ? s - 1 : -1;
+  }
+  return out;
 }
 
 export function buildSeries(game: GameRecord): SeriesPoint[] {
@@ -189,8 +198,10 @@ export function analyze(game: GameRecord): Review {
     const span = R.slice(best.from, best.to + 1).filter((x) => x.kind === "pvp");
     if (span.length >= 4) {
       const hpLost = span.reduce((a, r) => a + r.damageTaken, 0);
+      // the streak gold actually paid: every round from the first loss up to the round after the last
+      const before = streakBefore(R);
       let earned = 0;
-      span.forEach((_, k) => (earned += streakGold(k)));
+      for (let i = best.from + 1; i <= Math.min(best.to + 1, R.length - 1); i++) if (before[i] < 0) earned += streakGold(-before[i]);
       const endHp = hpAfter(span[span.length - 1]);
       const first = span[0].stage;
       const lastS = span[span.length - 1].stage;

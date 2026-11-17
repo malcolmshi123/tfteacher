@@ -1,3 +1,4 @@
+import { WIN_GOLD, interest, passiveIncome, streakGold } from "./rules";
 import { SHOP_ODDS, UNITS, UNIT_BY_ID, XP_TO_NEXT, combineItems, copiesOf, sellValue } from "./set";
 import type {
   GameRecord,
@@ -66,14 +67,14 @@ const SCRIPT: Step[] = [
   { stage: "2-4", kind: "carousel", outcome: "none", dmg: 0, board: "ornn:2 xayah:1:belt rakan:1:hoj alistar:1", bench: "leblanc:1", itemBench: "rod" },
   { stage: "2-5", kind: "pvp", outcome: "loss", dmg: 6, xp: 2, board: "ornn:2 xayah:1:belt alistar:1 khazix:1:hoj leblanc:1", itemBench: "rod" },
   { stage: "2-6", kind: "pvp", outcome: "loss", dmg: 5, board: "ornn:2 xayah:1:belt alistar:1 khazix:1:hoj leblanc:1", itemBench: "rod" },
-  { stage: "2-7", kind: "pve", outcome: "win", dmg: 0, board: "ornn:2 xayah:1:belt alistar:1 khazix:1:hoj leblanc:1", itemBench: "rod,glove", goldDrop: 3 },
+  { stage: "2-7", kind: "pve", outcome: "win", dmg: 0, board: "ornn:2 xayah:1:belt alistar:1 khazix:1:hoj leblanc:1", itemBench: "rod,glove", goldDrop: 2 },
   { stage: "3-1", kind: "pvp", outcome: "loss", dmg: 7, xp: 3, board: "ornn:2 alistar:1 khazix:1:hoj leblanc:1 hecarim:1:belt diana:1", itemBench: "rod,glove" },
   { stage: "3-2", kind: "pvp", outcome: "loss", dmg: 8, xp: 4, board: "ornn:2 alistar:2 khazix:1:hoj leblanc:1 hecarim:1:belt diana:1", bench: "khazix:1", itemBench: "rod,glove", forceShop: { 0: ["khazix"] } },
   { stage: "3-3", kind: "pvp", outcome: "loss", dmg: 9, board: "ornn:2 alistar:2 khazix:1:hoj leblanc:1 hecarim:1:belt diana:1", bench: "khazix:1", itemBench: "rod,glove", forceShop: { 0: ["khazix"] } },
   { stage: "3-4", kind: "carousel", outcome: "none", dmg: 0, board: "ornn:2 alistar:2 khazix:1:hoj leblanc:1 hecarim:1:belt diana:1", bench: "khazix:1", itemBench: "rod,glove,rod" },
   { stage: "3-5", kind: "pvp", outcome: "loss", dmg: 9, board: "ornn:2 alistar:2 khazix:1:hoj leblanc:2 hecarim:1:belt diana:1", bench: "khazix:1", itemBench: "rod,glove,rod" },
   { stage: "3-6", kind: "pvp", outcome: "loss", dmg: 10, xp: 3, board: "ornn:2 alistar:2 khazix:1:hoj leblanc:2 hecarim:1:belt diana:1", bench: "khazix:1", itemBench: "rod,glove,rod" },
-  { stage: "3-7", kind: "pve", outcome: "win", dmg: 0, board: "ornn:2 alistar:2 khazix:1:hoj leblanc:2 hecarim:1:belt diana:1", bench: "khazix:1", itemBench: "rod,glove,rod,tear,belt", goldDrop: 4 },
+  { stage: "3-7", kind: "pve", outcome: "win", dmg: 0, board: "ornn:2 alistar:2 khazix:1:hoj leblanc:2 hecarim:1:belt diana:1", bench: "khazix:1", itemBench: "rod,glove,rod,tear,belt" },
   // the level 7 rolldown: hand-set shops with level 7 odds (5 one-costs, 8 two-costs, 10 three-costs, 2 four-costs)
   {
     stage: "4-1", kind: "pvp", outcome: "loss", dmg: 12, xp: 4, rerolls: 4,
@@ -91,7 +92,7 @@ const SCRIPT: Step[] = [
   { stage: "4-4", kind: "carousel", outcome: "none", dmg: 0, board: "ornn:2 leblanc:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 fiddlesticks:1 soraka:1", bench: "diana:1 hecarim:1", itemBench: "cloak" },
   { stage: "4-5", kind: "pvp", outcome: "loss", dmg: 13, rerolls: 3, board: "ornn:2 leblanc:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 fiddlesticks:1 soraka:1", bench: "diana:1 hecarim:1 khazix:1", itemBench: "cloak" },
   { stage: "4-6", kind: "pvp", outcome: "win", dmg: 0, rerolls: 2, board: "ornn:2 leblanc:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 fiddlesticks:1 soraka:1", bench: "diana:1 hecarim:1 khazix:1", itemBench: "cloak" },
-  { stage: "4-7", kind: "pve", outcome: "win", dmg: 0, board: "ornn:2 leblanc:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 fiddlesticks:1 soraka:1", bench: "diana:1 hecarim:1 khazix:1", itemBench: "cloak", goldDrop: 3 },
+  { stage: "4-7", kind: "pve", outcome: "win", dmg: 0, board: "ornn:2 leblanc:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 fiddlesticks:1 soraka:1", bench: "diana:1 hecarim:1 khazix:1", itemBench: "cloak", goldDrop: 2 },
   { stage: "5-1", kind: "pvp", outcome: "loss", dmg: 15, rerolls: 4, board: "ornn:2 leblanc:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog,gargoyle,spirit diana:1:ionic fiddlesticks:1 soraka:1", bench: "diana:1 hecarim:1 khazix:1" },
 ];
 
@@ -236,6 +237,7 @@ export function simulate(script: Step[], meta: GameMeta): GameRecord {
   let level = 1;
   let xp = 0;
   let streak = 0; // positive win streak, negative loss streak
+  let wonLast = false; // a player-fight win pays 1 gold at the next round
   let prevCopies: Record<string, number> = {};
   let prevPieces: Piece[] = [];
 
@@ -245,13 +247,9 @@ export function simulate(script: Step[], meta: GameMeta): GameRecord {
 
     // income at the start of the round
     if (i > 0) {
-      if (t < 20) gold += t === 12 ? 2 : t === 13 ? 2 : 3;
-      else {
-        const interest = Math.min(5, Math.floor(gold / 10));
-        const st = Math.abs(streak);
-        const streakGold = st >= 6 ? 3 : st >= 5 ? 2 : st >= 2 ? 1 : 0;
-        gold += 5 + interest + (s.kind === "pvp" ? streakGold : 0);
-      }
+      // passive + interest + streak (every round while it lasts) + win gold
+      gold += passiveIncome(s.stage) + (t >= 21 ? interest(gold) + streakGold(Math.abs(streak)) : 0) + (wonLast ? WIN_GOLD : 0);
+      wonLast = false;
       gold += s.goldDrop ?? 0;
       if (t >= 12) {
         xp += 2;
@@ -366,7 +364,10 @@ export function simulate(script: Step[], meta: GameMeta): GameRecord {
 
     hp -= s.dmg;
     // only player fights count toward a streak; monster rounds don't break it
-    if (s.kind === "pvp" && s.outcome === "win") streak = streak > 0 ? streak + 1 : 1;
+    if (s.kind === "pvp" && s.outcome === "win") {
+      streak = streak > 0 ? streak + 1 : 1;
+      wonLast = true;
+    }
     if (s.kind === "pvp" && s.outcome === "loss") streak = streak < 0 ? streak - 1 : -1;
 
     // HP never goes up: each opponent's HP is capped at its previous value
