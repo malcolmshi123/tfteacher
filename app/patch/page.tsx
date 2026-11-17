@@ -118,7 +118,7 @@ export default function PatchPage() {
               </div>
             ))}
           </dl>
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <div className="mt-6 grid gap-4 md:grid-cols-2 md:items-start">
             <PickList title="Worth trying" tone="var(--good)" picks={PATCH_SUMMARY.tryThese.filter((p) => outside(p.lines))} />
             <PickList title="Worth avoiding" tone="var(--hp)" picks={PATCH_SUMMARY.avoid.filter((p) => outside(p.lines))} />
           </div>

@@ -209,9 +209,12 @@ export default function Home() {
                         <span className="tnum text-[12px] text-[var(--ink-2)]">{r.stage}</span>
                         <span
                           className="block h-1 w-5 rounded-full"
-                          style={{ background: r.kind === "pvp" ? (r.outcome === "win" ? "var(--good)" : "var(--hp)") : "var(--line-2)" }}
+                          style={{
+                            background: r.kind === "pvp" ? (r.outcome === "win" ? "var(--good)" : "var(--hp)") : r.kind === "pve" ? "var(--line-2)" : "transparent",
+                            border: r.kind === "carousel" ? "1px dashed var(--ink-2)" : undefined,
+                          }}
                         />
-                        <span className="tnum text-[13px] font-semibold">{Math.max(0, r.hp - r.damageTaken)}</span>
+                        {r.kind === "carousel" ? <span className="h-[18px]" aria-hidden /> : <span className="tnum text-[13px] font-semibold">{Math.max(0, r.hp - r.damageTaken)}</span>}
                       </div>
                     ))}
                   </div>

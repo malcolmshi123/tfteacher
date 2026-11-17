@@ -99,14 +99,14 @@ export function MobileRounds({
               className={`flex h-[60px] w-12 shrink-0 snap-start flex-col items-center justify-between rounded-xl border py-2 ${
                 sel ? "border-[var(--ink)] bg-[var(--panel-2)]" : hl.has(p.stage) ? "border-[color-mix(in_oklab,var(--brand)_40%,var(--line))] bg-[color-mix(in_oklab,var(--brand)_7%,var(--panel))]" : "border-[var(--line)] bg-[var(--panel)]"
               }`}
-              aria-label={`Round ${p.stage}, ${after(p)} HP after`}
+              aria-label={p.kind === "carousel" ? `Round ${p.stage}, carousel` : `Round ${p.stage}, ${after(p)} HP after`}
             >
               <span className={`tnum text-[13px] ${sel ? "font-semibold text-[var(--ink)]" : "text-[var(--ink-2)]"}`}>{p.stage}</span>
               <span
                 className="block h-1.5 w-6 rounded-full"
                 style={{ background: bar, border: p.kind === "carousel" ? "1px dashed var(--ink-2)" : undefined }}
               />
-              <span className="tnum text-[13px] text-[var(--ink-2)]">{after(p)}</span>
+              {p.kind === "carousel" ? <span className="h-[18px]" aria-hidden /> : <span className="tnum text-[13px] text-[var(--ink-2)]">{after(p)}</span>}
             </button>
           );
         })}
