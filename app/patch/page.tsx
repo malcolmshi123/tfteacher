@@ -155,8 +155,8 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
         : TONE[v.verdict];
   return (
     <article className="overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--panel)]">
-      <header className="flex flex-col gap-5 border-b border-[var(--line)] p-6 lg:flex-row lg:items-center lg:gap-14">
-        <div className="min-w-0 lg:flex-none">
+      <header className="grid gap-5 border-b border-[var(--line)] p-6 lg:grid-cols-[minmax(0,1fr)_530px] lg:items-start lg:gap-8">
+        <div className="min-w-0">
           <div className="flex items-center gap-2 text-[13px] font-medium" style={{ color: t.color }}>
             <span className="block h-2 w-2 rounded-full" style={{ background: t.color }} />
             {t.label}
@@ -168,7 +168,7 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
             <span className="rounded-md bg-[color-mix(in_oklab,var(--good)_13%,transparent)] px-2 py-0.5 text-[var(--good)]">{(() => { const k = v.lines.filter((l) => l.direction === "buff").length; return `${k} buff${k === 1 ? "" : "s"}`; })()}</span>
           </p>
         </div>
-        <div className="flex min-w-0 flex-wrap gap-x-2.5 gap-y-4">
+        <div className="flex min-w-0 flex-wrap gap-x-2.5 gap-y-4 lg:flex-nowrap">
           {v.comp.core.map((u) => (
             <UnitToken key={u} unitId={u} size={44} showName={false} items={v.comp.items?.[u] ?? []} />
           ))}

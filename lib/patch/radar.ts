@@ -104,11 +104,11 @@ export const MY_COMPS: PlayedComp[] = [
   comp("c3", "Tempo Riftbeast", "brambleback", ["pebbles", "murkwolf", "krug", "sentinel", "brambleback", "gnar", "taric", "elderdragon"], 4, 4.5, 50),
 ];
 
-// The usual three items on each board's carries, the same builds the sample games end with.
+// The usual items on each board's carries, the same builds the sample games end with.
 const RECOMMENDED: Record<string, Record<string, string[]>> = {
-  c1: { khazix: ["hoj", "hoj", "rabadon"], hecarim: ["warmog", "gargoyle", "spirit"] },
-  c2: { ahri: ["shojin", "morello", "quicksilver"], krug: ["warmog", "gargoyle", "spirit"] },
-  c3: { brambleback: ["guinsoo", "eon", "quicksilver"], krug: ["warmog", "spirit", "gargoyle"] },
+  c1: { khazix: ["hoj", "hoj", "rabadon"], hecarim: ["warmog", "gargoyle", "spirit"], diana: ["ionic"] },
+  c2: { sett: ["warmog", "bramble", "claw"], ahri: ["jeweled", "flail", "shojin"], morgana: ["voidstaff", "morello"] },
+  c3: { brambleback: ["guinsoo", "eon", "quicksilver"], krug: ["warmog", "spirit", "gargoyle"], elderdragon: ["ie", "lw"] },
 };
 for (const c of MY_COMPS) c.items = RECOMMENDED[c.id];
 

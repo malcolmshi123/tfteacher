@@ -114,6 +114,9 @@ export const ITEMS: Record<string, string> = {
   lw: "Last Whisper",
   sterak: "Sterak's Gage",
   ie: "Infinity Edge",
+  ionic: "Ionic Spark",
+  voidstaff: "Void Staff",
+  flail: "Striker's Flail",
 };
 
 export const RECIPES: Record<string, [string, string]> = {
@@ -133,6 +136,9 @@ export const RECIPES: Record<string, [string, string]> = {
   lw: ["bow", "glove"],
   sterak: ["edge", "belt"],
   ie: ["edge", "glove"],
+  ionic: ["rod", "cloak"],
+  voidstaff: ["bow", "tear"],
+  flail: ["belt", "glove"],
 };
 
 // Combine component pairs on one unit into their completed items.

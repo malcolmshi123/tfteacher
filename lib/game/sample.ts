@@ -92,7 +92,7 @@ const SCRIPT: Step[] = [
   { stage: "4-5", kind: "pvp", outcome: "loss", dmg: 13, rerolls: 3, board: "ornn:2 leblanc:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 fiddlesticks:1 soraka:1", bench: "diana:1 hecarim:1 khazix:1", itemBench: "cloak" },
   { stage: "4-6", kind: "pvp", outcome: "win", dmg: 0, rerolls: 2, board: "ornn:2 leblanc:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 fiddlesticks:1 soraka:1", bench: "diana:1 hecarim:1 khazix:1", itemBench: "cloak" },
   { stage: "4-7", kind: "pve", outcome: "win", dmg: 0, board: "ornn:2 leblanc:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog diana:1 fiddlesticks:1 soraka:1", bench: "diana:1 hecarim:1 khazix:1", itemBench: "cloak", goldDrop: 3 },
-  { stage: "5-1", kind: "pvp", outcome: "loss", dmg: 15, rerolls: 4, board: "ornn:2 leblanc:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog,gargoyle,spirit diana:1 fiddlesticks:1 soraka:1", bench: "diana:1 hecarim:1 khazix:1" },
+  { stage: "5-1", kind: "pvp", outcome: "loss", dmg: 15, rerolls: 4, board: "ornn:2 leblanc:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog,gargoyle,spirit diana:1:ionic fiddlesticks:1 soraka:1", bench: "diana:1 hecarim:1 khazix:1" },
 ];
 
 const OPPONENTS: { id: string; name: string; place: number; strength: number }[] = [

@@ -136,7 +136,7 @@ export default function Home() {
               <div className="rounded-2xl border border-[var(--line-2)] bg-[var(--panel-2)] p-6">
                 <div className="text-[13px] font-medium text-[var(--brand)]">What TFTeacher sees at 4-1 alone</div>
                 <div className="mt-5 grid gap-5 sm:grid-cols-[auto_minmax(0,1fr)]">
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {r41.shops.map((shop, si) => (
                     <div key={si} className="flex items-center gap-3">
                       <span className="w-12 text-[11px] text-[var(--muted)]">{si === 0 ? "Free" : `Roll ${si}`}</span>
