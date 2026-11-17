@@ -18,6 +18,11 @@ export function HighlightSwatch({ state }: { state: "bought" | "missed" | "flex"
   );
 }
 
+// how far a highlighted tile's outer ring reaches past the portrait: cost border + spacer + ring
+export function ringReach(size: number) {
+  return (size < 36 ? 1.5 : 2) + 3.5;
+}
+
 export function UnitToken({
   piece,
   unitId,

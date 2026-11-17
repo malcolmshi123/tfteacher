@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { CiteText } from "@/components/review/CiteText";
 import { SiteFooter, SiteNav } from "@/components/SiteChrome";
-import { HighlightSwatch, UnitToken } from "@/components/UnitToken";
+import { HighlightSwatch, UnitToken, ringReach } from "@/components/UnitToken";
 import { Timeline } from "@/components/review/Timeline";
 import { buildSampleGame } from "@/lib/game/sample";
 import { analyze, boardValue, shopMarks } from "@/lib/review/engine";
@@ -104,12 +104,12 @@ export default function Home() {
                 you rolled past, gold you never spent.
               </p>
             </div>
-            <div className="mt-10 grid gap-4 md:grid-cols-2 md:items-start">
+            <div className="mt-10 grid gap-4 lg:grid-cols-2 lg:items-start">
               <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
                 <div className="text-[13px] font-medium text-[var(--muted)]">What match history shows</div>
-                <div className="mt-5 flex flex-wrap gap-y-5">
+                <div className="mt-5 flex flex-wrap gap-x-2.5 gap-y-4">
                   {last.board.map((p, i) => (
-                    <UnitToken key={i} piece={p} size={50} />
+                    <UnitToken key={i} piece={p} size={50} showName={false} />
                   ))}
                 </div>
                 <dl className="tnum mt-5 grid grid-cols-3 gap-3 text-[13px]">
@@ -136,11 +136,12 @@ export default function Home() {
               <div className="rounded-2xl border border-[var(--line-2)] bg-[var(--panel-2)] p-6">
                 <div className="text-[13px] font-medium text-[var(--brand)]">What TFTeacher sees at 4-1 alone</div>
                 <div className="mt-5 grid gap-5 sm:grid-cols-[auto_minmax(0,1fr)]">
-                <div className="space-y-2.5">
+                {/* highlighted neighbours: rings touch, never overlap */}
+                <div className="flex flex-col" style={{ gap: 2 * ringReach(42) }}>
                   {r41.shops.map((shop, si) => (
                     <div key={si} className="flex items-center gap-3">
                       <span className="w-12 text-[11px] text-[var(--muted)]">{si === 0 ? "Free" : `Roll ${si}`}</span>
-                      <div className="flex gap-2.5">
+                      <div className="flex" style={{ gap: 2 * ringReach(42) }}>
                         {shop.map((u, k) => (
                           <UnitToken key={k} unitId={u} size={42} showName={false} state={slotState(si, k, u)} />
                         ))}

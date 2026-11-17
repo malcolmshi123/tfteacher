@@ -243,7 +243,7 @@ export function radar(comps = MY_COMPS, notes = NOTES): CompVerdict[] {
                 .map((t) => ` ${name(t)} went both ways: its ${nerfs.filter((x) => x.target === t).map((x) => x.text.replace(`${name(t)} `, "")).join("; ")}, but its ${buffs.filter((x) => x.target === t).map((x) => x.text.replace(`${name(t)} `, "")).join("; ")}.`)
                 .join("");
               const pure = nerfs.filter((x) => !mixed.includes(x.target));
-              return `${list(up)} got stronger.${mixedText}${pure.length ? ` ${pure.length === 1 ? (mixedText ? "Another line" : "One line") : `${pure.length} ${mixedText ? "more " : ""}lines`} went the other way: ${pure.map((x) => x.text).join("; ")}.` : ""}${nerfs.length ? "" : " Nothing in the comp was nerfed."}`;
+              return `${list(up)} got stronger.${mixedText}${pure.length && !mixedText ? ` ${pure.length === 1 ? "One line" : `${pure.length} lines`} went the other way: ${pure.map((x) => x.text).join("; ")}.` : ""}${nerfs.length ? "" : " Nothing in the comp was nerfed."}`;
             })()
           : verdict === "mixed"
             ? (() => {
