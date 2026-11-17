@@ -26,7 +26,8 @@ export function MobileRounds({
   const after = (p: SeriesPoint) => Math.max(0, p.hp - p.damage);
   const y = (hp: number) => 6 + (H - 12) * (1 - hp / 100);
   const line = series.map((p, i) => `${i ? "L" : "M"}${x(i)},${y(after(p))}`).join(" ");
-  const lobby = series.map((p, i) => `${i ? "L" : "M"}${x(i)},${y(p.lobbyHp)}`).join(" ");
+  const secured = series.findIndex((p) => p.lobbyHp === 0);
+  const lobby = series.slice(0, secured < 0 ? series.length : secured + 1).map((p, i) => `${i ? "L" : "M"}${x(i)},${y(p.lobbyHp)}`).join(" ");
   const si = series.findIndex((p) => p.stage === selected);
   const hlIdx = series.map((p, i) => (hl.has(p.stage) ? i : -1)).filter((i) => i >= 0);
 
@@ -68,6 +69,14 @@ export function MobileRounds({
           </g>
         ))}
         <path d={lobby} fill="none" stroke="var(--ink-2)" strokeOpacity={0.55} strokeWidth={1.25} strokeDasharray="3 3" />
+        {secured >= 0 && (
+          <g>
+            <circle cx={x(secured)} cy={y(0)} r={3} fill="var(--bg)" stroke="var(--ink-2)" strokeWidth={1.5} />
+            <text x={x(secured) + (x(secured) + 92 > W ? -7 : 7)} y={y(0) - (x(secured) + 92 > W ? 14 : 6)} textAnchor={x(secured) + 92 > W ? "end" : "start"} fontSize="12" fill="var(--ink-2)" stroke="var(--panel)" strokeWidth={4} paintOrder="stroke" strokeLinejoin="round">
+              Top 4 secured
+            </text>
+          </g>
+        )}
         <path d={line} fill="none" stroke="var(--hp)" strokeWidth={2.25} strokeLinejoin="round" />
         {series.map((p, i) =>
           p.stage.endsWith("-1") && p.stage !== "1-1" ? (

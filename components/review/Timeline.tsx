@@ -49,7 +49,9 @@ export function Timeline({
   const hpPath = series.map((p, i) => `${i ? "L" : "M"}${cx(i)},${hpY(after(p))}`).join(" ");
   const hpArea = `${hpPath} L${cx(n - 1)},${HP_TOP + HP_H} L${cx(0)},${HP_TOP + HP_H} Z`;
   // Top 4: 4th-highest opponent HP, knocked-out players at 0
-  const lobbyPath = series.map((p, i) => `${i ? "L" : "M"}${cx(i)},${hpY(p.lobbyHp)}`).join(" ");
+  // once four opponents are out, top 4 is secured: the line ends at the first round it reaches 0
+  const secured = series.findIndex((p) => p.lobbyHp === 0);
+  const lobbyPath = series.slice(0, secured < 0 ? series.length : secured + 1).map((p, i) => `${i ? "L" : "M"}${cx(i)},${hpY(p.lobbyHp)}`).join(" ");
   const hl = new Set(highlight ?? []);
 
   // stage boundaries
@@ -111,6 +113,14 @@ export function Timeline({
 
       <path d={hpArea} fill="url(#hpFill)" />
       <path d={lobbyPath} fill="none" stroke="var(--ink-2)" strokeOpacity={0.6} strokeWidth={1.5} strokeDasharray="3 3" />
+      {secured >= 0 && (
+        <g>
+          <circle cx={cx(secured)} cy={hpY(0)} r={3} fill="var(--bg)" stroke="var(--ink-2)" strokeWidth={1.5} />
+          <text x={cx(secured) + (cx(secured) + 110 > W - PAD_R ? -8 : 8)} y={hpY(0) - (cx(secured) + 110 > W - PAD_R ? 14 : 6)} textAnchor={cx(secured) + 110 > W - PAD_R ? "end" : "start"} fontSize={FS} fill="var(--ink-2)" stroke="var(--panel)" strokeWidth={4} paintOrder="stroke" strokeLinejoin="round">
+            Top 4 secured
+          </text>
+        </g>
+      )}
       <path d={hpPath} fill="none" stroke="var(--hp)" strokeWidth={2.25} strokeLinejoin="round" />
       {series.map((p, i) =>
         p.damage > 0 ? <circle key={`d${i}`} cx={cx(i)} cy={hpY(after(p))} r={2.6} fill="var(--bg)" stroke="var(--hp)" strokeWidth={1.6} /> : null,

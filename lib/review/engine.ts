@@ -478,7 +478,7 @@ export function analyze(game: GameRecord): Review {
         return {
           label: `HP after ${keyStage}`,
           value: String(Math.max(0, R[k].hp - R[k].damageTaken)),
-          note: `top 4: ${pt.lobbyHp}`,
+          note: pt.lobbyHp === 0 ? "top 4 secured" : `top 4: ${pt.lobbyHp}`,
         };
       })(),
       { label: "Rerolls", value: String(totalRolls), note: "whole game" },
