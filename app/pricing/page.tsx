@@ -92,13 +92,6 @@ const COMPARE: [string, string, string][] = [
   ["History", "20 games", "All games"],
 ];
 
-// one hue per stage; the stage that cost the most HP is full strength, the others are muted
-const STAGE_HUE: Record<string, string> = { "Stage 2": "#7c8cff", "Stage 3": "var(--hp)", "Stage 4": "var(--gold)", "Stage 5+": "#b48ead" };
-function stageColor(stage: string, top: boolean) {
-  const c = STAGE_HUE[stage] ?? "var(--muted)";
-  return top ? c : `color-mix(in oklab, ${c} 55%, var(--panel-2))`;
-}
-
 const TREND = [
   // share of all HP lost over the 19 games, by stage; adds up to 100
   { stage: "Stage 2", hp: 9 },
@@ -159,7 +152,7 @@ function ProPreview() {
             <span
               key={s.stage}
               className="h-full border-r-2 border-[var(--panel)] last:border-r-0"
-              style={{ width: `${s.hp}%`, background: stageColor(s.stage, s === top) }}
+              style={{ width: `${s.hp}%`, background: s === top ? "var(--hp)" : "color-mix(in oklab, var(--hp) 38%, var(--panel-2))" }}
             />
           ))}
         </div>
@@ -167,7 +160,7 @@ function ProPreview() {
         <div className="tnum mt-2.5 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-[var(--ink-2)]">
           {TREND.map((s) => (
             <span key={s.stage} className="flex items-center gap-1.5" style={{ color: s === top ? "var(--ink)" : undefined }}>
-              <span className="block h-2 w-2 rounded-sm" style={{ background: stageColor(s.stage, s === top) }} />
+              <span className="block h-2 w-2 rounded-sm" style={{ background: s === top ? "var(--hp)" : "color-mix(in oklab, var(--hp) 38%, var(--panel-2))" }} />
               {s.stage} {s.hp}%
             </span>
           ))}
