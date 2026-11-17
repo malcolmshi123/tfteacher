@@ -411,7 +411,9 @@ export function analyze(game: GameRecord): Review {
   const verdict = (f: Finding): string => {
     switch (f.kind) {
       case "held-gold-low-hp":
-        return `Gold you didn't spend under 40 HP cost you ${f.hpCost} HP at ${listStages(f.stages)}`;
+        return f.stages.length > 1
+          ? `You went into ${listStages(f.stages)} under 40 HP with gold still in the bank, and lost both`
+          : `You went into ${f.stages[0]} under 40 HP with gold still in the bank, and lost`;
       case "unspent-gold":
         return `You died on ${last.stage} with ${last.goldEnd} gold that never reached your board`;
       case "missed-upgrade":
