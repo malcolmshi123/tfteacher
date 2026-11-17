@@ -134,7 +134,7 @@ function PickList({ title, tone, picks }: { title: string; tone: string; picks: 
             <h3 className="text-[16px] font-semibold tracking-tight">{pk.name}</h3>
             <div className="mt-3 flex flex-wrap gap-x-2 gap-y-3">
               {pk.units.map((u) => (
-                <UnitToken key={u} unitId={u} size={34} />
+                <UnitToken key={u} unitId={u} size={34} showName={false} />
               ))}
             </div>
             <p className="mt-3 text-[14px] leading-relaxed text-[var(--ink-2)]">{pk.why}</p>
@@ -162,9 +162,9 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
             <span className="rounded-md bg-[color-mix(in_oklab,var(--good)_13%,transparent)] px-2 py-0.5 text-[var(--good)]">{(() => { const k = v.lines.filter((l) => l.direction === "buff").length; return `${k} buff${k === 1 ? "" : "s"}`; })()}</span>
           </p>
         </div>
-        <div className="flex flex-wrap gap-x-1 gap-y-3 lg:shrink-0">
+        <div className="flex flex-wrap gap-x-2.5 gap-y-4 lg:max-w-[560px] lg:shrink-0 lg:justify-end">
           {v.comp.core.map((u) => (
-            <UnitToken key={u} unitId={u} size={44} />
+            <UnitToken key={u} unitId={u} size={44} showName={false} items={v.comp.items?.[u] ?? []} />
           ))}
         </div>
       </header>

@@ -23,6 +23,7 @@ export interface PlayedComp {
   avgPlace: number;
   top4: number; // percent
   flex?: string[]; // units that fit the board when the core is in place
+  items?: Record<string, string[]>; // recommended items on the board's carries
 }
 
 export interface CompVerdict {
@@ -102,6 +103,14 @@ export const MY_COMPS: PlayedComp[] = [
   comp("c2", "Ahri Morgana", "ahri", ["pebbles", "karma", "krug", "sentinel", "sett", "ahri", "morgana", "taric"], 6, 3.8, 67),
   comp("c3", "Tempo Riftbeast", "brambleback", ["pebbles", "murkwolf", "krug", "sentinel", "brambleback", "gnar", "taric", "elderdragon"], 4, 4.5, 50),
 ];
+
+// The usual three items on each board's carries, the same builds the sample games end with.
+const RECOMMENDED: Record<string, Record<string, string[]>> = {
+  c1: { khazix: ["hoj", "hoj", "rabadon"], hecarim: ["warmog", "gargoyle", "spirit"] },
+  c2: { ahri: ["shojin", "morello", "quicksilver"], krug: ["warmog", "gargoyle", "spirit"] },
+  c3: { brambleback: ["guinsoo", "eon", "quicksilver"], krug: ["warmog", "spirit", "gargoyle"] },
+};
+for (const c of MY_COMPS) c.items = RECOMMENDED[c.id];
 
 // The patch at a glance, beyond your own comps: what the changes add up to and
 // which kinds of boards they favor. Every pick names the note lines behind it.

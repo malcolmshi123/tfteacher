@@ -24,12 +24,14 @@ export function UnitToken({
   size = 52,
   state = "normal",
   showName = true,
+  items: extraItems,
 }: {
   piece?: Piece;
   unitId?: string;
   size?: number;
   state?: "normal" | "missed" | "bought" | "flex" | "dim";
   showName?: boolean;
+  items?: string[]; // items to show on a bare unit (recommended builds)
 }) {
   const id = piece?.unit ?? unitId!;
   const u = UNIT_BY_ID[id];
@@ -37,6 +39,13 @@ export function UnitToken({
   const star = piece?.star ?? 0;
   const small = size < 36;
   const b = small ? 1.5 : 2;
+  const items = piece?.items ?? extraItems ?? [];
+  // item icons: a row no wider than the portrait, so neighbours never touch
+  const GAP = 2;
+  const itemSize = (n: number) => Math.min(Math.round(size * 0.36), Math.floor((size - GAP * (n - 1)) / n));
+  // a quarter of the icon sits on the portrait, three quarters below its bottom edge
+  const below = (s: number) => Math.ceil(s * 0.75);
+  const reserve = piece || extraItems ? below(itemSize(3)) + 3 : 0;
   return (
     <div className="flex flex-col items-center gap-1.5" style={{ width: showName ? Math.max(size + 10, 76) : size, opacity: state === "dim" ? 0.55 : 1 }}>
       <div
@@ -45,8 +54,8 @@ export function UnitToken({
           width: size,
           height: size,
           borderRadius: Math.max(6, size * 0.18),
-          // board tiles always leave room for item icons, so names line up across a row
-          marginBottom: piece ? Math.round(size * 0.18) : 0,
+          // board tiles always leave room for three items, so names line up across a row
+          marginBottom: reserve,
           // the cost border always shows; a highlight is a second ring outside it
           boxShadow: HIGHLIGHT[state]
             ? `0 0 0 ${b}px ${color}, 0 0 0 ${b + 1.5}px var(--panel-2), 0 0 0 ${b + 3.5}px ${HIGHLIGHT[state]}`
@@ -71,19 +80,17 @@ export function UnitToken({
           </span>
         )}
 
-        {piece && piece.items.length > 0 && (
+        {items.length > 0 &&
           (() => {
-            const s = Math.max(11, Math.min(Math.round(size * 0.36), Math.floor((size - 3 * (piece.items.length - 1)) / piece.items.length)));
-            // the row's middle sits on the portrait's bottom edge, centered left to right
+            const s = itemSize(items.length);
             return (
-              <span className="absolute left-1/2 flex w-max -translate-x-1/2 gap-[3px]" style={{ bottom: -Math.round(s / 2) }}>
-                {piece.items.map((it, k) => (
+              <span className="absolute left-1/2 flex w-max -translate-x-1/2" style={{ gap: GAP, bottom: -below(s) }}>
+                {items.map((it, k) => (
                   <ItemIcon key={k} id={it} size={s} />
                 ))}
               </span>
             );
-          })()
-        )}
+          })()}
       </div>
       {showName && <span className="mt-0.5 block w-full truncate text-center text-[11px] leading-none text-[var(--ink-2)]" title={u.name}>{u.name}</span>}
     </div>
@@ -100,7 +107,7 @@ export function ItemIcon({ id, size = 14 }: { id: string; size?: number }) {
       width={size}
       height={size}
       className="block rounded-[3px]"
-      style={{ width: size, height: size, boxShadow: "0 0 0 1.5px var(--ink)" }}
+      style={{ width: size, height: size }}
     />
   );
 }
