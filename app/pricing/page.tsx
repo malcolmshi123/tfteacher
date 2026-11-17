@@ -118,7 +118,6 @@ function ProPreview() {
         <div className="text-[13px] font-medium text-[var(--muted)]">Patch Radar</div>
         <ul className="mt-1 divide-y divide-[var(--line)]">
           {verdicts.map((v, i) => {
-            const both = v.lines.some((l) => l.direction === "nerf") && v.lines.some((l) => l.direction === "buff");
             const [label, color] =
               v.verdict === "weaker" ? ["Nerfed", "var(--hp)"] : v.verdict === "stronger" ? ["Buffed", "var(--good)"] : v.verdict === "mixed" ? ["Mixed", "var(--gold)"] : ["Unchanged", "var(--muted)"];
             return (
@@ -129,10 +128,9 @@ function ProPreview() {
                 </span>
                 <span className="text-[13px] font-medium" style={{ color }}>
                   {label}
-                  {both && (v.verdict === "stronger" || v.verdict === "weaker") ? " overall" : ""}
                 </span>
                 <span
-                  className={`rounded-md px-1.5 py-0.5 text-center text-[12px] font-medium ${i === 0 ? "bg-[var(--panel-2)] text-[var(--ink-2)]" : "bg-[color-mix(in_oklab,var(--brand)_16%,transparent)] text-[var(--brand)]"}`}
+                  className={`w-11 rounded-md py-0.5 text-center text-[12px] font-medium ${i === 0 ? "bg-[var(--panel-2)] text-[var(--ink-2)]" : "bg-[color-mix(in_oklab,var(--brand)_16%,transparent)] text-[var(--brand)]"}`}
                 >
                   {i === 0 ? "Free" : "Pro"}
                 </span>
@@ -146,7 +144,7 @@ function ProPreview() {
       <div className="mt-auto border-t border-[var(--line)] px-6 py-4">
         <div className="flex items-baseline justify-between gap-3 text-[13px]">
           <span className="font-medium text-[var(--muted)]">Trends: where the HP went</span>
-          <span className="rounded-md bg-[color-mix(in_oklab,var(--brand)_16%,transparent)] px-1.5 py-0.5 text-[12px] font-medium text-[var(--brand)]">Pro</span>
+          <span className="w-11 shrink-0 rounded-md bg-[color-mix(in_oklab,var(--brand)_16%,transparent)] py-0.5 text-center text-[12px] font-medium text-[var(--brand)]">Pro</span>
         </div>
         {/* one bar of all HP lost over the games, split by stage */}
         <div className="mt-3 flex h-3 overflow-hidden rounded-full">

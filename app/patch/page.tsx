@@ -155,7 +155,7 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
         : TONE[v.verdict];
   return (
     <article className="overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--panel)]">
-      <header className="grid gap-5 border-b border-[var(--line)] p-6 lg:grid-cols-[minmax(0,1fr)_530px] lg:items-start lg:gap-8">
+      <header className="grid gap-5 border-b border-[var(--line)] p-6 lg:grid-cols-[minmax(0,1fr)_530px] lg:items-center lg:gap-8 lg:pr-[53px]">
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-[13px] font-medium" style={{ color: t.color }}>
             <span className="block h-2 w-2 rounded-full" style={{ background: t.color }} />

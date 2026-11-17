@@ -104,12 +104,12 @@ export default function Home() {
                 you rolled past, gold you never spent.
               </p>
             </div>
-            <div className="mt-10 grid gap-4 lg:grid-cols-2 lg:items-start">
+            <div className="mt-10 grid gap-4 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-start">
               <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
                 <div className="text-[13px] font-medium text-[var(--muted)]">What match history shows</div>
-                <div className="mt-5 flex flex-wrap gap-x-2.5 gap-y-4">
+                <div className="mt-5 flex flex-wrap gap-x-2.5 gap-y-4 lg:w-[510px]">
                   {last.board.map((p, i) => (
-                    <UnitToken key={i} piece={p} size={50} showName={false} />
+                    <UnitToken key={i} piece={p} size={42} showName={false} />
                   ))}
                 </div>
                 <dl className="tnum mt-5 grid grid-cols-3 gap-3 text-[13px]">
