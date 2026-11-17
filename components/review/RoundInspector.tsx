@@ -53,7 +53,7 @@ export function RoundInspector({
             : `Lost by ${by} unit${by === 1 ? "" : "s"}`;
 
   return (
-    <div className={bare ? "" : "rounded-2xl border border-[var(--line)] bg-[var(--panel)]"}>
+    <div className={bare ? "" : "rounded-2xl border border-[var(--line)] bg-[var(--panel)] lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:[scrollbar-width:thin]"}>
       <div className={`flex items-center justify-between gap-4 border-b border-[var(--line)] px-4 py-4 sm:px-5 sticky top-0 z-10 bg-[var(--panel)] ${bare ? "" : "rounded-t-2xl"}`}>
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-0.5">
           <h3 className="tnum whitespace-nowrap text-[22px] font-semibold tracking-tight">Round {r.stage}</h3>
@@ -75,10 +75,10 @@ export function RoundInspector({
       {takeaway && <p className="text-pretty border-b border-[var(--line)] px-4 py-3 text-[14px] leading-snug text-[var(--ink)] sm:px-5">{takeaway}</p>}
 
       <dl className="grid grid-cols-2 border-b border-[var(--line)] lg:grid-cols-4">
-        <Stat k="HP after combat" v={`${Math.max(0, r.hp - r.damageTaken)}`} sub={pt.lobbyAlive >= 4 ? `lobby ${pt.lobbyHp}` : `${pt.lobbyAlive} opponents left`} tone={pt.lobbyAlive < 4 ? undefined : r.hp - r.damageTaken < pt.lobbyHp ? "hp" : "good"} />
+        <Stat k="HP after combat" v={`${Math.max(0, r.hp - r.damageTaken)}`} sub={`lobby ${pt.lobbyHp}`} tone={r.hp - r.damageTaken < pt.lobbyHp ? "hp" : "good"} />
         <Stat k="Gold" v={`${r.gold}`} sub={`${r.goldEnd} into combat`} />
-        <Stat k="Level" v={`${r.level}`} sub={pt.lobbyAlive >= 4 ? `lobby ${pt.lobbyLevel}` : "no lobby median"} tone={pt.lobbyAlive < 4 ? undefined : r.level < pt.lobbyLevel ? "hp" : r.level > pt.lobbyLevel ? "good" : undefined} />
-        <Stat k="Board" v={`${pt.boardValue}`} sub={pt.lobbyAlive >= 4 ? `lobby ${pt.lobbyBoardValue}` : "no lobby median"} tone={pt.lobbyAlive < 4 ? undefined : pt.boardValue < pt.lobbyBoardValue ? "hp" : "good"} />
+        <Stat k="Level" v={`${r.level}`} sub={`lobby ${pt.lobbyLevel}`} tone={r.level < pt.lobbyLevel ? "hp" : r.level > pt.lobbyLevel ? "good" : undefined} />
+        <Stat k="Board" v={`${pt.boardValue}`} sub={`lobby ${pt.lobbyBoardValue}`} tone={pt.boardValue < pt.lobbyBoardValue ? "hp" : "good"} />
       </dl>
 
       <div className="space-y-5 px-4 py-5 sm:px-5">

@@ -26,7 +26,7 @@ export function MobileRounds({
   const after = (p: SeriesPoint) => Math.max(0, p.hp - p.damage);
   const y = (hp: number) => 6 + (H - 12) * (1 - hp / 100);
   const line = series.map((p, i) => `${i ? "L" : "M"}${x(i)},${y(after(p))}`).join(" ");
-  const lobby = series.filter((p) => p.lobbyAlive >= 4).map((p, i) => `${i ? "L" : "M"}${x(series.indexOf(p))},${y(p.lobbyHp)}`).join(" ");
+  const lobby = series.filter((p) => p.lobbyAlive >= 1).map((p, i) => `${i ? "L" : "M"}${x(series.indexOf(p))},${y(p.lobbyHp)}`).join(" ");
   const si = series.findIndex((p) => p.stage === selected);
   const hlIdx = series.map((p, i) => (hl.has(p.stage) ? i : -1)).filter((i) => i >= 0);
 
@@ -104,7 +104,7 @@ export function MobileRounds({
               <span className={`tnum text-[13px] ${sel ? "font-semibold text-[var(--ink)]" : "text-[var(--ink-2)]"}`}>{p.stage}</span>
               <span
                 className="block h-1.5 w-6 rounded-full"
-                style={{ background: bar, border: p.kind === "carousel" ? "1px dashed var(--ink-2)" : undefined }}
+                style={{ background: bar, border: p.kind === "carousel" ? "1px solid var(--ink-2)" : undefined }}
               />
               {p.kind === "carousel" ? <span className="h-[18px]" aria-hidden /> : <span className="tnum text-[13px] text-[var(--ink-2)]">{after(p)}</span>}
             </button>
@@ -118,7 +118,7 @@ export function MobileRounds({
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--good)]" />Won</span>
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--hp)]" />Lost</span>
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--line-2)]" />PvE</span>
-        <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full border border-dashed border-[var(--ink-2)]" />Carousel</span>
+        <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full border border-[var(--ink-2)]" />Carousel</span>
         <span className="w-full text-[var(--ink-2)]">Numbers on chips are HP after combat. Tap one to open it.</span>
       </p>
     </div>

@@ -134,7 +134,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
             <AskPanel gameId={game.id} onCite={openRound} suggested={suggestions} />
           </div>
         </section>
-        <aside className="hidden scroll-mt-24 lg:sticky lg:top-20 lg:block lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-y-auto lg:rounded-2xl lg:[scrollbar-width:thin]">
+        <aside className="hidden scroll-mt-24 lg:sticky lg:top-20 lg:block lg:self-start">
           <RoundInspector game={game} stage={round} series={series} findings={findings} onPick={setRound} />
         </aside>
       </div>
@@ -269,7 +269,7 @@ function Key({ color = "transparent", children, faint, solid, dashed, line, spen
   return (
     <span className="inline-flex items-center gap-1.5">
       <span
-        className={`block h-2.5 w-2.5 rounded-[3px] ${dashed ? "border border-dashed border-[var(--ink-2)]" : ""} ${faint ? "border border-[color-mix(in_oklab,var(--brand)_55%,transparent)]" : ""}`}
+        className={`block h-2.5 w-2.5 rounded-[3px] ${dashed ? "border border-[var(--ink-2)]" : ""} ${faint ? "border border-[color-mix(in_oklab,var(--brand)_55%,transparent)]" : ""}`}
         style={{ background: faint ? "color-mix(in oklab, var(--brand) 14%, transparent)" : color, opacity: solid || dashed || faint ? 1 : 0.85 }}
       />
       {children}

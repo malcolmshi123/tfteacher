@@ -60,7 +60,7 @@ export interface SeriesPoint {
   lobbyLevel: number;
   lobbyHp: number; // after this round's fights
   lobbyHpEntering: number; // before them (the previous round's roster)
-  lobbyAlive: number; // opponents still in after this round; the HP median means little under 4
+  lobbyAlive: number; // opponents still in after this round
   lobbyAliveEntering: number;
   outcome: RoundSnapshot["outcome"];
   kind: RoundSnapshot["kind"];
@@ -132,7 +132,7 @@ function streakBefore(R: RoundSnapshot[]): number[] {
 export function buildSeries(game: GameRecord): SeriesPoint[] {
   return game.rounds.map((r, i) => {
     const alive = r.roster.filter((o) => o.hp > 0);
-    // HP median counts knocked-out players at 0, so it can only go down
+    // medians are over the opponents still in the game, down to the last one
     const before = (game.rounds[i - 1] ?? r).roster;
     return {
       stage: r.stage,
@@ -143,8 +143,8 @@ export function buildSeries(game: GameRecord): SeriesPoint[] {
       boardValue: boardValue(r.board),
       lobbyBoardValue: Math.round(median(alive.map((o) => o.boardValue))),
       lobbyLevel: median(alive.map((o) => o.level)),
-      lobbyHp: Math.round(median(r.roster.map((o) => o.hp))),
-      lobbyHpEntering: Math.round(median(before.map((o) => o.hp))),
+      lobbyHp: Math.round(median(alive.map((o) => o.hp))),
+      lobbyHpEntering: Math.round(median(before.filter((o) => o.hp > 0).map((o) => o.hp))),
       lobbyAlive: alive.length,
       lobbyAliveEntering: before.filter((o) => o.hp > 0).length,
       outcome: r.outcome,
@@ -311,8 +311,7 @@ export function analyze(game: GameRecord): Review {
   // level 7+ where the bench holds extra copies of a board unit costing 3 or less
   const rerolling = (r: RoundSnapshot) =>
     r.level >= 7 && r.bench.some((b) => UNIT_BY_ID[b.unit].cost <= 3 && r.board.some((p) => p.unit === b.unit));
-  // a median needs at least 4 opponents; past that the chart drops it, so the finding does too
-  const withLobby = (p: SeriesPoint) => p.kind === "pvp" && p.lobbyAlive >= 4;
+  const withLobby = (p: SeriesPoint) => p.kind === "pvp" && p.lobbyAlive >= 1;
   const behind = series.filter((p, i) => withLobby(p) && p.stage >= "3-1" && p.level < p.lobbyLevel && !rerolling(R[i]));
   if (behind.length >= 3) {
     const counted = series.filter((p) => withLobby(p) && p.stage >= behind[0].stage);
@@ -323,7 +322,7 @@ export function analyze(game: GameRecord): Review {
       kind: "level-tempo",
       severity: behind.length >= 5 ? "medium" : "low",
       title: `Below lobby level in ${behind.length} of ${counted.length} fights ${range}`,
-      detail: `In the ${counted.length} fights ${range}, while at least 4 opponents were left, you were a level behind the lobby's median in ${behind.length}, and fewer slots meant a weaker board: at ${worst.stage} yours was worth ${worst.boardValue} against a lobby median of ${worst.lobbyBoardValue}.`,
+      detail: `In the ${counted.length} fights ${range}, you were a level behind the lobby's median in ${behind.length}, and fewer slots meant a weaker board: at ${worst.stage} yours was worth ${worst.boardValue} against a lobby median of ${worst.lobbyBoardValue}.`,
       advice: "Higher level means more units and better shop odds. If you are not rolling for a reroll comp, match the lobby's level by stage 4.",
       stages: behind.map((p) => p.stage),
       focus: worst.stage,
@@ -472,7 +471,7 @@ export function analyze(game: GameRecord): Review {
         return {
           label: `HP after ${keyStage}`,
           value: String(Math.max(0, R[k].hp - R[k].damageTaken)),
-          note: pt.lobbyAlive >= 4 ? `lobby median ${pt.lobbyHp}` : `${pt.lobbyAlive} opponents left`,
+          note: `lobby median ${pt.lobbyHp}`,
         };
       })(),
       { label: "Rerolls", value: String(totalRolls), note: "whole game" },

@@ -66,9 +66,16 @@ describe.each(allGames().map((g) => [g.game.id, g] as const))("game %s", (_id, {
     const facts = buildFacts(review);
     for (const s of checkAnswer(`${review.headline} ${review.shortHeadline} ${review.summary}`, facts)) expect(s.unsupported, s.text).toEqual([]);
   });
-  it("never shows the lobby median HP going up", () => {
+  it("takes the lobby median HP over opponents still alive", () => {
     const s = analyze(game).series;
-    for (let i = 1; i < s.length; i++) expect(s[i].lobbyHp, s[i].stage).toBeLessThanOrEqual(s[i - 1].lobbyHp);
+    game.rounds.forEach((r, i) => {
+      const alive = r.roster.filter((o) => o.hp > 0).map((o) => o.hp);
+      expect(s[i].lobbyAlive, r.stage).toBe(alive.length);
+      if (alive.length) {
+        expect(s[i].lobbyHp, r.stage).toBeGreaterThanOrEqual(Math.min(...alive));
+        expect(s[i].lobbyHp, r.stage).toBeLessThanOrEqual(Math.max(...alive));
+      }
+    });
   });
   it("ends on its comp's core board", () => {
     const core = MY_COMPS.find((c) => c.id === comp)!.core;

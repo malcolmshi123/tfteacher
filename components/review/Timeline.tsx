@@ -47,7 +47,7 @@ export function Timeline({
   const hpPath = series.map((p, i) => `${i ? "L" : "M"}${cx(i)},${hpY(after(p))}`).join(" ");
   const hpArea = `${hpPath} L${cx(n - 1)},${HP_TOP + HP_H} L${cx(0)},${HP_TOP + HP_H} Z`;
   // the lobby median stops once fewer than 4 opponents are left
-  const lobbyPath = series.filter((p) => p.lobbyAlive >= 4).map((p, i) => `${i ? "L" : "M"}${cx(series.indexOf(p))},${hpY(p.lobbyHp)}`).join(" ");
+  const lobbyPath = series.filter((p) => p.lobbyAlive >= 1).map((p, i) => `${i ? "L" : "M"}${cx(series.indexOf(p))},${hpY(p.lobbyHp)}`).join(" ");
   const hl = new Set(highlight ?? []);
 
   // stage boundaries
@@ -108,19 +108,6 @@ export function Timeline({
       </g>}
 
       <path d={hpArea} fill="url(#hpFill)" />
-      {(() => {
-        // say why the lobby line stops early
-        const lastLive = series.reduce((k, p, i) => (p.lobbyAlive >= 4 ? i : k), -1);
-        if (compact || lastLive < 0 || lastLive === series.length - 1) return null;
-        return (
-          <g>
-            <circle cx={cx(lastLive)} cy={hpY(series[lastLive].lobbyHp)} r={3} fill="var(--bg)" stroke="var(--ink-2)" strokeWidth={1.5} />
-            <text x={cx(lastLive) + 8} y={hpY(series[lastLive].lobbyHp) - 6} fontSize={FS - 1} fill="var(--muted)">
-              Lobby median ends: {series[lastLive + 1].lobbyAlive} opponents left
-            </text>
-          </g>
-        );
-      })()}
       <path d={lobbyPath} fill="none" stroke="var(--ink-2)" strokeOpacity={0.6} strokeWidth={1.5} strokeDasharray="3 3" />
       <path d={hpPath} fill="none" stroke="var(--hp)" strokeWidth={2.25} strokeLinejoin="round" />
       {series.map((p, i) =>
@@ -171,7 +158,7 @@ export function Timeline({
             fill={fill}
             fillOpacity={p.kind === "pve" ? 1 : 0.85}
             stroke={p.kind === "carousel" ? "var(--line-2)" : "none"}
-            strokeDasharray={p.kind === "carousel" ? "2 2" : undefined}
+            strokeDasharray={undefined}
           />
         );
       })}

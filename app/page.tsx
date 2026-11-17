@@ -126,16 +126,16 @@ export default function Home() {
                 <dl className="tnum mt-5 grid grid-cols-3 gap-3 text-[13px]">
                   <div>
                     <dt className="text-[var(--muted)]">Placement</dt>
-                    <dd className="mt-0.5"><PlaceBadge place={review.game.placement} /></dd>
+                    <dd className="mt-1"><PlaceBadge place={review.game.placement} size="md" /></dd>
                   </div>
                   <div>
                     <dt className="text-[var(--muted)]">Level</dt>
-                    <dd className="text-[18px] font-semibold">{last.level}</dd>
+                    <dd className="text-[26px] font-semibold leading-tight tracking-tight">{last.level}</dd>
                   </div>
                   <div>
                     <dt className="text-[var(--muted)]">Board value</dt>
-                    <dd className="text-[18px] font-semibold">
-                      {boardValue(last.board)} <span className="text-[13px] font-normal text-[var(--muted)]">gold</span>
+                    <dd className="text-[26px] font-semibold leading-tight tracking-tight">
+                      {boardValue(last.board)} <span className="text-[15px] font-normal text-[var(--muted)]">gold</span>
                     </dd>
                   </div>
                 </dl>
@@ -163,17 +163,17 @@ export default function Home() {
                 <dl className="tnum grid content-start gap-4 text-[13px] sm:border-l sm:border-[var(--line)] sm:pl-5">
                   <div>
                     <dt className="text-[var(--muted)]">HP after combat</dt>
-                    <dd className="text-[18px] font-semibold text-[var(--hp)]">{Math.max(0, r41.hp - r41.damageTaken)}</dd>
+                    <dd className="text-[26px] font-semibold leading-tight tracking-tight text-[var(--hp)]">{Math.max(0, r41.hp - r41.damageTaken)}</dd>
                   </div>
                   <div>
                     <dt className="text-[var(--muted)]">Gold</dt>
-                    <dd className="text-[18px] font-semibold">
-                      {r41.gold} <span className="text-[13px] font-normal text-[var(--muted)]">→ {r41.goldEnd}</span>
+                    <dd className="text-[26px] font-semibold leading-tight tracking-tight">
+                      {r41.gold} <span className="text-[16px] font-normal text-[var(--muted)]">→ {r41.goldEnd}</span>
                     </dd>
                   </div>
                   <div>
                     <dt className="text-[var(--muted)]">Rerolls</dt>
-                    <dd className="text-[18px] font-semibold">{r41.rerolls}</dd>
+                    <dd className="text-[26px] font-semibold leading-tight tracking-tight">{r41.rerolls}</dd>
                   </div>
                 </dl>
                 </div>
@@ -211,7 +211,7 @@ export default function Home() {
                           className="block h-1 w-5 rounded-full"
                           style={{
                             background: r.kind === "pvp" ? (r.outcome === "win" ? "var(--good)" : "var(--hp)") : r.kind === "pve" ? "var(--line-2)" : "transparent",
-                            border: r.kind === "carousel" ? "1px dashed var(--ink-2)" : undefined,
+                            border: r.kind === "carousel" ? "1px solid var(--ink-2)" : undefined,
                           }}
                         />
                         {r.kind === "carousel" ? <span className="h-[18px]" aria-hidden /> : <span className="tnum text-[13px] font-semibold">{Math.max(0, r.hp - r.damageTaken)}</span>}
