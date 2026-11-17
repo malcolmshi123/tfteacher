@@ -354,23 +354,26 @@ export function analyze(game: GameRecord): Review {
     });
   }
 
+  const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? "" : "s"}`;
   for (const f of findings) {
     if (f.positive) continue;
     f.cost =
       f.hpCost !== undefined
-        ? `${f.hpCost} HP`
+        ? `−${f.hpCost} HP`
         : f.goldCost !== undefined
           ? `${f.goldCost} gold unspent`
           : f.kind === "missed-upgrade"
-            ? `${f.stages.length} upgrades`
+            ? plural(f.stages.length, "upgrade")
             : f.kind === "idle-items"
-              ? `${f.lines?.length ?? 0} components`
+              ? plural(f.lines?.length ?? 0, "component")
               : f.kind === "level-tempo"
-                ? `${f.stages.length} fights behind`
+                ? `${plural(f.stages.length, "fight")} behind`
                 : undefined;
   }
 
-  findings.sort((a, b) => Number(!!a.positive) - Number(!!b.positive) || RANK[a.severity] - RANK[b.severity] || (b.hpCost ?? 0) - (a.hpCost ?? 0));
+  // one order a reader can check from the badges: HP lost first (most first), then gold unspent, then the rest by severity
+  const tier = (f: Finding) => (f.positive ? 3 : f.hpCost !== undefined ? 0 : f.goldCost !== undefined ? 1 : 2);
+  findings.sort((a, b) => tier(a) - tier(b) || (b.hpCost ?? 0) - (a.hpCost ?? 0) || (b.goldCost ?? 0) - (a.goldCost ?? 0) || RANK[a.severity] - RANK[b.severity]);
 
   const peakHpLoss = findings.find((f) => f.kind === "loss-streak");
   const streak = findings.find((f) => f.kind === "loss-streak");

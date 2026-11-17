@@ -79,12 +79,12 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
       </div>
 
       {/* stats */}
-      <dl className="mt-6 grid grid-cols-4 overflow-hidden rounded-t-2xl md:mt-8 border border-[var(--line)] bg-[var(--panel)] md:grid-cols-4">
+      <dl className="mt-6 grid grid-cols-2 overflow-hidden rounded-t-2xl border border-[var(--line)] bg-[var(--panel)] md:mt-8 md:grid-cols-4">
         {review.stats.map((s, i) => (
-          <div key={s.label} className={`min-w-0 px-2.5 py-3 md:px-5 md:py-4 ${i === 3 ? "" : "border-r border-[var(--line)]"}`}>
-            <dt className="truncate text-[11px] text-[var(--muted)] md:text-[12px]">{s.label}</dt>
-            <dd className="tnum mt-1 whitespace-nowrap text-[17px] font-semibold tracking-tight md:text-[26px]">{s.value}</dd>
-            {s.note && <dd className="tnum hidden text-[12px] text-[var(--muted)] md:block">{s.note}</dd>}
+          <div key={s.label} className={`min-w-0 border-[var(--line)] px-4 py-3 md:px-5 md:py-4 ${i % 2 === 0 ? "border-r" : ""} ${i < 2 ? "border-b md:border-b-0" : ""} ${i === 1 ? "md:border-r" : ""}`}>
+            <dt className="truncate text-[12px] text-[var(--muted)]">{s.label}</dt>
+            <dd className="tnum mt-1 whitespace-nowrap text-[22px] font-semibold tracking-tight md:text-[26px]">{s.value}</dd>
+            {s.note && <dd className="tnum truncate text-[12px] text-[var(--muted)]">{s.note}</dd>}
           </div>
         ))}
       </dl>
@@ -121,7 +121,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
               {(() => {
                 const bad = findings.filter((f) => !f.positive).length;
                 const good = findings.length - bad;
-                return `${bad} mistake${bad === 1 ? "" : "s"}, worst first${good ? ` · ${good} strength${good === 1 ? "" : "s"}` : ""}`;
+                return `${bad} mistake${bad === 1 ? "" : "s"}, most HP lost first${good ? ` · ${good} strength${good === 1 ? "" : "s"}` : ""}`;
               })()}
             </span>
           </div>

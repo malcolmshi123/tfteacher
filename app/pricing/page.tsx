@@ -158,10 +158,12 @@ function ProPreview() {
             />
           ))}
         </div>
-        <div className="tnum mt-2 flex text-[12px] text-[var(--ink-2)]">
+        {/* a legend, so even the thinnest segment is named */}
+        <div className="tnum mt-2.5 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-[var(--ink-2)]">
           {TREND.map((s) => (
-            <span key={s.stage} className="truncate" style={{ width: `${s.hp}%`, color: s === top ? "var(--ink)" : undefined }}>
-              {s.hp >= 15 ? `${s.stage} ${s.hp}%` : `${s.hp}%`}
+            <span key={s.stage} className="flex items-center gap-1.5" style={{ color: s === top ? "var(--ink)" : undefined }}>
+              <span className="block h-2 w-2 rounded-sm" style={{ background: s === top ? "var(--hp)" : "color-mix(in oklab, var(--hp) 38%, var(--panel-2))" }} />
+              {s.stage} {s.hp}%
             </span>
           ))}
         </div>
