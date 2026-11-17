@@ -3,12 +3,10 @@ import { SiteFooter, SiteNav } from "@/components/SiteChrome";
 import { UnitToken } from "@/components/UnitToken";
 import { allGames } from "@/lib/game/games";
 import { MY_COMPS } from "@/lib/patch/radar";
-import { analyze, ordinal } from "@/lib/review/engine";
+import { analyze, costTone, ordinal } from "@/lib/review/engine";
 
 export const metadata = { title: "Reviews · TFTeacher" };
 
-// same severity colors as the review page
-const sev = (s: string) => (s === "high" ? "var(--hp)" : s === "medium" ? "var(--gold)" : "var(--ink-2)");
 
 const COMP_NAME = Object.fromEntries(MY_COMPS.map((c) => [c.id, c.name]));
 
@@ -123,7 +121,7 @@ export default async function ReviewsPage({ searchParams }: { searchParams: Prom
                     {top.cost && (
                       <span
                         className="tnum mt-1.5 inline-block rounded-full px-2 py-0.5 text-[12px]"
-                        style={{ background: `color-mix(in oklab, ${sev(top.severity)} 13%, transparent)`, color: sev(top.severity) }}
+                        style={{ background: `color-mix(in oklab, ${costTone(top)} 13%, transparent)`, color: costTone(top) }}
                       >
                         {top.cost}
                       </span>

@@ -190,7 +190,7 @@ export default function Home() {
                     <span className="block h-2 w-2 rounded-full bg-[var(--hp)]" />
                     Recording
                   </span>
-                  <span className="tnum text-[var(--muted)]">{review.game.rounds.findIndex((r) => r.stage === r32.stage) + 1} rounds saved</span>
+                  <span className="tnum text-[var(--muted)]">{review.game.rounds.findIndex((r) => r.stage === r32.stage) + 1} rounds saved so far</span>
                 </div>
               }
             >

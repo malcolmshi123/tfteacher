@@ -432,6 +432,13 @@ export function analyze(game: GameRecord): Review {
   };
 }
 
+// Color for a finding's cost, the same on every page: HP and gold lost are red,
+// counts (upgrades, components, fights behind) are amber, strengths are green.
+export function costTone(f: Finding): string {
+  if (f.positive) return "var(--good)";
+  return f.hpCost !== undefined || f.goldCost !== undefined ? "var(--hp)" : "var(--gold)";
+}
+
 export function ordinal(n: number) {
   const s = ["th", "st", "nd", "rd"];
   const v = n % 100;

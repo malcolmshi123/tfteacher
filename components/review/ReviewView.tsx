@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ordinal, type Finding, type Review } from "@/lib/review/engine";
+import { costTone, ordinal, type Finding, type Review } from "@/lib/review/engine";
 import { AskPanel } from "./AskPanel";
 import { MobileRounds } from "./MobileRounds";
 import { RoundInspector } from "./RoundInspector";
@@ -143,7 +143,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
             <AskPanel gameId={game.id} onCite={openRound} suggested={suggestions} />
           </div>
         </section>
-        <aside className="hidden lg:sticky lg:top-20 lg:block lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-y-auto lg:rounded-2xl">
+        <aside className="hidden scroll-mt-24 lg:sticky lg:top-20 lg:block lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-y-auto lg:rounded-2xl">
           <RoundInspector game={game} stage={round} series={series} findings={findings} onPick={setRound} />
         </aside>
       </div>
@@ -151,16 +151,21 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
       {/* phone: the round opens in a bottom sheet */}
       {sheet && (
         <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label={`Round ${round}`}>
-          <button aria-label="Close" className="absolute inset-0 bg-black/85 backdrop-blur-[6px]" onClick={() => setSheet(false)} />
-          <div className="absolute inset-x-0 bottom-0 max-h-[68dvh] overflow-y-auto rounded-t-2xl border-t border-[var(--line-2)] bg-[var(--panel)] pb-6 pt-2 shadow-[0_-20px_60px_rgba(0,0,0,0.6)]">
+          <button aria-label="Close" className="absolute inset-0 bg-black/70" onClick={() => setSheet(false)} />
+          <div className="absolute inset-x-0 bottom-0 flex max-h-[86dvh] flex-col rounded-t-2xl border-t border-[var(--line-2)] bg-[var(--panel)] pt-2 shadow-[0_-20px_60px_rgba(0,0,0,0.6)]">
             {/* the handle is the close control: tap it (or the dimmed page) to close */}
             <button onClick={() => setSheet(false)} aria-label="Close round" className="flex w-full justify-center pb-2 pt-1">
               <span className="block h-1 w-10 rounded-full bg-[var(--ink-2)] opacity-50" aria-hidden />
             </button>
-            <RoundInspector game={game} stage={round} series={series} findings={findings} onPick={setRound} bare />
-            <button onClick={() => setSheet(false)} className="mx-4 mt-3 w-[calc(100%-2rem)] rounded-xl border border-[var(--line-2)] py-3 text-[15px] font-medium">
-              Close
-            </button>
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+              <RoundInspector game={game} stage={round} series={series} findings={findings} onPick={setRound} bare />
+            </div>
+            {/* the way out stays on screen */}
+            <div className="border-t border-[var(--line)] bg-[var(--panel)] px-4 pb-[max(env(safe-area-inset-bottom),12px)] pt-3">
+              <button onClick={() => setSheet(false)} className="w-full rounded-xl bg-[var(--ink)] py-3 text-[15px] font-semibold text-[var(--bg)]">
+                Done
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -170,7 +175,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
 
 function FindingCard({ f, active, lead, onClick, onCite, children }: { f: Finding; active: boolean; lead?: boolean; onClick: () => void; onCite: (stage: string) => void; children?: React.ReactNode }) {
   const quiet = !active && !lead;
-  const tone = f.positive ? "var(--good)" : f.severity === "high" ? "var(--hp)" : f.severity === "medium" ? "var(--gold)" : "var(--muted)";
+  const tone = costTone(f);
   const label = f.positive ? "Went well" : lead ? `Biggest cost · ${f.cost}` : f.cost ?? "Minor";
   return (
     <li

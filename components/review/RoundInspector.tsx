@@ -3,7 +3,7 @@
 import { HighlightSwatch, ItemChip, UnitToken } from "@/components/UnitToken";
 import { UNIT_BY_ID } from "@/lib/game/set";
 import type { GameRecord } from "@/lib/game/types";
-import { shopMarks, type Finding, type SeriesPoint } from "@/lib/review/engine";
+import { costTone, shopMarks, type Finding, type SeriesPoint } from "@/lib/review/engine";
 
 export function RoundInspector({
   game,
@@ -127,7 +127,7 @@ export function RoundInspector({
             <ul className="space-y-1.5 pt-1">
               {here.map((f) => (
                 <li key={f.id} className="flex items-start gap-2 text-[13px] leading-snug text-[var(--ink-2)]">
-                  <span className="mt-[6px] block h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: f.positive ? "var(--good)" : f.severity === "high" ? "var(--hp)" : "var(--gold)" }} />
+                  <span className="mt-[6px] block h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: costTone(f) }} />
                   {f.title}
                 </li>
               ))}
