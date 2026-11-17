@@ -1,6 +1,7 @@
 import { SiteFooter, SiteNav } from "@/components/SiteChrome";
 import { UnitToken } from "@/components/UnitToken";
 import { allGames } from "@/lib/game/games";
+import { UNIT_BY_ID } from "@/lib/game/set";
 import { NOTES, PATCH, PATCH_SUMMARY, changePct, radar, type CompVerdict, type NoteLine, type PatchPick } from "@/lib/patch/radar";
 
 export const metadata = { title: "Patch Radar · TFTeacher" };
@@ -154,6 +155,7 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
             {t.label}
           </div>
           <h3 className="mt-2 text-[22px] font-semibold tracking-tight">{v.comp.name}</h3>
+          <p className="tnum mt-1 text-[13px] text-[var(--ink-2)]">{traitLine(v.comp.core)}</p>
           <p className="tnum mt-2 flex gap-2 text-[13px]">
             <span className="rounded-md bg-[color-mix(in_oklab,var(--hp)_13%,transparent)] px-2 py-0.5 text-[var(--hp)]">{(() => { const k = v.lines.filter((l) => l.direction === "nerf").length; return `${k} nerf${k === 1 ? "" : "s"}`; })()}</span>
             <span className="rounded-md bg-[color-mix(in_oklab,var(--good)_13%,transparent)] px-2 py-0.5 text-[var(--good)]">{(() => { const k = v.lines.filter((l) => l.direction === "buff").length; return `${k} buff${k === 1 ? "" : "s"}`; })()}</span>
@@ -269,6 +271,13 @@ function NoteRow({ n, note }: { n: NoteLine; note?: string }) {
       </span>
     </li>
   );
+}
+
+// the traits a board runs at 2 or more units, biggest first
+function traitLine(core: string[]) {
+  const n = new Map<string, number>();
+  for (const u of core) for (const t of UNIT_BY_ID[u]?.traits ?? []) n.set(t, (n.get(t) ?? 0) + 1);
+  return [...n].filter(([, k]) => k >= 2).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([t, k]) => `${k} ${t}`).join(" · ");
 }
 
 function Delta({ n }: { n: NoteLine }) {

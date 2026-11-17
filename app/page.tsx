@@ -21,6 +21,19 @@ export default function Home() {
     return marks.bought.has(key) ? "bought" : marks.missed.has(key) ? "missed" : flex.has(u) ? "flex" : "dim";
   };
   const anyMissed = marks.missed.size > 0;
+  // which unit was missed, and the copies you already held when it showed up
+  const missedNote = (() => {
+    const key = [...marks.missed][0];
+    if (!key) return "";
+    const [si, k] = key.split(":").map(Number);
+    const u = r41.shops[si]?.[k];
+    if (!u) return "";
+    const onBoard = r41.board.filter((p) => p.unit === u && p.star === 1).length;
+    const onBench = r41.bench.filter((p) => p.unit === u && p.star === 1).length;
+    if (onBoard + onBench !== 2) return "";
+    const where = onBoard && onBench ? "one on your board and one on the bench" : onBoard ? "two on your board" : "two on the bench";
+    return `Missed: the ${UNIT_BY_ID[u].name} in Roll ${si}. You had ${where}, so it was a 2-star.`;
+  })();
   const xpCost = r41.xpBought * 4;
   const rollCost = r41.rerolls * 2;
   const buyCost = r41.bought.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0);
@@ -166,6 +179,7 @@ export default function Home() {
                   {anyMissed && <span className="flex items-center gap-1.5"><HighlightSwatch state="missed" />Missed</span>}
                   <span className="flex items-center gap-1.5"><HighlightSwatch state="flex" />Flex option</span>
                 </div>
+                {missedNote && <p className="mt-3 text-[13px] leading-relaxed text-[var(--ink-2)]">{missedNote}</p>}
                 <p className="tnum mt-3 text-[13px] text-[var(--muted)]">
                   {r41.gold} gold: {xpCost > 0 && <>{xpCost} on XP, </>}{rollCost} on {r41.rerolls} rerolls, {buyCost} on {r41.bought.length} unit buys, plus {soldFor} for selling{" "}
                   {soldNames}. {r41.goldEnd} left.

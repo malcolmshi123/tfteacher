@@ -101,8 +101,10 @@ export default async function ReviewsPage({ searchParams }: { searchParams: Prom
                     className="tnum flex h-12 w-12 items-center justify-center rounded-xl font-semibold md:h-14 md:w-14"
                     style={{ background: `color-mix(in oklab, ${color} 16%, var(--panel-2))`, color }}
                   >
-                    <span className="text-[22px] leading-none">{game.placement}</span>
-                    <span className="ml-[2px] self-start pt-[11px] text-[11px] leading-none md:pt-[14px]">{ordinal(game.placement).slice(String(game.placement).length)}</span>
+                    <span className="text-[22px] leading-none">
+                      {game.placement}
+                      <span className="ml-px text-[13px] font-medium">{ordinal(game.placement).slice(String(game.placement).length)}</span>
+                    </span>
                   </span>
                   <div className="min-w-0">
                     <div className="truncate text-[16px] font-semibold">{COMP_NAME[comp]}</div>

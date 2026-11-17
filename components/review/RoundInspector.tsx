@@ -203,7 +203,7 @@ function Stat({ k, v, sub, tone }: { k: string; v: string; sub?: string; tone?: 
   return (
     <div className="border-b border-r border-[var(--line)] px-4 py-3.5 even:border-r-0 sm:px-5 [&:nth-child(n+3)]:border-b-0">
       <dt className="text-[12px] text-[var(--muted)]">{k}</dt>
-      <dd className="tnum mt-0.5 text-[20px] font-semibold tracking-tight" style={{ color: tone === "hp" ? "var(--hp)" : tone === "good" ? "var(--good)" : undefined }}>
+      <dd className="tnum mt-0.5 text-[20px] font-semibold tracking-tight">
         {v}
       </dd>
       {sub && (

@@ -112,7 +112,7 @@ export interface PatchPick {
 }
 
 export const PATCH_SUMMARY: { lead: string; up: string[]; down: string[]; tryThese: PatchPick[]; avoid: PatchPick[] } = {
-  lead: "18.5 mostly helps AP carries, Fae and Taric.",
+  lead: "18.5 mostly helps AP 4-costs, Fae and front lines.",
   up: ["Fae", "Morgana", "Soraka", "Sett", "Taric", "Brambleback"],
   down: ["Blackthorn", "Rapidfire", "Flora Fatalis healing", "Elderwood (9)", "Riftbeast (7)", "Kha'Zix damage", "Azir damage", "Mama Beak damage", "Sentinel stun"],
   tryThese: [
@@ -123,16 +123,16 @@ export const PATCH_SUMMARY: { lead: string; up: string[]; down: string[]; tryThe
       lines: ["t-fae-1", "t-fae-2", "t-fae-3", "t-fae-4", "u-tristana-1", "u-tristana-2"],
     },
     {
-      name: "AP 4-costs: Morgana, Soraka, Sett",
-      why: "Morgana's curse and Soraka's stars deal more damage, and Sett heals more, so AP boards built around them gain the most.",
-      units: ["morgana", "soraka", "sett"],
-      lines: ["u-morgana-1", "u-morgana-2", "u-soraka-1", "u-soraka-2", "u-sett-1"],
+      name: "AP 4-costs",
+      why: "Morgana's curse and Soraka's stars both deal more damage, so AP boards built around them gain the most.",
+      units: ["morgana", "soraka"],
+      lines: ["u-morgana-1", "u-morgana-2", "u-soraka-1", "u-soraka-2"],
     },
     {
-      name: "Taric frontlines",
-      why: "Taric gets more resists and much stronger empowered attacks, so any board that can fit him gets a sturdier front line.",
-      units: ["taric"],
-      lines: ["u-taric-1", "u-taric-2"],
+      name: "Sturdier front lines",
+      why: "Taric gets more resists and much stronger empowered attacks, and Sett heals more, so boards that fit either hold the front longer.",
+      units: ["taric", "sett"],
+      lines: ["u-taric-1", "u-taric-2", "u-sett-1"],
     },
   ],
   avoid: [

@@ -295,8 +295,8 @@ export function analyze(game: GameRecord): Review {
       id: "level-tempo",
       kind: "level-tempo",
       severity: behind.length >= 5 ? "medium" : "low",
-      title: `Below lobby level in ${behind.length} fights from stage 3 on`,
-      detail: `You were a level behind the lobby's median in ${behind.length} of ${series.filter((p) => p.kind === "pvp" && p.stage >= "3-1").length} fights from stage 3 on. It started at ${behind[0].stage}, and fewer slots meant a weaker board: at ${worst.stage} yours was worth ${worst.boardValue} against a lobby median of ${worst.lobbyBoardValue}.`,
+      title: `Below lobby level in ${behind.length} of ${series.filter((p) => p.kind === "pvp" && p.stage >= behind[0].stage).length} fights from ${behind[0].stage} on`,
+      detail: `From ${behind[0].stage} on you were a level behind the lobby's median in ${behind.length} of ${series.filter((p) => p.kind === "pvp" && p.stage >= behind[0].stage).length} fights, and fewer slots meant a weaker board: at ${worst.stage} yours was worth ${worst.boardValue} against a lobby median of ${worst.lobbyBoardValue}.`,
       advice: "Higher level means more units and better shop odds. If you are not rolling for a reroll comp, match the lobby's level by stage 4.",
       stages: behind.map((p) => p.stage),
       focus: worst.stage,
@@ -393,7 +393,7 @@ export function analyze(game: GameRecord): Review {
     const allRolls = rolls === totalRolls ? `all ${rolls} of your rerolls came in the last ${after.length} rounds` : `you rolled ${rolls} times in the last ${after.length} rounds`;
     // rolls that bought no board strength are worth saying out loud
     const flat = boardValue(R[k].board) === boardValue(last.board) && rolls > 0;
-    summary = `The streak took ${peakHpLoss.hpCost} HP for ${gold} gold. After it, ${allRolls}${flat ? " without making your board any stronger" : ""}, and you lost ${losses} of the ${after.filter((r) => r.kind === "pvp").length} fights that were left.`;
+    summary = `The streak took ${peakHpLoss.hpCost} HP for ${gold} gold. After it, ${allRolls}${flat ? `, yet your units were still worth ${boardValue(last.board)} gold at the end` : ""}, and you lost ${losses} of the ${after.filter((r) => r.kind === "pvp").length} fights that were left.`;
   } else {
     const fights = R.filter((r) => r.kind === "pvp");
     const lost = fights.filter((r) => r.outcome === "loss").length;
