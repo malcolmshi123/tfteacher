@@ -16,6 +16,12 @@ const TONE = {
 export default function PatchPage() {
   const verdicts = radar();
   // lines that touch two or more of your comps are shown once, above the cards
+  // "the rest" means it: only lines that touch none of your comps
+  const covered = new Set(verdicts.flatMap((v) => v.lines.map((l) => l.id)));
+  const outside = (lines: string[]) => lines.some((id) => !covered.has(id));
+  const restUp = PATCH_SUMMARY.up.filter((c) => outside(c.lines));
+  const restDown = PATCH_SUMMARY.down.filter((c) => outside(c.lines));
+  const names = (xs: { label: string }[]) => (xs.length <= 1 ? xs.map((x) => x.label).join("") : `${xs.slice(0, -1).map((x) => x.label).join(", ")} and ${xs[xs.length - 1].label}`);
   const touches = (id: string) => verdicts.filter((v) => v.lines.some((l) => l.id === id)).map((v) => v.comp.name);
   const shared = NOTES.filter((n) => touches(n.id).length >= 2);
   const sharedIds = new Set(shared.map((n) => n.id));
@@ -93,9 +99,11 @@ export default function PatchPage() {
 
         <section id="rest" className="mt-20 scroll-mt-20 border-t border-[var(--line)] pt-12">
           <h2 className="text-[28px] font-semibold tracking-[-0.02em]">The rest of {PATCH.to}</h2>
-          <p className="mt-2 text-[17px] text-[var(--ink)]">{PATCH_SUMMARY.lead}</p>
+          <p className="mt-2 text-[17px] text-[var(--ink)]">
+            Outside your comps, {PATCH.to} helps {names(restUp)} and hurts {names(restDown)}.
+          </p>
           <dl className="mt-5 grid gap-3 text-[14px] sm:grid-cols-[96px_minmax(0,1fr)] sm:items-start">
-            {([["Stronger", "var(--good)", PATCH_SUMMARY.up], ["Weaker", "var(--hp)", PATCH_SUMMARY.down]] as const).map(([k, c, items]) => (
+            {([["Stronger", "var(--good)", restUp], ["Weaker", "var(--hp)", restDown]] as const).map(([k, c, items]) => (
               <div key={k} className="contents">
                 <dt className="pt-1 font-medium" style={{ color: c }}>
                   {k}
@@ -111,8 +119,8 @@ export default function PatchPage() {
             ))}
           </dl>
           <div className="mt-6 grid gap-4 md:grid-cols-2">
-            <PickList title="Worth trying" tone="var(--good)" picks={PATCH_SUMMARY.tryThese} />
-            <PickList title="Worth avoiding" tone="var(--hp)" picks={PATCH_SUMMARY.avoid} />
+            <PickList title="Worth trying" tone="var(--good)" picks={PATCH_SUMMARY.tryThese.filter((p) => outside(p.lines))} />
+            <PickList title="Worth avoiding" tone="var(--hp)" picks={PATCH_SUMMARY.avoid.filter((p) => outside(p.lines))} />
           </div>
         </section>
       </main>

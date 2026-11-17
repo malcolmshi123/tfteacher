@@ -12,6 +12,7 @@ export function RoundInspector({
   findings,
   onPick,
   bare = false,
+  onClose,
 }: {
   game: GameRecord;
   stage: string;
@@ -19,6 +20,7 @@ export function RoundInspector({
   findings: Finding[];
   onPick: (id: string) => void;
   bare?: boolean;
+  onClose?: () => void;
 }) {
   const idx = game.rounds.findIndex((r) => r.stage === stage);
   const r = game.rounds[idx];
@@ -62,6 +64,11 @@ export function RoundInspector({
         <div className="flex gap-1">
           <NavBtn disabled={!prev} onClick={() => prev && onPick(prev.stage)} label="Previous round">‹</NavBtn>
           <NavBtn disabled={idx >= game.rounds.length - 1} onClick={() => game.rounds[idx + 1] && onPick(game.rounds[idx + 1].stage)} label="Next round">›</NavBtn>
+          {onClose && (
+            <NavBtn onClick={onClose} label="Close">
+              ×
+            </NavBtn>
+          )}
         </div>
       </div>
 
@@ -70,19 +77,11 @@ export function RoundInspector({
       <dl className="grid grid-cols-2 border-b border-[var(--line)] lg:grid-cols-4">
         <Stat k="HP after combat" v={`${Math.max(0, r.hp - r.damageTaken)}`} sub={pt.lobbyAlive >= 4 ? `lobby ${pt.lobbyHp}` : `${pt.lobbyAlive} opponents left`} tone={pt.lobbyAlive < 4 ? undefined : r.hp - r.damageTaken < pt.lobbyHp ? "hp" : "good"} />
         <Stat k="Gold" v={`${r.gold}`} sub={`${r.goldEnd} into combat`} />
-        <Stat k="Level" v={`${r.level}`} sub={pt.lobbyAlive >= 4 ? `lobby ${pt.lobbyLevel}` : undefined} tone={pt.lobbyAlive < 4 ? undefined : r.level < pt.lobbyLevel ? "hp" : r.level > pt.lobbyLevel ? "good" : undefined} />
-        <Stat k="Board" v={`${pt.boardValue}`} sub={pt.lobbyAlive >= 4 ? `lobby ${pt.lobbyBoardValue}` : undefined} tone={pt.lobbyAlive < 4 ? undefined : pt.boardValue < pt.lobbyBoardValue ? "hp" : "good"} />
+        <Stat k="Level" v={`${r.level}`} sub={pt.lobbyAlive >= 4 ? `lobby ${pt.lobbyLevel}` : "no lobby median"} tone={pt.lobbyAlive < 4 ? undefined : r.level < pt.lobbyLevel ? "hp" : r.level > pt.lobbyLevel ? "good" : undefined} />
+        <Stat k="Board" v={`${pt.boardValue}`} sub={pt.lobbyAlive >= 4 ? `lobby ${pt.lobbyBoardValue}` : "no lobby median"} tone={pt.lobbyAlive < 4 ? undefined : pt.boardValue < pt.lobbyBoardValue ? "hp" : "good"} />
       </dl>
 
       <div className="space-y-5 px-4 py-5 sm:px-5">
-        <Section title="Board when combat started">
-          <div className="flex flex-wrap justify-center gap-y-4 pt-3 [&>*]:basis-1/4">
-            {r.board.map((p, i) => (
-              <UnitToken key={i} piece={p} size={bare ? 34 : 38} />
-            ))}
-          </div>
-        </Section>
-
         {(
           <Section title="Gold this round">
             <dl className="tnum mt-1 divide-y divide-[var(--line)] text-[13px]">
@@ -103,6 +102,14 @@ export function RoundInspector({
             </dl>
           </Section>
         )}
+
+        <Section title="Board when combat started">
+          <div className="flex flex-wrap justify-center gap-y-4 pt-3 [&>*]:basis-1/4">
+            {r.board.map((p, i) => (
+              <UnitToken key={i} piece={p} size={bare ? 34 : 38} />
+            ))}
+          </div>
+        </Section>
 
         <Section title="Bench">
           {r.bench.length > 0 ? (
@@ -206,7 +213,7 @@ function NavBtn({ children, onClick, disabled, label }: { children: React.ReactN
       aria-label={label}
       disabled={disabled}
       onClick={onClick}
-      className="grid h-11 w-11 place-items-center rounded-lg text-[18px] leading-none text-[var(--muted)] transition-colors hover:bg-[var(--panel-2)] hover:text-[var(--ink)] disabled:opacity-30 sm:h-8 sm:w-8"
+      className="grid h-11 w-11 place-items-center rounded-lg bg-[var(--panel-2)] text-[24px] leading-none text-[var(--ink-2)] transition-colors hover:text-[var(--ink)] disabled:opacity-30 lg:h-8 lg:w-8 lg:bg-transparent lg:text-[18px]"
     >
       {children}
     </button>

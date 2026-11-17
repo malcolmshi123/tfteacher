@@ -127,14 +127,14 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
           </div>
           <ol className="space-y-3">
             {findings.map((f, i) => (
-              <FindingCard key={f.id} f={f} lead={i === 0} active={f.id === active} onClick={() => pick(f)} onCite={(s) => { setActive(f.id); openRound(s); }} />
+              <FindingCard key={f.id} f={f} rank={f.positive ? undefined : i + 1} lead={i === 0} active={f.id === active} onClick={() => pick(f)} onCite={(s) => { setActive(f.id); openRound(s); }} />
             ))}
           </ol>
           <div className="mt-6">
             <AskPanel gameId={game.id} onCite={openRound} suggested={suggestions} />
           </div>
         </section>
-        <aside className="hidden scroll-mt-24 lg:sticky lg:top-20 lg:block lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-y-auto lg:rounded-2xl lg:[mask-image:linear-gradient(to_bottom,black_calc(100%-48px),transparent)] lg:pb-10">
+        <aside className="hidden scroll-mt-24 lg:sticky lg:top-20 lg:block lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-y-auto lg:rounded-2xl lg:[scrollbar-width:thin]">
           <RoundInspector game={game} stage={round} series={series} findings={findings} onPick={setRound} />
         </aside>
       </div>
@@ -149,14 +149,10 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
               <span className="block h-1 w-10 rounded-full bg-[var(--ink-2)] opacity-50" aria-hidden />
             </button>
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-              <RoundInspector game={game} stage={round} series={series} findings={findings} onPick={setRound} bare />
+              <RoundInspector game={game} stage={round} series={series} findings={findings} onPick={setRound} onClose={() => setSheet(false)} bare />
             </div>
             {/* the way out stays on screen */}
-            <div className="border-t border-[var(--line)] bg-[var(--panel)] px-4 pb-[max(env(safe-area-inset-bottom),12px)] pt-3">
-              <button onClick={() => setSheet(false)} className="w-full rounded-xl bg-[var(--ink)] py-3 text-[15px] font-semibold text-[var(--bg)]">
-                Done
-              </button>
-            </div>
+            <div className="pb-[max(env(safe-area-inset-bottom),8px)]" />
           </div>
         </div>
       )}
@@ -164,7 +160,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
   );
 }
 
-function FindingCard({ f, active, lead, onClick, onCite, children }: { f: Finding; active: boolean; lead?: boolean; onClick: () => void; onCite: (stage: string) => void; children?: React.ReactNode }) {
+function FindingCard({ f, rank, active, lead, onClick, onCite, children }: { f: Finding; rank?: number; active: boolean; lead?: boolean; onClick: () => void; onCite: (stage: string) => void; children?: React.ReactNode }) {
   const quiet = !active && !lead;
   const tone = costTone(f);
   const label = f.positive ? "Went well" : lead ? `Biggest cost · ${f.cost}` : f.cost ?? "Minor";
@@ -177,9 +173,16 @@ function FindingCard({ f, active, lead, onClick, onCite, children }: { f: Findin
       onClick={onClick}
     >
       <div className="flex items-start gap-3">
-        {!lead && <span className="mt-[7px] hidden h-2 w-2 shrink-0 rounded-full sm:block" style={{ background: tone }} />}
+        {/* rank, in the order the header promises: most HP lost first */}
+        <span
+          className="tnum mt-[1px] grid h-6 w-6 shrink-0 place-items-center rounded-full text-[12px] font-semibold"
+          style={{ color: tone, background: `color-mix(in oklab, ${tone} 15%, transparent)` }}
+          aria-label={rank ? `Mistake ${rank}` : "Strength"}
+        >
+          {rank ?? "✓"}
+        </span>
         <div className="min-w-0 flex-1">
-          <div className={`flex flex-col-reverse items-start justify-between gap-x-3 gap-y-2 sm:flex-row`}>
+          <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1.5">
             <h3 className={`${lead ? "text-[18px] sm:text-[20px]" : "text-[16px]"} font-semibold leading-snug tracking-tight`}>{f.title}</h3>
             <span className="tnum shrink-0 rounded-full px-2 py-0.5 text-[12px] font-medium" style={{ color: tone, background: `color-mix(in oklab, ${tone} 13%, transparent)` }}>
               {label}
@@ -187,7 +190,7 @@ function FindingCard({ f, active, lead, onClick, onCite, children }: { f: Findin
           </div>
           <p className={`mt-2 ${lead ? "text-[15px]" : "text-[14px]"} leading-relaxed text-[var(--ink-2)]`}>{f.detail}</p>
           {quiet && (
-            <span className="mt-3 inline-flex items-center gap-1.5 text-[13px] text-[var(--ink-2)] transition-colors group-hover:text-[var(--ink)]">
+            <span className="mt-2 flex min-h-11 w-full items-center gap-1.5 text-[13px] font-medium text-[var(--brand)] transition-opacity group-hover:opacity-80 sm:mt-3 sm:inline-flex sm:min-h-0 sm:w-auto">
               {f.positive ? "Show rounds" : "Show rounds and fix"}
               <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden>
                 <path d="M2.5 3.8 5 6.3l2.5-2.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -216,7 +219,7 @@ function FindingCard({ f, active, lead, onClick, onCite, children }: { f: Findin
             </ul>
           )}
           {(active || lead) && (
-            <p className="mt-3 rounded-xl border border-[var(--line)] bg-[var(--bg)] px-4 py-3 text-[14px] leading-relaxed text-[var(--ink)]">
+            <p className="mt-3 text-[14px] leading-relaxed text-[var(--ink)]">
               <span className="font-medium text-[var(--brand)]">Next game: </span>
               {f.advice}
             </p>

@@ -7,7 +7,7 @@ import { buildSampleGame } from "@/lib/game/sample";
 import { analyze, boardValue, shopMarks } from "@/lib/review/engine";
 import { PlaceBadge } from "@/components/PlaceBadge";
 import { UNIT_BY_ID } from "@/lib/game/set";
-import { MY_COMPS } from "@/lib/patch/radar";
+import { MY_COMPS, PATCH, radar } from "@/lib/patch/radar";
 
 export default function Home() {
   const review = analyze(buildSampleGame());
@@ -32,13 +32,24 @@ export default function Home() {
   const r32 = review.game.rounds.find((r) => r.stage === "3-2")!;
   const r43 = review.game.rounds.find((r) => r.stage === "4-3")!;
   const r45 = review.game.rounds.find((r) => r.stage === "4-5")!;
+  // the recording so far, up to the round the step chip has always shown
+  const saved = review.game.rounds.slice(0, review.game.rounds.findIndex((r) => r.stage === r32.stage) + 1);
+  const radar0 = radar()[0];
+  // the claim's numbers and where each comes from in the recording
+  const checks: [string, string, string][] = [
+    [`${r43.hp} HP`, "4-3", "HP at the start of the round"],
+    [`${r43.goldEnd} gold`, "4-3", "gold taken into combat"],
+    [`${r43.damageTaken} HP`, "4-3", "damage taken"],
+    [`${r45.hp} HP`, "4-5", "HP at the start of the round"],
+    [`${r45.goldEnd} gold`, "4-5", "gold taken into combat"],
+  ];
 
   return (
     <>
       <SiteNav />
       <main>
         {/* hero */}
-        <section className="mx-auto grid max-w-[1240px] gap-10 px-4 pb-16 pt-12 md:px-6 md:pt-20 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:items-start lg:gap-14">
+        <section className="mx-auto grid max-w-[1240px] gap-10 px-4 pb-16 pt-12 md:px-6 md:pt-20 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:items-center lg:gap-14">
           <div className="lg:pt-14">
             <h1 className="text-[40px] font-semibold leading-[1.04] tracking-[-0.035em] text-balance md:text-[56px]">
               Find out why you went 8th.
@@ -190,13 +201,21 @@ export default function Home() {
             <Step
               title="Play with the app open"
               visual={
-                <div className="flex items-center justify-between rounded-xl border border-[var(--line)] bg-[var(--panel)] px-4 py-3 text-[13px]">
-                  <span className="flex items-center gap-2 text-[var(--ink-2)]">
-                    <span className="block h-2 w-2 rounded-full bg-[var(--hp)]" />
-                    Recording
-                  </span>
-                  <span className="tnum text-[var(--muted)]">{review.game.rounds.findIndex((r) => r.stage === r32.stage) + 1} rounds saved so far</span>
-                </div>
+                <StepFrame label={`${saved.length} rounds saved so far`}>
+                  {/* the round strip from the review, as it fills during a game */}
+                  <div className="flex gap-1.5">
+                    {saved.slice(-6).map((r) => (
+                      <div key={r.stage} className="flex h-[60px] w-12 shrink-0 flex-col items-center justify-between rounded-xl border border-[var(--line)] bg-[var(--bg)] py-2">
+                        <span className="tnum text-[12px] text-[var(--ink-2)]">{r.stage}</span>
+                        <span
+                          className="block h-1 w-5 rounded-full"
+                          style={{ background: r.kind === "pvp" ? (r.outcome === "win" ? "var(--good)" : "var(--hp)") : "var(--line-2)" }}
+                        />
+                        <span className="tnum text-[13px] font-semibold">{Math.max(0, r.hp - r.damageTaken)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </StepFrame>
               }
             >
               The desktop app saves a snapshot of each round from the game&apos;s official event feed. It never shows anything
@@ -205,10 +224,22 @@ export default function Home() {
             <Step
               title="Read the review when you die"
               visual={
-                <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--line)] bg-[var(--panel)] px-4 py-3 text-[13px]">
-                  <span className="truncate text-[var(--ink)]">Died on {last.stage} holding {last.goldEnd} gold</span>
-                  <PlaceBadge place={review.game.placement} />
-                </div>
+                <StepFrame label="The top finding">
+                  {/* the review's first finding, as the review page shows it */}
+                  <div className="flex items-start gap-2.5">
+                    <span className="tnum grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[color-mix(in_oklab,var(--hp)_15%,transparent)] text-[12px] font-semibold text-[var(--hp)]">1</span>
+                    <div className="min-w-0">
+                      <div className="text-[14px] font-semibold leading-snug">{top.title}</div>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {top.cites.slice(0, 2).map((c, i) => (
+                          <span key={i} className="tnum rounded-md border border-[var(--line)] bg-[var(--bg)] px-2 py-0.5 text-[12px] text-[var(--ink-2)]">
+                            <CiteText c={c} />
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </StepFrame>
               }
             >
               A few findings, most costly first. Click any round to see the board, the bench and every shop you saw.
@@ -216,10 +247,19 @@ export default function Home() {
             <Step
               title="Check Patch Radar on patch day"
               visual={
-                <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--line)] bg-[var(--panel)] px-4 py-3 text-[13px]">
-                  <span className="text-[var(--ink)]">{MY_COMPS[0].name}</span>
-                  <span className="shrink-0 text-[12px] font-medium text-[var(--hp)]">Nerfed</span>
-                </div>
+                <StepFrame label={`Patch Radar, ${PATCH.from} to ${PATCH.to}`}>
+                  {/* the comp header from Patch Radar */}
+                  <div className="flex items-center gap-2 text-[12px] font-medium text-[var(--hp)]">
+                    <span className="block h-1.5 w-1.5 rounded-full bg-[var(--hp)]" />
+                    Nerfed overall
+                  </div>
+                  <div className="mt-1 text-[15px] font-semibold">{radar0.comp.name}</div>
+                  <div className="mt-3 flex gap-1.5">
+                    {radar0.comp.core.map((u) => (
+                      <UnitToken key={u} unitId={u} size={30} showName={false} items={radar0.comp.items?.[u] ?? []} />
+                    ))}
+                  </div>
+                </StepFrame>
               }
             >
               We read the patch notes against the comps you actually play and tell you which ones got better or worse.
@@ -240,26 +280,34 @@ export default function Home() {
                 How reviews are checked
               </Link>
             </div>
-            <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
-              <p className="text-[15px] leading-relaxed text-[var(--ink)]">
+            <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6 md:p-7">
+              <p className="text-[17px] leading-[1.7] text-[var(--ink)]">
                 You entered <Cite round>4-3</Cite> at <Cite>{r43.hp} HP</Cite>, fought holding <Cite>{r43.goldEnd} gold</Cite> and lost{" "}
                 <Cite>{r43.damageTaken} HP</Cite>. Two rounds later you entered <Cite round>4-5</Cite> at <Cite>{r45.hp} HP</Cite> and still fought holding{" "}
                 <Cite>{r45.goldEnd} gold</Cite>.
               </p>
-              <div className="mt-5 flex items-center gap-2 text-[12px] text-[var(--muted)]">
-                <span className="block h-1.5 w-1.5 rounded-full bg-[var(--good)]" />5 numbers and 2 rounds, all match the recording
-              </div>
+              <ul className="tnum mt-5 divide-y divide-[var(--line)] border-t border-[var(--line)] text-[13px]">
+                {checks.map(([v, st, what]) => (
+                  <li key={v + st + what} className="grid grid-cols-[18px_76px_40px_minmax(0,1fr)] items-center gap-2 py-2">
+                    <svg width="12" height="12" viewBox="0 0 12 12" aria-label="matches">
+                      <path d="M2.5 6.5 5 9l4.5-6" fill="none" stroke="var(--good)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span className="font-medium text-[var(--ink)]">{v}</span>
+                    <span className="text-[var(--brand)]">{st}</span>
+                    <span className="truncate text-[var(--ink-2)]">{what}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-3 text-[12px] text-[var(--muted)]">5 numbers and 2 rounds, all match the recording</div>
             </div>
           </div>
         </section>
 
         <section className="border-t border-[var(--line)]">
-          <div className="mx-auto flex max-w-[1240px] flex-col items-start gap-6 px-4 py-16 md:flex-row md:items-center md:justify-between md:px-6">
-            <div>
-              <h2 className="text-[24px] font-semibold tracking-tight">Your next game is the one to record.</h2>
-              <p className="mt-2 text-[15px] text-[var(--ink-2)]">3 free round-by-round reviews a week. Pro is $5 a month for unlimited.</p>
-            </div>
-            <div className="flex gap-3">
+          <div className="mx-auto flex max-w-[1240px] flex-col items-center px-4 py-24 text-center md:px-6">
+            <h2 className="text-balance text-[30px] font-semibold leading-tight tracking-[-0.02em] md:text-[40px]">Your next game is the one to record.</h2>
+            <p className="mt-3 text-[16px] text-[var(--ink-2)]">3 free round-by-round reviews a week. Pro is $5 a month for unlimited.</p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link href="/download" className="rounded-xl bg-[var(--brand)] px-5 py-3 text-[15px] font-semibold text-[#1a1306] hover:opacity-90">
                 Download for Windows
               </Link>
@@ -272,6 +320,16 @@ export default function Home() {
       </main>
       <SiteFooter />
     </>
+  );
+}
+
+// One frame for the step visuals: same height, a small label, a real piece of the product inside.
+function StepFrame({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex h-[164px] flex-col overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--panel)] p-4">
+      <div className="tnum mb-3 text-[12px] text-[var(--muted)]">{label}</div>
+      <div className="min-h-0 flex-1">{children}</div>
+    </div>
   );
 }
 

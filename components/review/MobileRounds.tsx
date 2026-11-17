@@ -19,10 +19,8 @@ export function MobileRounds({
   const strip = useRef<HTMLDivElement>(null);
   const hl = new Set(highlight ?? []);
   const W = 340;
-  const H = 156;
+  const H = 190;
   const L = 26; // room for HP labels
-  const GH = 48;
-  const maxGold = Math.max(60, ...series.map((p) => p.gold));
   const n = series.length;
   const x = (i: number) => L + ((W - L - 14) * i) / (n - 1);
   const after = (p: SeriesPoint) => Math.max(0, p.hp - p.damage);
@@ -55,9 +53,13 @@ export function MobileRounds({
           </span>
         </span>
       </div>
-      <svg viewBox={`0 0 ${W} ${H + 10 + GH + 18}`} className="mt-2 block h-auto w-full" aria-hidden>
+      <svg viewBox={`0 0 ${W} ${H + 24}`} className="mt-2 block h-auto w-full" aria-hidden>
         {hlIdx.length > 0 && (
-          <rect x={x(hlIdx[0]) - 3} y={0} width={x(hlIdx[hlIdx.length - 1]) - x(hlIdx[0]) + 6} height={H} rx={4} fill="var(--brand)" opacity={0.16} />
+          <g>
+            <rect x={x(hlIdx[0]) - 3} y={0} width={x(hlIdx[hlIdx.length - 1]) - x(hlIdx[0]) + 6} height={3} rx={1.5} fill="var(--brand)" opacity={0.85} />
+            <line x1={x(hlIdx[0]) - 3} x2={x(hlIdx[0]) - 3} y1={3} y2={H} stroke="var(--brand)" strokeOpacity={0.4} strokeDasharray="2 3" />
+            <line x1={x(hlIdx[hlIdx.length - 1]) + 3} x2={x(hlIdx[hlIdx.length - 1]) + 3} y1={3} y2={H} stroke="var(--brand)" strokeOpacity={0.4} strokeDasharray="2 3" />
+          </g>
         )}
         {[0, 50, 100].map((v) => (
           <g key={v}>
@@ -69,41 +71,19 @@ export function MobileRounds({
         <path d={line} fill="none" stroke="var(--hp)" strokeWidth={2.25} strokeLinejoin="round" />
         {series.map((p, i) =>
           p.stage.endsWith("-1") && p.stage !== "1-1" ? (
-            <text key={`t${i}`} x={x(i)} y={H + 10 + GH + 14} textAnchor="middle" fontSize="12" fill={p.stage === selected ? "var(--ink)" : "var(--ink-2)"} className="tnum">
+            <text key={`t${i}`} x={x(i)} y={H + 18} textAnchor="middle" fontSize="12" fill={p.stage === selected ? "var(--ink)" : "var(--ink-2)"} className="tnum">
               {p.stage}
             </text>
           ) : null,
         )}
-        {series.map((p, i) => {
-          // solid: gold taken into combat; dashed cap: gold spent that round
-          const held = (p.goldEnd / maxGold) * GH;
-          const start = (p.gold / maxGold) * GH;
-          const base = H + 10 + GH;
-          const on = i === si ? 1 : 0.5;
-          return (
-            <g key={i}>
-              {start > held && (
-                <rect x={x(i) - 4} y={base - start} width={8} height={start - held} rx={1.5} fill="var(--gold)" fillOpacity={0.22 * on + 0.08} />
-              )}
-              <rect x={x(i) - 4} y={base - held} width={8} height={held} rx={1.5} fill="var(--gold)" opacity={on} />
-            </g>
-          );
-        })}
         {si >= 0 && (
           <>
-            <line x1={x(si)} x2={x(si)} y1={0} y2={H + 10 + GH} stroke="var(--ink)" strokeOpacity={0.35} />
+            <line x1={x(si)} x2={x(si)} y1={0} y2={H} stroke="var(--ink)" strokeOpacity={0.35} />
             <circle cx={x(si)} cy={y(after(series[si]))} r={4} fill="var(--bg)" stroke="var(--hp)" strokeWidth={2} />
           </>
         )}
       </svg>
 
-      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 px-1 text-[12px] text-[var(--muted)]">
-        <span className="flex items-center gap-3">
-          Gold into combat
-          <span className="flex items-center gap-1.5"><span className="block h-2.5 w-2.5 rounded-[2px] bg-[color-mix(in_oklab,var(--gold)_30%,transparent)]" />Spent that round</span>
-        </span>
-        {si >= 0 && <span className="tnum w-full text-[var(--gold)]">{series[si].goldEnd} of {series[si].gold} into combat at {selected}</span>}
-      </div>
       <div className="relative">
       <div ref={strip} className="-mx-3 mt-3 flex snap-x snap-mandatory scroll-pl-3 gap-1.5 overflow-x-auto px-3 pb-1 [mask-image:linear-gradient(to_right,transparent,black_14px,black_calc(100%-28px),transparent)] [scrollbar-width:none]" role="list" aria-label="Rounds">
         {series.map((p) => {

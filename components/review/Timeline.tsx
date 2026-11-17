@@ -113,9 +113,12 @@ export function Timeline({
         const lastLive = series.reduce((k, p, i) => (p.lobbyAlive >= 4 ? i : k), -1);
         if (compact || lastLive < 0 || lastLive === series.length - 1) return null;
         return (
-          <text x={cx(lastLive)} y={HP_TOP + HP_H + 15} textAnchor="end" fontSize={FS - 1} fill="var(--muted)">
-            Lobby median ends here: only {series[lastLive + 1].lobbyAlive} opponents left
-          </text>
+          <g>
+            <circle cx={cx(lastLive)} cy={hpY(series[lastLive].lobbyHp)} r={3} fill="var(--bg)" stroke="var(--ink-2)" strokeWidth={1.5} />
+            <text x={cx(lastLive) + 8} y={hpY(series[lastLive].lobbyHp) - 6} fontSize={FS - 1} fill="var(--muted)">
+              Lobby median ends: {series[lastLive + 1].lobbyAlive} opponents left
+            </text>
+          </g>
         );
       })()}
       <path d={lobbyPath} fill="none" stroke="var(--ink-2)" strokeOpacity={0.6} strokeWidth={1.5} strokeDasharray="3 3" />
