@@ -83,7 +83,7 @@ export function MobileRounds({
           return (
             <g key={i}>
               {start > held && (
-                <rect x={x(i) - 3.5} y={base - start + 0.5} width={7} height={start - held - 1} rx={1.5} fill="var(--gold)" fillOpacity={0.12 * on + 0.04} stroke="var(--gold)" strokeOpacity={0.5 * on + 0.1} strokeDasharray="2 2" />
+                <rect x={x(i) - 4} y={base - start} width={8} height={start - held} rx={1.5} fill="var(--gold)" fillOpacity={0.22 * on + 0.08} />
               )}
               <rect x={x(i) - 4} y={base - held} width={8} height={held} rx={1.5} fill="var(--gold)" opacity={on} />
             </g>
@@ -100,7 +100,7 @@ export function MobileRounds({
       <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 px-1 text-[12px] text-[var(--muted)]">
         <span className="flex items-center gap-3">
           Gold into combat
-          <span className="flex items-center gap-1.5"><span className="block h-2.5 w-2.5 rounded-[2px] border border-dashed border-[var(--gold)] bg-[color-mix(in_oklab,var(--gold)_14%,transparent)]" />Spent that round</span>
+          <span className="flex items-center gap-1.5"><span className="block h-2.5 w-2.5 rounded-[2px] bg-[color-mix(in_oklab,var(--gold)_30%,transparent)]" />Spent that round</span>
         </span>
         {si >= 0 && <span className="tnum w-full text-[var(--gold)]">{series[si].goldEnd} of {series[si].gold} into combat at {selected}</span>}
       </div>

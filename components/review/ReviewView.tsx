@@ -111,7 +111,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
               Shared draft
             </Key>
             <span className="ml-auto flex items-center gap-1.5">
-              <span className="block h-3 w-3 rounded-[3px] bg-[color-mix(in_oklab,var(--brand)_18%,transparent)]" />
+              <span className="block h-3 w-4 border-t-[3px] border-[var(--brand)] bg-[color-mix(in_oklab,var(--brand)_10%,transparent)]" />
               Rounds in the selected finding
             </span>
           </div>
@@ -181,7 +181,7 @@ function FindingCard({ f, active, lead, onClick, onCite, children }: { f: Findin
       onClick={onClick}
     >
       <div className="flex items-start gap-3">
-        <span className="mt-[7px] hidden h-2 w-2 shrink-0 rounded-full sm:block" style={{ background: tone }} />
+        {!lead && <span className="mt-[7px] hidden h-2 w-2 shrink-0 rounded-full sm:block" style={{ background: tone }} />}
         <div className="min-w-0 flex-1">
           <div className={`flex flex-col-reverse items-start justify-between gap-x-3 gap-y-2 sm:flex-row`}>
             <h3 className={`${lead ? "text-[18px] sm:text-[20px]" : "text-[16px]"} font-semibold leading-snug tracking-tight`}>{f.title}</h3>
@@ -191,7 +191,7 @@ function FindingCard({ f, active, lead, onClick, onCite, children }: { f: Findin
           </div>
           <p className={`mt-2 ${lead ? "text-[15px]" : "text-[14px]"} leading-relaxed text-[var(--ink-2)]`}>{f.detail}</p>
           {quiet && (
-            <span className="mt-2 inline-flex items-center gap-1 text-[13px] text-[var(--muted)] group-hover:text-[var(--ink-2)]">
+            <span className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-[var(--line-2)] px-2.5 py-1 text-[13px] text-[var(--ink-2)] transition-colors group-hover:border-[var(--ink-2)] group-hover:text-[var(--ink)]">
               {f.positive ? "Show rounds" : "Show rounds and fix"}
               <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden>
                 <path d="M2.5 3.8 5 6.3l2.5-2.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -262,7 +262,7 @@ function Key({ color = "transparent", children, faint, solid, dashed, line, spen
   if (spent)
     return (
       <span className="inline-flex items-center gap-1.5">
-        <span className="block h-2.5 w-2.5 rounded-[3px] border border-dashed border-[var(--gold)] bg-[color-mix(in_oklab,var(--gold)_12%,transparent)]" />
+        <span className="block h-2.5 w-2.5 rounded-[3px] bg-[color-mix(in_oklab,var(--gold)_30%,transparent)]" />
         {children}
       </span>
     );

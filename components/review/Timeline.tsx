@@ -59,17 +59,27 @@ export function Timeline({
     <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full select-none" role="img" aria-label="Round by round timeline of HP, gold and fight results">
       <defs>
         <linearGradient id="hpFill" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor="var(--hp)" stopOpacity="0.28" />
-          <stop offset="1" stopColor="var(--hp)" stopOpacity="0.02" />
+          <stop offset="0" stopColor="var(--hp)" stopOpacity="0.14" />
+          <stop offset="1" stopColor="var(--hp)" stopOpacity="0" />
         </linearGradient>
       </defs>
 
-      {/* highlighted rounds */}
-      {series.map((p, i) =>
-        hl.has(p.stage) ? (
-          <rect key={`h${i}`} x={cx(i) - step / 2} y={HP_TOP - 2} width={step} height={STRIP_TOP + STRIP_H - HP_TOP + 6} fill="var(--brand)" opacity={0.07} />
-        ) : null,
-      )}
+      {/* rounds in the selected finding: one band per run of rounds, bracketed above the plot */}
+      {(() => {
+        const runs: [number, number][] = [];
+        series.forEach((p, i) => {
+          if (!hl.has(p.stage)) return;
+          const last = runs[runs.length - 1];
+          if (last && last[1] === i - 1) last[1] = i;
+          else runs.push([i, i]);
+        });
+        return runs.map(([a, b]) => (
+          <g key={`h${a}`}>
+            <rect x={cx(a) - step / 2} y={HP_TOP - 2} width={step * (b - a + 1)} height={STRIP_TOP + STRIP_H - HP_TOP + 6} fill="var(--brand)" opacity={0.06} />
+            <rect x={cx(a) - step / 2 + 2} y={HP_TOP - 7} width={step * (b - a + 1) - 4} height={3} rx={1.5} fill="var(--brand)" opacity={0.8} />
+          </g>
+        ));
+      })()}
 
       {/* stage separators */}
       {stageStarts.slice(1).map(({ i }) => (
@@ -117,7 +127,7 @@ export function Timeline({
         Gold into combat
       </text>
       {<g transform={`translate(${PAD_L + 150}, ${compact ? GOLD_TOP - 14 - FS * 0.75 : GOLD_TOP - 27})`}>
-        <rect x={0} y={0} width={10} height={10} rx={2} fill="var(--gold)" fillOpacity={0.14} stroke="var(--gold)" strokeOpacity={0.6} strokeDasharray="2 2" />
+        <rect x={0} y={0} width={10} height={10} rx={2} fill="var(--gold)" fillOpacity={0.3} />
         <text x={16} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">Spent that round</text>
       </g>}
       <line x1={PAD_L} x2={W - PAD_R} y1={goldY(50)} y2={goldY(50)} stroke="var(--gold)" strokeOpacity={0.35} strokeDasharray="2 4" />
@@ -128,13 +138,13 @@ export function Timeline({
         0
       </text>
       {series.map((p, i) => {
-        const on = selected === p.stage ? 1 : hl.has(p.stage) ? 0.9 : 0.62;
+        const on = selected === p.stage ? 1 : hl.has(p.stage) ? 0.92 : 0.72;
         const x = cx(i) - step * 0.3;
         const w = step * 0.6;
         return (
           <g key={`g${i}`}>
             {p.gold > p.goldEnd && (
-              <rect x={x + 0.5} y={goldY(p.gold) + 0.5} width={w - 1} height={goldY(p.goldEnd) - goldY(p.gold) - 1} rx={1.5} fill="var(--gold)" fillOpacity={0.1} stroke="var(--gold)" strokeOpacity={0.75 * on + 0.15} strokeWidth={1.25} strokeDasharray="3 2" />
+              <rect x={x} y={goldY(p.gold)} width={w} height={goldY(p.goldEnd) - goldY(p.gold)} rx={1.5} fill="var(--gold)" fillOpacity={0.22 * on + 0.08} />
             )}
             <rect x={x} y={goldY(p.goldEnd)} width={w} height={GOLD_TOP + GOLD_H - goldY(p.goldEnd)} rx={1.5} fill="var(--gold)" opacity={on} />
           </g>
@@ -184,7 +194,10 @@ export function Timeline({
       {/* selection */}
       {series.map((p, i) =>
         p.stage === selected ? (
-          <rect key="sel" x={cx(i) - step / 2 + 1} y={HP_TOP - 2} width={step - 2} height={STRIP_TOP + STRIP_H - HP_TOP + 6} fill="none" stroke="var(--ink)" strokeOpacity={0.7} strokeWidth={1.25} rx={4} />
+          <g key="sel">
+            <rect x={cx(i) - step / 2 + 1} y={HP_TOP - 2} width={step - 2} height={STRIP_TOP + STRIP_H - HP_TOP + 6} fill="var(--ink)" opacity={0.08} rx={3} />
+            <path d={`M${cx(i) - 5},${HP_TOP - 12} L${cx(i) + 5},${HP_TOP - 12} L${cx(i)},${HP_TOP - 5} Z`} fill="var(--ink)" />
+          </g>
         ) : null,
       )}
 

@@ -30,7 +30,7 @@ export default function PatchPage() {
     <>
       <SiteNav active="/patch" />
       <main className="mx-auto max-w-[1240px] px-4 pb-24 pt-8 md:px-6 md:pt-10">
-        <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_300px] md:items-end">
+        <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_300px] md:items-start">
           <div className="max-w-[720px]">
             <p className="text-[13px] text-[var(--muted)]">
               Patch {PATCH.from} to {PATCH.to} · live {PATCH.date}
@@ -78,7 +78,7 @@ export default function PatchPage() {
         {shared.length > 0 && (
           <section className="mt-4 rounded-2xl border border-[var(--line)] bg-[var(--panel)] px-5 py-4">
             <div className="text-[13px] font-medium text-[var(--ink)]">Shared by more than one of your comps</div>
-            <ul className="mt-3 space-y-2">
+            <ul className="mt-3 max-w-[900px] space-y-2">
               {shared.map((n) => (
                 <NoteRow key={n.id} n={n} note={touches(n.id).length === verdicts.length ? "All your comps" : touches(n.id).join(", ")} />
               ))}
@@ -133,65 +133,23 @@ function PickList({ title, tone, picks }: { title: string; tone: string; picks: 
 function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
   const t = v.verdict === "mixed" && v.score !== 0 ? { ...TONE.mixed, label: v.score < 0 ? "Mixed, leans nerfed" : "Mixed, leans buffed" } : TONE[v.verdict];
   return (
-    <article className="grid overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--panel)] lg:grid-cols-[400px_minmax(0,1fr)]">
-      <div className="flex flex-col border-b border-[var(--line)] p-6 lg:border-b-0 lg:border-r">
-        <div className="flex items-center gap-2 text-[13px] font-medium" style={{ color: t.color }}>
-          <span className="block h-2 w-2 rounded-full" style={{ background: t.color }} />
-          {t.label}
+    <article className="overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--panel)]">
+      <header className="flex flex-col gap-5 border-b border-[var(--line)] p-6 lg:flex-row lg:items-center lg:justify-between">
+        <div className="lg:w-[340px] lg:shrink-0">
+          <div className="flex items-center gap-2 text-[13px] font-medium" style={{ color: t.color }}>
+            <span className="block h-2 w-2 rounded-full" style={{ background: t.color }} />
+            {t.label}
+          </div>
+          <h3 className="mt-2 text-[22px] font-semibold tracking-tight">{v.comp.name}</h3>
+          <Meter score={v.score} buffs={v.lines.filter((l) => l.direction === "buff").length} nerfs={v.lines.filter((l) => l.direction === "nerf").length} />
         </div>
-        <h3 className="mt-2 text-[22px] font-semibold tracking-tight">{v.comp.name}</h3>
-        <Meter score={v.score} buffs={v.lines.filter((l) => l.direction === "buff").length} nerfs={v.lines.filter((l) => l.direction === "nerf").length} />
-        <div className="mt-5 grid grid-cols-4 gap-x-2 gap-y-3 justify-items-center">
+        <div className="flex flex-wrap gap-x-1 gap-y-3">
           {v.comp.core.map((u) => (
             <UnitToken key={u} unitId={u} size={44} />
           ))}
         </div>
-        {(() => {
-          // last patch is the baseline the verdict was made from; this patch is how it's going now
-          const now = allGames().filter((g) => g.comp === v.comp.id).map((g) => g.game.placement);
-          const nowAvg = now.length ? now.reduce((x, y) => x + y, 0) / now.length : undefined;
-          const nowTop4 = now.length ? Math.round((now.filter((x) => x <= 4).length / now.length) * 100) : undefined;
-          const better = (was: number, is: number | undefined, lowerIsBetter: boolean) =>
-            is === undefined || is === was ? undefined : lowerIsBetter ? is < was : is > was;
-          const rows: [string, string, string, boolean | undefined][] = [
-            ["Games", String(v.comp.games), String(now.length), undefined],
-            ["Avg place", v.comp.avgPlace.toFixed(1), nowAvg === undefined ? "–" : nowAvg.toFixed(1), better(v.comp.avgPlace, nowAvg, true)],
-            ["Top 4", `${v.comp.top4}%`, nowTop4 === undefined ? "–" : `${nowTop4}%`, better(v.comp.top4, nowTop4, false)],
-          ];
-          return (
-            <table className="tnum mt-6 w-full border-t border-[var(--line)] text-[13px]">
-              <thead>
-                <tr className="text-left text-[12px] text-[var(--muted)]">
-                  <th className="pb-2 pt-4 font-normal" />
-                  <th className="pb-2 pt-4 text-right font-normal">{PATCH.from}</th>
-                  <th className="pb-2 pt-4 text-right font-medium text-[var(--ink-2)]">{PATCH.to} so far</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map(([k, was, is, up]) => (
-                  <tr key={k} className="border-t border-[var(--line)]">
-                    <td className="py-2 text-[var(--ink-2)]">{k}</td>
-                    <td className="py-2 text-right text-[var(--ink-2)]">{was}</td>
-                    <td className="py-2 text-right text-[15px] font-semibold text-[var(--ink)]">
-                      {is}
-                      {up !== undefined && (
-                        <span className="ml-1.5 text-[12px] font-medium" style={{ color: up ? "var(--good)" : "var(--hp)" }}>
-                          {up ? "better" : "worse"}
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-              {now.length > 0 && now.length < 5 && (
-                <caption className="caption-bottom pt-2 text-left text-[12px] text-[var(--muted)]">
-                  Only {now.length} game{now.length === 1 ? "" : "s"} on {PATCH.to} so far, so treat this column as early.
-                </caption>
-              )}
-            </table>
-          );
-        })()}
-      </div>
+      </header>
+      <div className="grid lg:grid-cols-[minmax(0,1fr)_340px]">
       <div className="p-6">
         {(() => {
           const cut = v.why.indexOf(". ");
@@ -214,19 +172,67 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
             ))}
         </ul>
       </div>
+      <div className="border-t border-[var(--line)] p-6 lg:border-l lg:border-t-0">
+        {(() => {
+          // last patch is the baseline the verdict was made from; this patch is how it's going now
+          const now = allGames().filter((g) => g.comp === v.comp.id).map((g) => g.game.placement);
+          const nowAvg = now.length ? now.reduce((x, y) => x + y, 0) / now.length : undefined;
+          const nowTop4 = now.length ? Math.round((now.filter((x) => x <= 4).length / now.length) * 100) : undefined;
+          const better = (was: number, is: number | undefined, lowerIsBetter: boolean) =>
+            is === undefined || is === was ? undefined : lowerIsBetter ? is < was : is > was;
+          const rows: [string, string, string, boolean | undefined][] = [
+            ["Games", String(v.comp.games), String(now.length), undefined],
+            ["Avg place", v.comp.avgPlace.toFixed(1), nowAvg === undefined ? "–" : nowAvg.toFixed(1), better(v.comp.avgPlace, nowAvg, true)],
+            ["Top 4", `${v.comp.top4}%`, nowTop4 === undefined ? "–" : `${nowTop4}%`, better(v.comp.top4, nowTop4, false)],
+          ];
+          return (
+            <table className="tnum w-full text-[14px]">
+              <thead>
+                <tr className="text-left text-[12px] text-[var(--muted)]">
+                  <th className="pb-2 text-[13px] font-medium text-[var(--ink)]">How it&apos;s going</th>
+                  <th className="pb-2 text-right font-normal">{PATCH.from}</th>
+                  <th className="pb-2 text-right font-medium text-[var(--ink-2)]">{PATCH.to} so far</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map(([k, was, is, up]) => (
+                  <tr key={k} className="border-t border-[var(--line)]">
+                    <td className="py-2 text-[var(--ink-2)]">{k}</td>
+                    <td className="py-2 text-right text-[var(--ink-2)]">{was}</td>
+                    <td className="py-2 text-right text-[17px] font-semibold text-[var(--ink)]">
+                      {is}
+                      {up !== undefined && (
+                        <span className="ml-1.5 text-[12px] font-medium" style={{ color: up ? "var(--good)" : "var(--hp)" }}>
+                          {up ? "better" : "worse"}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+              {now.length > 0 && now.length < 5 && (
+                <caption className="caption-bottom pt-2 text-left text-[12px] text-[var(--muted)]">
+                  Only {now.length} game{now.length === 1 ? "" : "s"} on {PATCH.to} so far, so treat this column as early.
+                </caption>
+              )}
+            </table>
+          );
+        })()}
+      </div>
+      </div>
     </article>
   );
 }
 
 function NoteRow({ n, note }: { n: NoteLine; note?: string }) {
   return (
-    <li className="flex items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--bg)] px-4 py-2.5 text-[14px]">
+    <li className="grid grid-cols-[48px_minmax(0,1fr)] items-center gap-x-3 gap-y-2 rounded-xl border border-[var(--line)] bg-[var(--bg)] px-4 py-2.5 text-[14px] sm:grid-cols-[48px_minmax(0,1fr)_200px]">
       <Dir d={n.direction} />
-      <span className="tnum flex-1 text-[var(--ink-2)]">
+      <span className="tnum text-[var(--ink-2)]">
         {n.text}
         {note && <span className="block text-[12px] text-[var(--muted)]">{note}</span>}
       </span>
-      <Delta n={n} />
+      <Size n={n} />
     </li>
   );
 }
@@ -254,6 +260,22 @@ function Meter({ score, buffs, nerfs }: { score: number; buffs: number; nerfs: n
         <span>Stronger</span>
       </div>
     </div>
+  );
+}
+
+// How big a change is: a bar (capped at 50%) beside the value, so size reads at a glance.
+function Size({ n }: { n: NoteLine }) {
+  const pct = changePct(n.text);
+  if (pct === undefined) return <span className="hidden sm:block" />;
+  const color = n.direction === "buff" ? "var(--good)" : n.direction === "nerf" ? "var(--hp)" : "var(--ink-2)";
+  const w = Math.max(4, (Math.min(50, Math.abs(pct)) / 50) * 100);
+  return (
+    <span className="col-start-2 flex items-center gap-3 sm:col-start-auto">
+      <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--panel-2)]">
+        <span className="block h-full rounded-full" style={{ width: `${w}%`, background: color }} />
+      </span>
+      <Delta n={n} />
+    </span>
   );
 }
 
