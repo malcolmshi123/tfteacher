@@ -5,15 +5,27 @@ import { allGames } from "@/lib/game/games";
 import { MY_COMPS } from "@/lib/patch/radar";
 import { analyze, costTone } from "@/lib/review/engine";
 import { PlaceBadge } from "@/components/PlaceBadge";
+import { SetSelect } from "@/components/SetSelect";
 
 export const metadata = { title: "Reviews · TFTeacher" };
 
 
 const COMP_NAME = Object.fromEntries(MY_COMPS.map((c) => [c.id, c.name]));
+const patchNo = (patch: string) => patch.replace(/^Patch\s*/, "");
+const setOf = (patch: string) => `Set ${patchNo(patch).split(".")[0]}`;
+// newest patch first: compare 18.10 above 18.9
+const byPatchDesc = (a: string, b: string) => {
+  const [am, an] = patchNo(a).split(".").map(Number);
+  const [bm, bn] = patchNo(b).split(".").map(Number);
+  return bm - am || bn - an;
+};
 
-export default async function ReviewsPage({ searchParams }: { searchParams: Promise<{ comp?: string }> }) {
-  const { comp: only } = await searchParams;
-  const all = allGames().map(({ game, comp }) => {
+export default async function ReviewsPage({ searchParams }: { searchParams: Promise<{ comp?: string; set?: string }> }) {
+  const { comp: only, set: setParam } = await searchParams;
+  const everything = allGames();
+  const sets = [...new Set(everything.map((g) => setOf(g.game.patch)))].sort((a, b) => Number(b.split(" ")[1]) - Number(a.split(" ")[1]));
+  const set = sets.includes(setParam ?? "") ? setParam! : sets[0];
+  const all = everything.filter((g) => setOf(g.game.patch) === set).map(({ game, comp }) => {
     const review = analyze(game);
     const top = review.findings.find((f) => !f.positive) ?? review.findings[0];
     return { game, comp, top, board: game.rounds[game.rounds.length - 1].board };
@@ -24,7 +36,7 @@ export default async function ReviewsPage({ searchParams }: { searchParams: Prom
   // placement over time, oldest first, for the trend line
   const avg = rows.reduce((a, r) => a + r.game.placement, 0) / n;
   const top4 = rows.filter((r) => r.game.placement <= 4).length;
-  const patch = rows[0]?.game.patch;
+  const patches = [...new Set(rows.map((r) => r.game.patch))].sort(byPatchDesc);
 
   return (
     <>
@@ -36,7 +48,9 @@ export default async function ReviewsPage({ searchParams }: { searchParams: Prom
             <p className="mt-3 text-[15px] leading-relaxed text-[var(--ink-2)]">
               Every game you play with the app open shows up here when it ends, with what cost you placements.
             </p>
-            <p className="mt-1.5 text-[13px] text-[var(--muted)]">Showing {patch}. The 19 games on 18.4 are the ones Patch Radar read.</p>
+            <div className="mt-4">
+              <SetSelect sets={sets} value={set} />
+            </div>
           </div>
           <dl className="tnum grid grid-cols-[auto_auto_auto] items-end gap-6 rounded-2xl border border-[var(--line)] bg-[var(--panel)] px-5 py-4 text-[13px]">
             <div>
@@ -64,7 +78,7 @@ export default async function ReviewsPage({ searchParams }: { searchParams: Prom
               return (
                 <Link
                   key={c.name}
-                  href={c.id ? `/reviews?comp=${c.id}` : "/reviews"}
+                  href={c.id ? `/reviews?set=${encodeURIComponent(set)}&comp=${c.id}` : `/reviews?set=${encodeURIComponent(set)}`}
                   aria-current={on ? "page" : undefined}
                   className={`tnum rounded-full border px-3 py-1.5 text-[13px] transition-colors ${on ? "border-[var(--ink-2)] bg-[var(--panel-2)] text-[var(--ink)]" : "border-[var(--line)] text-[var(--ink-2)] hover:border-[var(--line-2)]"}`}
                 >
@@ -73,7 +87,17 @@ export default async function ReviewsPage({ searchParams }: { searchParams: Prom
               );
             })}
         </nav>
-        <div className="mt-6 hidden grid-cols-[56px_200px_374px_minmax(0,1fr)_96px_16px] gap-6 px-5 pb-2 text-[12px] text-[var(--ink-2)] md:grid">
+        {patches.map((pt) => {
+          const inPatch = rows.filter((r) => r.game.patch === pt);
+          return (
+        <section key={pt} aria-label={pt} className="mt-8">
+        <h2 className="tnum mb-3 flex items-baseline gap-2 px-1 text-[15px] font-semibold md:px-5">
+          {pt}
+          <span className="text-[13px] font-normal text-[var(--muted)]">
+            {inPatch.length} game{inPatch.length === 1 ? "" : "s"}
+          </span>
+        </h2>
+        <div className="hidden grid-cols-[56px_200px_374px_minmax(0,1fr)_96px_16px] gap-6 px-5 pb-2 pt-1 text-[12px] text-[var(--ink-2)] md:grid">
           <span>Place</span>
           <span>Comp</span>
           <span>Final board</span>
@@ -81,8 +105,8 @@ export default async function ReviewsPage({ searchParams }: { searchParams: Prom
           <span className="text-right">Cost</span>
           <span />
         </div>
-        <ul className="mt-4 space-y-3 md:mt-0">
-          {rows.map(({ game, comp, top, board }) => {
+        <ul className="space-y-3">
+          {inPatch.map(({ game, comp, top, board }) => {
             const when = new Date(game.playedAt);
             return (
               <li key={game.id}>
@@ -124,6 +148,9 @@ export default async function ReviewsPage({ searchParams }: { searchParams: Prom
             );
           })}
         </ul>
+        </section>
+          );
+        })}
       </main>
       <SiteFooter />
     </>
