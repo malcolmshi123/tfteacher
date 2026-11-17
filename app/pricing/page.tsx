@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { SiteFooter, SiteNav } from "@/components/SiteChrome";
+import { UnitToken } from "@/components/UnitToken";
+import { PATCH, radar } from "@/lib/patch/radar";
 
 export const metadata = { title: "Pricing · TFTeacher" };
 
@@ -35,7 +37,7 @@ export default function Pricing() {
 
         <section className="mt-16 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <div className="overflow-hidden rounded-2xl border border-[var(--line)]">
-            <table className="w-full text-left text-[14px]">
+            <table className="h-full w-full text-left text-[14px]">
               <thead className="bg-[var(--panel)] text-[13px] text-[var(--muted)]">
                 <tr>
                   <th className="px-5 py-3 font-medium">Compare</th>
@@ -54,7 +56,7 @@ export default function Pricing() {
               </tbody>
             </table>
           </div>
-          <TrendsPreview />
+          <ProPreview />
         </section>
 
         <section className="mt-16 grid gap-x-12 gap-y-8 border-t border-[var(--line)] pt-12 md:grid-cols-2">
@@ -98,28 +100,75 @@ const TREND = [
   { stage: "Stage 5+", hp: 23 },
 ];
 
-function TrendsPreview() {
-  const max = Math.max(...TREND.map((t) => t.hp));
+// Beside the compare table: what Pro adds, shown on the sample account's own data.
+function ProPreview() {
+  const verdicts = [...radar()].sort((a, b) => b.comp.games - a.comp.games);
+  const games = verdicts.reduce((a, v) => a + v.comp.games, 0);
+  const top = TREND.reduce((a, b) => (b.hp > a.hp ? b : a));
   return (
-    <div className="flex h-full flex-col rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
-      <div className="flex items-baseline justify-between gap-3">
-        <h3 className="text-[15px] font-semibold">Pro trends: where your HP went, by stage</h3>
-        <span className="text-[13px] text-[var(--ink-2)]">Sample account, 19 games on patch 18.4</span>
+    <div className="flex h-full flex-col rounded-2xl border border-[var(--line)] bg-[var(--panel)]">
+      <div className="border-b border-[var(--line)] px-6 py-4">
+        <h3 className="text-[15px] font-semibold">What Pro adds, on the sample account</h3>
+        <p className="mt-0.5 text-[13px] text-[var(--ink-2)]">
+          {games} games on {PATCH.from}, checked against the {PATCH.to} notes
+        </p>
       </div>
-      <div className="mb-6 mt-6 space-y-3">
-        {TREND.map((t) => (
-          <div key={t.stage} className="grid grid-cols-[72px_1fr_44px] items-center gap-3 text-[13px]">
-            <span className="text-[var(--ink-2)]">{t.stage}</span>
-            <span className="h-3 overflow-hidden rounded-full bg-[var(--panel-2)]">
-              <span className="block h-full rounded-full" style={{ width: `${(t.hp / max) * 100}%`, background: t.hp === max ? "var(--hp)" : "color-mix(in oklab, var(--hp) 45%, var(--panel-2))" }} />
+
+      <div className="px-6 pt-4">
+        <div className="text-[13px] font-medium text-[var(--muted)]">Patch Radar</div>
+        <ul className="mt-1 divide-y divide-[var(--line)]">
+          {verdicts.map((v, i) => {
+            const both = v.lines.some((l) => l.direction === "nerf") && v.lines.some((l) => l.direction === "buff");
+            const [label, color] =
+              v.verdict === "weaker" ? ["Nerfed", "var(--hp)"] : v.verdict === "stronger" ? ["Buffed", "var(--good)"] : v.verdict === "mixed" ? ["Mixed", "var(--gold)"] : ["Unchanged", "var(--muted)"];
+            return (
+              <li key={v.comp.id} className="grid grid-cols-[32px_minmax(0,1fr)_auto_44px] items-center gap-3 py-2.5 text-[14px]">
+                <UnitToken unitId={v.comp.carry} size={32} showName={false} />
+                <span className="min-w-0 truncate">
+                  {v.comp.name} <span className="tnum text-[13px] text-[var(--muted)]">{v.comp.games} games</span>
+                </span>
+                <span className="text-[13px] font-medium" style={{ color }}>
+                  {label}
+                  {both && (v.verdict === "stronger" || v.verdict === "weaker") ? " overall" : ""}
+                </span>
+                <span
+                  className={`rounded-md px-1.5 py-0.5 text-center text-[12px] font-medium ${i === 0 ? "bg-[var(--panel-2)] text-[var(--ink-2)]" : "bg-[color-mix(in_oklab,var(--brand)_16%,transparent)] text-[var(--brand)]"}`}
+                >
+                  {i === 0 ? "Free" : "Pro"}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+        <p className="mt-1 text-[12px] text-[var(--muted)]">Free checks your most played comp. Pro checks every comp you play.</p>
+      </div>
+
+      <div className="mt-auto border-t border-[var(--line)] px-6 py-4">
+        <div className="flex items-baseline justify-between gap-3 text-[13px]">
+          <span className="font-medium text-[var(--muted)]">Trends: where the HP went</span>
+          <span className="rounded-md bg-[color-mix(in_oklab,var(--brand)_16%,transparent)] px-1.5 py-0.5 text-[12px] font-medium text-[var(--brand)]">Pro</span>
+        </div>
+        {/* one bar of all HP lost over the games, split by stage */}
+        <div className="mt-3 flex h-3 overflow-hidden rounded-full">
+          {TREND.map((s) => (
+            <span
+              key={s.stage}
+              className="h-full border-r-2 border-[var(--panel)] last:border-r-0"
+              style={{ width: `${s.hp}%`, background: s === top ? "var(--hp)" : "color-mix(in oklab, var(--hp) 38%, var(--panel-2))" }}
+            />
+          ))}
+        </div>
+        <div className="tnum mt-2 flex text-[12px] text-[var(--ink-2)]">
+          {TREND.map((s) => (
+            <span key={s.stage} className="truncate" style={{ width: `${s.hp}%`, color: s === top ? "var(--ink)" : undefined }}>
+              {s.hp >= 15 ? `${s.stage} ${s.hp}%` : `${s.hp}%`}
             </span>
-            <span className="tnum text-right text-[var(--ink)]">{t.hp}%</span>
-          </div>
-        ))}
+          ))}
+        </div>
+        <p className="mt-3 text-[14px] leading-relaxed text-[var(--ink-2)]">
+          {top.stage} took {top.hp}% of all the HP this player lost. Their reviews point at the same habit: long loss streaks there leave too little HP for stage 4.
+        </p>
       </div>
-      <p className="mt-auto border-t border-[var(--line)] pt-4 text-[14px] leading-relaxed text-[var(--ink-2)]">
-        Stage 3 costs this player the most HP per game. Their reviews point at the same habit: long loss streaks through stage 3 that leave too little HP for stage 4.
-      </p>
     </div>
   );
 }
