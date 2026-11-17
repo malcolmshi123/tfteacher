@@ -300,15 +300,17 @@ export function analyze(game: GameRecord): Review {
   // level 7+ where the bench holds extra copies of a board unit costing 3 or less
   const rerolling = (r: RoundSnapshot) =>
     r.level >= 7 && r.bench.some((b) => UNIT_BY_ID[b.unit].cost <= 3 && r.board.some((p) => p.unit === b.unit));
-  const behind = series.filter((p, i) => p.kind === "pvp" && p.stage >= "3-1" && p.level < p.lobbyLevel && !rerolling(R[i]));
+  // a median needs at least 4 opponents; past that the chart drops it, so the finding does too
+  const withLobby = (p: SeriesPoint) => p.kind === "pvp" && p.lobbyAliveEntering >= 4;
+  const behind = series.filter((p, i) => withLobby(p) && p.stage >= "3-1" && p.level < p.lobbyLevel && !rerolling(R[i]));
   if (behind.length >= 3) {
     const worst = behind.reduce((a, b) => (b.lobbyBoardValue - b.boardValue > a.lobbyBoardValue - a.boardValue ? b : a));
     findings.push({
       id: "level-tempo",
       kind: "level-tempo",
       severity: behind.length >= 5 ? "medium" : "low",
-      title: `Below lobby level in ${behind.length} of ${series.filter((p) => p.kind === "pvp" && p.stage >= behind[0].stage).length} fights from ${behind[0].stage} on`,
-      detail: `From ${behind[0].stage} on you were a level behind the lobby's median in ${behind.length} of ${series.filter((p) => p.kind === "pvp" && p.stage >= behind[0].stage).length} fights, and fewer slots meant a weaker board: at ${worst.stage} yours was worth ${worst.boardValue} against a lobby median of ${worst.lobbyBoardValue}.`,
+      title: `Below lobby level in ${behind.length} of ${series.filter((p) => withLobby(p) && p.stage >= behind[0].stage).length} fights from ${behind[0].stage} on`,
+      detail: `From ${behind[0].stage} on you were a level behind the lobby's median in ${behind.length} of ${series.filter((p) => withLobby(p) && p.stage >= behind[0].stage).length} fights, and fewer slots meant a weaker board: at ${worst.stage} yours was worth ${worst.boardValue} against a lobby median of ${worst.lobbyBoardValue}.`,
       advice: "Higher level means more units and better shop odds. If you are not rolling for a reroll comp, match the lobby's level by stage 4.",
       stages: behind.map((p) => p.stage),
       focus: worst.stage,

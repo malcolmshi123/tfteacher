@@ -70,8 +70,8 @@ export function RoundInspector({
       <dl className="grid grid-cols-2 border-b border-[var(--line)]">
         <Stat k="HP after combat" v={`${Math.max(0, r.hp - r.damageTaken)}`} sub={pt.lobbyAlive >= 4 ? `lobby ${pt.lobbyHp}` : `${pt.lobbyAlive} opponents left`} tone={pt.lobbyAlive < 4 ? undefined : r.hp - r.damageTaken < pt.lobbyHp ? "hp" : "good"} />
         <Stat k="Gold" v={`${r.gold}`} sub={`${r.goldEnd} into combat`} />
-        <Stat k="Level" v={`${r.level}`} sub={`lobby ${pt.lobbyLevel}`} tone={r.level < pt.lobbyLevel ? "hp" : r.level > pt.lobbyLevel ? "good" : undefined} />
-        <Stat k="Board" v={`${pt.boardValue}`} sub={`lobby ${pt.lobbyBoardValue}`} tone={pt.boardValue < pt.lobbyBoardValue ? "hp" : "good"} />
+        <Stat k="Level" v={`${r.level}`} sub={pt.lobbyAlive >= 4 ? `lobby ${pt.lobbyLevel}` : undefined} tone={pt.lobbyAlive < 4 ? undefined : r.level < pt.lobbyLevel ? "hp" : r.level > pt.lobbyLevel ? "good" : undefined} />
+        <Stat k="Board" v={`${pt.boardValue}`} sub={pt.lobbyAlive >= 4 ? `lobby ${pt.lobbyBoardValue}` : undefined} tone={pt.lobbyAlive < 4 ? undefined : pt.boardValue < pt.lobbyBoardValue ? "hp" : "good"} />
       </dl>
 
       <div className="space-y-5 px-4 py-5 sm:px-5">

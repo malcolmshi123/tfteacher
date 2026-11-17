@@ -3,7 +3,7 @@ import { UnitToken } from "@/components/UnitToken";
 import { allGames } from "@/lib/game/games";
 import { placeColor } from "@/lib/review/engine";
 import { UNIT_BY_ID } from "@/lib/game/set";
-import { NOTES, PATCH, PATCH_SUMMARY, changePct, radar, type CompVerdict, type NoteLine, type PatchPick } from "@/lib/patch/radar";
+import { NOTES, PATCH, PATCH_SUMMARY, chipSize, changePct, radar, type CompVerdict, type NoteLine, type PatchPick } from "@/lib/patch/radar";
 
 export const metadata = { title: "Patch Radar · TFTeacher" };
 
@@ -90,7 +90,7 @@ export default function PatchPage() {
         {shared.length > 0 && (
           <section className="mt-4 rounded-2xl border border-[var(--line)] bg-[var(--panel)] px-5 py-4">
             <div className="text-[13px] font-medium text-[var(--ink)]">Shared by more than one of your comps</div>
-            <ul className="mt-3 space-y-2">
+            <ul className="mt-3 divide-y divide-[var(--line)] border-y border-[var(--line)]">
               {shared.map((n) => (
                 <NoteRow key={n.id} n={n} note={touches(n.id).length === verdicts.length ? "All your comps" : touches(n.id).join(", ")} />
               ))}
@@ -108,9 +108,10 @@ export default function PatchPage() {
                   {k}
                 </dt>
                 <dd className="flex flex-wrap gap-2">
-                  {items.map((x) => (
-                    <span key={x} className="rounded-full border px-3 py-1 text-[var(--ink)]" style={{ borderColor: `color-mix(in oklab, ${c} 40%, var(--line))`, background: `color-mix(in oklab, ${c} 8%, transparent)` }}>
-                      {x}
+                  {[...items].sort((a, b) => chipSize(b) - chipSize(a)).map((x) => (
+                    <span key={x.label} className="tnum inline-flex items-baseline gap-1.5 rounded-full border px-3 py-1 text-[var(--ink)]" style={{ borderColor: `color-mix(in oklab, ${c} 40%, var(--line))`, background: `color-mix(in oklab, ${c} 8%, transparent)` }}>
+                      {x.label}
+                      <span className="text-[12px]" style={{ color: c }}>{chipSize(x).toFixed(0)}%</span>
                     </span>
                   ))}
                 </dd>
@@ -190,7 +191,7 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
             </>
           );
         })()}
-        <ul className="mt-5 space-y-2">
+        <ul className="mt-5 divide-y divide-[var(--line)] border-y border-[var(--line)]">
           {v.lines
             .filter((l) => !hide.has(l.id))
             .map((l) => (
@@ -227,7 +228,7 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
                     <td className="py-2 text-right text-[var(--ink-2)]">{was}</td>
                     <td className={`py-2 text-right ${now.length < 5 ? "text-[15px] font-medium text-[var(--ink-2)]" : "text-[17px] font-semibold text-[var(--ink)]"}`}>
                       {up !== undefined && (
-                        <span className="mr-1 text-[13px]" style={{ color: now.length < 5 ? "var(--muted)" : up ? "var(--good)" : "var(--hp)" }} aria-label={up ? "better" : "worse"}>
+                        <span className="mr-1 text-[13px]" style={{ color: up ? "var(--good)" : "var(--hp)" }} aria-label={up ? "better" : "worse"}>
                           {k === "Avg place" ? (up ? "↓" : "↑") : up ? "↑" : "↓"}
                         </span>
                       )}
@@ -268,7 +269,7 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
 
 function NoteRow({ n, note }: { n: NoteLine; note?: string }) {
   return (
-    <li className="grid grid-cols-[48px_minmax(0,1fr)] items-center gap-x-3 gap-y-2 rounded-xl border border-[var(--line)] bg-[var(--bg)] px-4 py-2.5 text-[14px] sm:grid-cols-[48px_minmax(0,1fr)_110px]">
+    <li className="grid grid-cols-[48px_minmax(0,1fr)] items-center gap-x-3 gap-y-2 py-2.5 text-[14px] sm:grid-cols-[48px_minmax(0,1fr)_96px]">
       <Dir d={n.direction} />
       <span className="tnum text-[var(--ink-2)]">
         {n.text}

@@ -111,10 +111,34 @@ export interface PatchPick {
   lines: string[]; // NoteLine ids
 }
 
-export const PATCH_SUMMARY: { lead: string; up: string[]; down: string[]; tryThese: PatchPick[]; avoid: PatchPick[] } = {
+export interface SummaryChip {
+  label: string;
+  lines: string[];
+}
+
+export const PATCH_SUMMARY: { lead: string; up: SummaryChip[]; down: SummaryChip[]; tryThese: PatchPick[]; avoid: PatchPick[] } = {
   lead: "18.5 mostly helps AP 4-costs, Fae and front lines.",
-  up: ["Fae", "Morgana", "Soraka", "Sett", "Taric", "Brambleback"],
-  down: ["Blackthorn (6)", "Rapidfire", "Flora Fatalis healing", "Elderwood (9)", "Riftbeast (7)", "Kha'Zix damage", "Azir damage", "Mama Beak damage", "Sentinel stun"],
+  up: [
+    { label: "Fae", lines: ["t-fae-1", "t-fae-2", "t-fae-3", "t-fae-4"] },
+    { label: "Tristana", lines: ["u-tristana-1", "u-tristana-2"] },
+    { label: "Morgana", lines: ["u-morgana-1", "u-morgana-2"] },
+    { label: "Soraka", lines: ["u-soraka-1", "u-soraka-2"] },
+    { label: "Sett heal", lines: ["u-sett-1"] },
+    { label: "Taric", lines: ["u-taric-1", "u-taric-2"] },
+    { label: "Brambleback", lines: ["u-brambleback-1", "u-brambleback-2"] },
+    { label: "Sentinel shield", lines: ["u-sentinel-2"] },
+  ],
+  down: [
+    { label: "Blackthorn (6)", lines: ["t-blackthorn-1", "t-blackthorn-2"] },
+    { label: "Rapidfire", lines: ["t-rapidfire-1"] },
+    { label: "Flora Fatalis healing", lines: ["t-flora-1"] },
+    { label: "Elderwood (9)", lines: ["t-elderwood-1"] },
+    { label: "Riftbeast (7)", lines: ["t-riftbeast-1"] },
+    { label: "Kha'Zix damage", lines: ["u-khazix-1", "u-khazix-2"] },
+    { label: "Azir damage", lines: ["u-azir-1"] },
+    { label: "Mama Beak damage", lines: ["u-mamabeak-2"] },
+    { label: "Sentinel stun", lines: ["u-sentinel-1"] },
+  ],
   tryThese: [
     {
       name: "Fae boards",
@@ -223,4 +247,9 @@ export function radar(comps = MY_COMPS, notes = NOTES): CompVerdict[] {
       .join("");
     return { comp, verdict, score, lines, why: why + note };
   });
+}
+
+// the biggest single change behind a chip, in percent (absolute)
+export function chipSize(c: SummaryChip): number {
+  return Math.max(0, ...c.lines.map((id) => Math.abs(changePct(NOTES.find((n) => n.id === id)?.text ?? "") ?? 0)));
 }

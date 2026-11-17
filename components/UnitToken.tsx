@@ -38,7 +38,7 @@ export function UnitToken({
   const small = size < 36;
   const b = small ? 1.5 : 2;
   return (
-    <div className="flex flex-col items-center gap-1.5" style={{ width: showName ? Math.max(size + 10, 66) : size, opacity: state === "dim" ? 0.55 : 1 }}>
+    <div className="flex flex-col items-center gap-1.5" style={{ width: showName ? Math.max(size + 10, 76) : size, opacity: state === "dim" ? 0.55 : 1 }}>
       <div
         className="relative"
         style={{

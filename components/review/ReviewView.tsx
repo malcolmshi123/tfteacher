@@ -133,7 +133,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
             <AskPanel gameId={game.id} onCite={openRound} suggested={suggestions} />
           </div>
         </section>
-        <aside className="hidden scroll-mt-24 lg:sticky lg:top-20 lg:block lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-y-auto lg:rounded-2xl">
+        <aside className="hidden scroll-mt-24 lg:sticky lg:top-20 lg:block lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-y-auto lg:rounded-2xl lg:[mask-image:linear-gradient(to_bottom,black_calc(100%-48px),transparent)] lg:pb-10">
           <RoundInspector game={game} stage={round} series={series} findings={findings} onPick={setRound} />
         </aside>
       </div>
