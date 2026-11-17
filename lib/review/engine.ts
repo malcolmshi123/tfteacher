@@ -58,7 +58,7 @@ export interface SeriesPoint {
   boardValue: number;
   lobbyBoardValue: number;
   lobbyLevel: number;
-  lobbyHp: number; // Top 4 line after this round's fights: 4th-highest opponent HP, knocked-out players at 0
+  lobbyHp: number; // Top 4 after this round's fights: 4th-highest opponent HP, knocked-out players at 0
   lobbyHpEntering: number; // the same line before them (the previous round's roster)
   lobbyAlive: number; // opponents still in after this round
   lobbyAliveEntering: number;
@@ -478,7 +478,7 @@ export function analyze(game: GameRecord): Review {
         return {
           label: `HP after ${keyStage}`,
           value: String(Math.max(0, R[k].hp - R[k].damageTaken)),
-          note: `top 4 line ${pt.lobbyHp}`,
+          note: `top 4: ${pt.lobbyHp}`,
         };
       })(),
       { label: "Rerolls", value: String(totalRolls), note: "whole game" },

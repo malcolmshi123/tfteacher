@@ -36,6 +36,8 @@ export function Timeline({
   width?: number;
 }) {
   const W = width;
+  // the HP and gold legends share one left edge on the right side of the chart
+  const LEGEND_W = compact ? 132 : 128;
   const { FS, PAD_L, PAD_R, HP_TOP, HP_H, GOLD_TOP, GOLD_H, STRIP_TOP, STRIP_H, AXIS_Y, H } = layout(compact);
   const n = series.length;
   const step = (W - PAD_L - PAD_R) / n;
@@ -46,7 +48,7 @@ export function Timeline({
 
   const hpPath = series.map((p, i) => `${i ? "L" : "M"}${cx(i)},${hpY(after(p))}`).join(" ");
   const hpArea = `${hpPath} L${cx(n - 1)},${HP_TOP + HP_H} L${cx(0)},${HP_TOP + HP_H} Z`;
-  // the Top 4 line: 4th-highest opponent HP, knocked-out players at 0
+  // Top 4: 4th-highest opponent HP, knocked-out players at 0
   const lobbyPath = series.map((p, i) => `${i ? "L" : "M"}${cx(i)},${hpY(p.lobbyHp)}`).join(" ");
   const hl = new Set(highlight ?? []);
 
@@ -100,11 +102,11 @@ export function Timeline({
       <text x={PAD_L} y={compact ? 14 : HP_TOP - 18} fontSize={FS} fill="var(--ink-2)">
         HP after combat
       </text>
-      {<g transform={`translate(${W - PAD_R - 170}, ${compact ? 4 : HP_TOP - 27})`}>
+      {<g transform={`translate(${W - PAD_R - LEGEND_W}, ${compact ? 4 : HP_TOP - 27})`}>
         <line x1={0} x2={16} y1={0} y2={0} stroke="var(--hp)" strokeWidth={2} transform="translate(0,4)" />
         <text x={22} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">You</text>
         <line x1={compact ? 66 : 58} x2={compact ? 84 : 74} y1={4} y2={4} stroke="var(--ink-2)" strokeWidth={1.5} strokeDasharray="3 3" />
-        <text x={compact ? 90 : 80} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">Top 4 line</text>
+        <text x={compact ? 90 : 80} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">Top 4</text>
       </g>}
 
       <path d={hpArea} fill="url(#hpFill)" />
@@ -118,9 +120,9 @@ export function Timeline({
       <text x={PAD_L} y={GOLD_TOP - (compact ? 14 : 18)} fontSize={FS} fill="var(--ink-2)">
         Gold into combat
       </text>
-      {<g transform={`translate(${PAD_L + 150}, ${compact ? GOLD_TOP - 14 - FS * 0.75 : GOLD_TOP - 27})`}>
-        <rect x={0} y={0} width={10} height={10} rx={2} fill="var(--gold)" fillOpacity={0.3} />
-        <text x={16} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">Spent that round</text>
+      {<g transform={`translate(${W - PAD_R - LEGEND_W}, ${compact ? GOLD_TOP - 14 - FS * 0.75 : GOLD_TOP - 27})`}>
+        <rect x={3} y={0} width={10} height={10} rx={2} fill="var(--gold)" fillOpacity={0.3} />
+        <text x={22} y={FS * 0.75} fontSize={FS} fill="var(--ink-2)">Spent that round</text>
       </g>}
       <line x1={PAD_L} x2={W - PAD_R} y1={goldY(50)} y2={goldY(50)} stroke="var(--gold)" strokeOpacity={0.35} strokeDasharray="2 4" />
       <text x={PAD_L - 8} y={goldY(50) + FS / 3} textAnchor="end" fontSize={FS} fill="var(--ink-2)" className="tnum">

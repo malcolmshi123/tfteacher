@@ -49,7 +49,7 @@ export function MobileRounds({
           </span>
           <span className="flex items-center gap-1.5">
             <span className="block h-0 w-3 border-t border-dashed border-[var(--ink-2)]" />
-            Top 4 line
+            Top 4
           </span>
         </span>
       </div>
