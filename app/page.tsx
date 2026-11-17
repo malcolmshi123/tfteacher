@@ -180,16 +180,17 @@ export default function Home() {
 
         {/* how */}
         <section className="border-t border-[var(--line)]">
-          <div className="mx-auto grid max-w-[1240px] gap-10 px-4 py-20 md:px-6 lg:grid-cols-3">
+          <h2 className="mx-auto max-w-[1240px] px-4 pt-20 text-[28px] font-semibold leading-tight tracking-[-0.02em] md:px-6 md:text-[34px]">How it works</h2>
+          <div className="mx-auto grid max-w-[1240px] gap-10 px-4 pb-20 pt-10 md:px-6 lg:grid-cols-3">
             <Step
               title="Play with the app open"
               visual={
                 <div className="flex items-center justify-between rounded-xl border border-[var(--line)] bg-[var(--panel)] px-4 py-3 text-[13px]">
                   <span className="flex items-center gap-2 text-[var(--ink-2)]">
                     <span className="block h-2 w-2 rounded-full bg-[var(--hp)]" />
-                    Recording round {r32.stage}
+                    Recording
                   </span>
-                  <span className="tnum text-[var(--muted)]">started at {r32.hp} HP · {r32.gold} gold</span>
+                  <span className="tnum text-[var(--muted)]">{review.game.rounds.findIndex((r) => r.stage === r32.stage) + 1} rounds saved</span>
                 </div>
               }
             >

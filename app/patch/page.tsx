@@ -39,11 +39,14 @@ export default function PatchPage() {
               {headline}
             </h1>
             <p className="mt-3 text-[15px] leading-relaxed text-[var(--ink-2)]">
-              Based on your {games} ranked games on {PATCH.from}. Augments and items aren&apos;t included.
+              Your {PATCH.from} comps checked against the {PATCH.to} notes. Augments and items aren&apos;t included.
             </p>
           </div>
           <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-4">
-            <div className="text-[12px] text-[var(--muted)]">Based on</div>
+            <div className="flex items-center justify-between text-[12px] text-[var(--muted)]">
+              <span>Based on</span>
+              <span className="rounded-full bg-[var(--panel-2)] px-2 py-0.5 text-[var(--ink-2)]">Pro view: every comp</span>
+            </div>
             <div className="tnum mt-1 text-[15px]">
               {games} ranked games, {verdicts.length} comps
             </div>
@@ -78,7 +81,7 @@ export default function PatchPage() {
         {shared.length > 0 && (
           <section className="mt-4 rounded-2xl border border-[var(--line)] bg-[var(--panel)] px-5 py-4">
             <div className="text-[13px] font-medium text-[var(--ink)]">Shared by more than one of your comps</div>
-            <ul className="mt-3 max-w-[900px] space-y-2">
+            <ul className="mt-3 space-y-2">
               {shared.map((n) => (
                 <NoteRow key={n.id} n={n} note={touches(n.id).length === verdicts.length ? "All your comps" : touches(n.id).join(", ")} />
               ))}
@@ -89,11 +92,21 @@ export default function PatchPage() {
         <section id="rest" className="mt-20 scroll-mt-20 border-t border-[var(--line)] pt-12">
           <h2 className="text-[28px] font-semibold tracking-[-0.02em]">The rest of {PATCH.to}</h2>
           <p className="mt-2 text-[17px] text-[var(--ink)]">{PATCH_SUMMARY.lead}</p>
-          <dl className="mt-4 grid max-w-[860px] gap-2 text-[15px] leading-relaxed sm:grid-cols-[110px_minmax(0,1fr)]">
-            <dt className="font-medium text-[var(--good)]">Stronger</dt>
-            <dd className="text-[var(--ink-2)]">{PATCH_SUMMARY.up}</dd>
-            <dt className="font-medium text-[var(--hp)]">Weaker</dt>
-            <dd className="text-[var(--ink-2)]">{PATCH_SUMMARY.down}</dd>
+          <dl className="mt-5 grid gap-3 text-[14px] sm:grid-cols-[96px_minmax(0,1fr)] sm:items-start">
+            {([["Stronger", "var(--good)", PATCH_SUMMARY.up], ["Weaker", "var(--hp)", PATCH_SUMMARY.down]] as const).map(([k, c, items]) => (
+              <div key={k} className="contents">
+                <dt className="pt-1 font-medium" style={{ color: c }}>
+                  {k}
+                </dt>
+                <dd className="flex flex-wrap gap-2">
+                  {items.map((x) => (
+                    <span key={x} className="rounded-full border px-3 py-1 text-[var(--ink)]" style={{ borderColor: `color-mix(in oklab, ${c} 40%, var(--line))`, background: `color-mix(in oklab, ${c} 8%, transparent)` }}>
+                      {x}
+                    </span>
+                  ))}
+                </dd>
+              </div>
+            ))}
           </dl>
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <PickList title="Worth trying" tone="var(--good)" picks={PATCH_SUMMARY.tryThese} />
@@ -141,7 +154,10 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
             {t.label}
           </div>
           <h3 className="mt-2 text-[22px] font-semibold tracking-tight">{v.comp.name}</h3>
-          <Meter score={v.score} buffs={v.lines.filter((l) => l.direction === "buff").length} nerfs={v.lines.filter((l) => l.direction === "nerf").length} />
+          <p className="tnum mt-2 flex gap-2 text-[13px]">
+            <span className="rounded-md bg-[color-mix(in_oklab,var(--hp)_13%,transparent)] px-2 py-0.5 text-[var(--hp)]">{(() => { const k = v.lines.filter((l) => l.direction === "nerf").length; return `${k} nerf${k === 1 ? "" : "s"}`; })()}</span>
+            <span className="rounded-md bg-[color-mix(in_oklab,var(--good)_13%,transparent)] px-2 py-0.5 text-[var(--good)]">{(() => { const k = v.lines.filter((l) => l.direction === "buff").length; return `${k} buff${k === 1 ? "" : "s"}`; })()}</span>
+          </p>
         </div>
         <div className="flex flex-wrap gap-x-1 gap-y-3">
           {v.comp.core.map((u) => (
@@ -210,9 +226,25 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
                   </tr>
                 ))}
               </tbody>
-              {now.length > 0 && now.length < 5 && (
-                <caption className="caption-bottom pt-2 text-left text-[12px] text-[var(--muted)]">
-                  Only {now.length} game{now.length === 1 ? "" : "s"} on {PATCH.to} so far, so treat this column as early.
+              {now.length > 0 && (
+                <caption className="caption-bottom pt-4 text-left">
+                  <span className="block text-[12px] text-[var(--muted)]">Your {PATCH.to} games, newest first</span>
+                  <span className="mt-2 flex flex-wrap gap-1.5">
+                    {now.map((pl, k) => (
+                      <span
+                        key={k}
+                        className="tnum rounded-md px-2 py-1 text-[13px] font-semibold"
+                        style={{ color: pl <= 4 ? "var(--good)" : "var(--hp)", background: `color-mix(in oklab, ${pl <= 4 ? "var(--good)" : "var(--hp)"} 14%, transparent)` }}
+                      >
+                        {pl}
+                      </span>
+                    ))}
+                  </span>
+                  {now.length < 5 && (
+                    <span className="mt-2 block text-[12px] text-[var(--muted)]">
+                      Only {now.length} game{now.length === 1 ? "" : "s"} on {PATCH.to} so far, so treat this column as early.
+                    </span>
+                  )}
                 </caption>
               )}
             </table>
@@ -226,56 +258,16 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
 
 function NoteRow({ n, note }: { n: NoteLine; note?: string }) {
   return (
-    <li className="grid grid-cols-[48px_minmax(0,1fr)] items-center gap-x-3 gap-y-2 rounded-xl border border-[var(--line)] bg-[var(--bg)] px-4 py-2.5 text-[14px] sm:grid-cols-[48px_minmax(0,1fr)_200px]">
+    <li className="grid grid-cols-[48px_minmax(0,1fr)] items-center gap-x-3 gap-y-2 rounded-xl border border-[var(--line)] bg-[var(--bg)] px-4 py-2.5 text-[14px] sm:grid-cols-[48px_minmax(0,1fr)_110px]">
       <Dir d={n.direction} />
       <span className="tnum text-[var(--ink-2)]">
         {n.text}
         {note && <span className="block text-[12px] text-[var(--muted)]">{note}</span>}
       </span>
-      <Size n={n} />
-    </li>
-  );
-}
-
-// Net size of the patch for this comp: weighted buffs minus nerfs, on a -8..8 scale.
-function Meter({ score, buffs, nerfs }: { score: number; buffs: number; nerfs: number }) {
-  const clamped = Math.max(-8, Math.min(8, score));
-  const pct = (Math.abs(clamped) / 8) * 50;
-  const color = score > 0 ? "var(--good)" : score < 0 ? "var(--hp)" : "var(--muted)";
-  return (
-    <div className="mt-3" aria-label={`Net patch effect ${score > 0 ? "+" : ""}${score}`}>
-      <div className="relative h-2 rounded-full bg-[var(--panel-2)]">
-        <span className="absolute left-1/2 top-[-4px] block h-4 w-0.5 -translate-x-1/2 rounded bg-[var(--ink-2)]" />
-        {clamped === 0 && <span className="absolute left-1/2 top-1/2 block h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[var(--panel)]" style={{ background: "var(--gold)" }} />}
-        <span
-          className="absolute top-0 block h-full rounded-full"
-          style={{ background: color, width: `${pct}%`, left: clamped < 0 ? `${50 - pct}%` : "50%" }}
-        />
-      </div>
-      <div className="tnum mt-1.5 flex justify-between text-[12px] text-[var(--muted)]">
-        <span>Weaker</span>
-        <span style={{ color }}>
-          {nerfs} nerf{nerfs === 1 ? "" : "s"} · {buffs} buff{buffs === 1 ? "" : "s"}
-        </span>
-        <span>Stronger</span>
-      </div>
-    </div>
-  );
-}
-
-// How big a change is: a bar (capped at 50%) beside the value, so size reads at a glance.
-function Size({ n }: { n: NoteLine }) {
-  const pct = changePct(n.text);
-  if (pct === undefined) return <span className="hidden sm:block" />;
-  const color = n.direction === "buff" ? "var(--good)" : n.direction === "nerf" ? "var(--hp)" : "var(--ink-2)";
-  const w = Math.max(4, (Math.min(50, Math.abs(pct)) / 50) * 100);
-  return (
-    <span className="col-start-2 flex items-center gap-3 sm:col-start-auto">
-      <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--panel-2)]">
-        <span className="block h-full rounded-full" style={{ width: `${w}%`, background: color }} />
+      <span className="col-start-2 sm:col-start-auto sm:text-right">
+        <Delta n={n} />
       </span>
-      <Delta n={n} />
-    </span>
+    </li>
   );
 }
 

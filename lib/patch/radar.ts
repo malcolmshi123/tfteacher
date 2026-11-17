@@ -111,10 +111,10 @@ export interface PatchPick {
   lines: string[]; // NoteLine ids
 }
 
-export const PATCH_SUMMARY: { lead: string; up: string; down: string; tryThese: PatchPick[]; avoid: PatchPick[] } = {
+export const PATCH_SUMMARY: { lead: string; up: string[]; down: string[]; tryThese: PatchPick[]; avoid: PatchPick[] } = {
   lead: "18.5 mostly helps AP carries, Fae and Taric.",
-  up: "Fae, AP 4-costs (Morgana, Soraka, Sett) and Taric.",
-  down: "Blackthorn, Rapidfire, Flora Fatalis healing, Elderwood (9) and Riftbeast (7), plus Kha'Zix, Azir and Mama Beak's damage and Sentinel's stun.",
+  up: ["Fae", "Morgana", "Soraka", "Sett", "Taric", "Brambleback"],
+  down: ["Blackthorn", "Rapidfire", "Flora Fatalis healing", "Elderwood (9)", "Riftbeast (7)", "Kha'Zix damage", "Azir damage", "Mama Beak damage", "Sentinel stun"],
   tryThese: [
     {
       name: "Fae boards",

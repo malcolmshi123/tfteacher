@@ -193,7 +193,8 @@ export function analyze(game: GameRecord): Review {
         focus: span[span.length - 1].stage,
         cites: [
           { stage: first, label: `${span[0].hp} HP before combat` },
-          { stage: lastS, label: `${endHp} HP after combat, +${earned} streak gold` },
+          { stage: lastS, label: `${endHp} HP after combat` },
+          { stage: first, label: `to ${lastS}: +${earned} streak gold in all` },
         ],
         hpCost: hpLost,
       });
