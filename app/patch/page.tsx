@@ -41,7 +41,7 @@ export default function PatchPage() {
               {headline}
             </h1>
             <p className="mt-3 text-[15px] leading-relaxed text-[var(--ink-2)]">
-              Your {PATCH.from} comps checked against the {PATCH.to} notes. Augments and items aren&apos;t included.
+              Your {PATCH.from} comps checked against the {PATCH.to} notes. Augments and items aren&apos;t included. A change listed for each star level shows the average of its per-star changes.
             </p>
           </div>
           <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-4">

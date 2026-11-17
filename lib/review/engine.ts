@@ -233,7 +233,7 @@ export function analyze(game: GameRecord): Review {
       kind: "held-gold-low-hp",
       severity: held.length >= 2 ? "high" : "medium",
       title: `Lost at ${held.map((r) => r.stage).join(" and ")} under 40 HP with ${held.map((r) => r.goldEnd).join(" and ")} gold unspent`,
-      detail: "Each of these fights started with gold you could have turned into board strength.",
+      detail: held.length > 1 ? `Each of these fights started with gold you could have turned into board strength. Together they cost ${hpLost} HP.` : `This fight started with gold you could have turned into board strength. It cost ${hpLost} HP.`,
       lines: held.map((r) => `${r.stage}: ${r.hp} HP, went into combat with ${r.goldEnd} gold, lost ${r.damageTaken} HP`),
       advice: "Under 40 HP, interest is worth less than HP. Roll to stabilize, then rebuild economy only after you win.",
       stages: held.map((r) => r.stage),
@@ -407,10 +407,27 @@ export function analyze(game: GameRecord): Review {
   const good = opener ? `won your first ${opener.stages.length} player fights` : "";
   const bad = worst ? mistake(worst) : `died on ${last.stage}`;
   const story = bad;
+  // the headline says what the mistake cost; the finding card below keeps the round-by-round title
+  const verdict = (f: Finding): string => {
+    switch (f.kind) {
+      case "held-gold-low-hp":
+        return `Gold you didn't spend under 40 HP cost you ${f.hpCost} HP at ${listStages(f.stages)}`;
+      case "unspent-gold":
+        return `You died on ${last.stage} with ${last.goldEnd} gold that never reached your board`;
+      case "missed-upgrade":
+        return `${f.stages.length} 2-star${f.stages.length === 1 ? "" : "s"} you could have bought stayed in the shop`;
+      case "idle-items":
+        return `${f.lines?.length ?? 0} item components never made it onto your board; one waited ${f.title.match(/for (\d+) rounds/)?.[1] ?? "several"} rounds`;
+      case "level-tempo":
+        return `A level behind the lobby in ${f.stages.length} fights left your board short of units`;
+      default:
+        return `You ${mistake(f)}`;
+    }
+  };
 
   const headline = streakStory
     ? `A loss streak left you at ${streakEndHp} HP after ${streak!.focus}, and you died on ${last.stage} holding ${last.goldEnd} gold.`
-    : `You ${story}.`;
+    : `${worst ? verdict(worst) : `You ${story}`}.`;
 
   const totalRolls = R.reduce((a, r) => a + r.rerolls, 0);
   let summary = "";

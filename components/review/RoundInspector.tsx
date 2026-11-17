@@ -83,7 +83,7 @@ export function RoundInspector({
           </div>
         </Section>
 
-        {(r.bought.length > 0 || r.sold.length > 0 || r.xpBought > 0 || r.rerolls > 0) && (
+        {(
           <Section title="Gold this round">
             <dl className="tnum mt-1 divide-y divide-[var(--line)] text-[13px]">
               {[
@@ -104,27 +104,32 @@ export function RoundInspector({
           </Section>
         )}
 
-        {r.bench.length > 0 && (
-          <Section title="Bench">
+        <Section title="Bench">
+          {r.bench.length > 0 ? (
             <div className="flex flex-wrap items-center gap-2 pt-2">
               {r.bench.map((p, i) => (
                 <UnitToken key={i} piece={p} size={36} showName={false} />
               ))}
             </div>
-          </Section>
-        )}
-        {r.itemBench.length > 0 && (
-          <Section title="Spare item components">
+          ) : (
+            <Empty>Empty</Empty>
+          )}
+        </Section>
+        <Section title="Spare item components">
+          {r.itemBench.length > 0 ? (
             <div className="flex flex-wrap items-center gap-2 pt-2">
               {r.itemBench.map((it, i) => (
                 <ItemChip key={i} id={it} />
               ))}
             </div>
-          </Section>
-        )}
+          ) : (
+            <Empty>None</Empty>
+          )}
+        </Section>
 
-        {here.length > 0 && (
+        {(
           <Section title="Findings at this round">
+            {here.length === 0 && <Empty>None at this round</Empty>}
             <ul className="space-y-1.5 pt-1">
               {here.map((f) => (
                 <li key={f.id} className="flex items-start gap-2 text-[13px] leading-snug text-[var(--ink-2)]">
@@ -136,7 +141,11 @@ export function RoundInspector({
           </Section>
         )}
 
-        {r.kind !== "carousel" && r.shops.length > 0 && (
+        {r.kind === "carousel" || r.shops.length === 0 ? (
+          <Section title="Shops seen">
+            <Empty>{r.kind === "carousel" ? "Carousel round: no shop" : "No shop this round"}</Empty>
+          </Section>
+        ) : (
           <Section title={`Shops seen · ${r.rerolls ? `free shop and ${r.rerolls} roll${r.rerolls === 1 ? "" : "s"}` : "free shop only"}`}>
             <div className="space-y-2 pt-1">
               {r.shops.map((shop, si) => (
@@ -161,6 +170,10 @@ export function RoundInspector({
       </div>
     </div>
   );
+}
+
+function Empty({ children }: { children: React.ReactNode }) {
+  return <p className="pt-1.5 text-[13px] text-[var(--muted)]">{children}</p>;
 }
 
 function summarize(units: string[]) {

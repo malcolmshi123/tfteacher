@@ -75,7 +75,9 @@ export function Timeline({
         });
         return runs.map(([a, b]) => (
           <g key={`h${a}`}>
-            <rect x={cx(a) - step / 2} y={HP_TOP - 2} width={step * (b - a + 1)} height={STRIP_TOP + STRIP_H - HP_TOP + 6} fill="var(--brand)" opacity={0.06} />
+            <rect x={cx(a) - step / 2} y={GOLD_TOP - 6} width={step * (b - a + 1)} height={STRIP_TOP + STRIP_H - GOLD_TOP + 10} fill="var(--brand)" opacity={0.07} />
+            <line x1={cx(a) - step / 2} x2={cx(a) - step / 2} y1={HP_TOP - 2} y2={HP_TOP + HP_H} stroke="var(--brand)" strokeOpacity={0.35} strokeDasharray="2 3" />
+            <line x1={cx(b) + step / 2} x2={cx(b) + step / 2} y1={HP_TOP - 2} y2={HP_TOP + HP_H} stroke="var(--brand)" strokeOpacity={0.35} strokeDasharray="2 3" />
             <rect x={cx(a) - step / 2 + 2} y={HP_TOP - 7} width={step * (b - a + 1) - 4} height={3} rx={1.5} fill="var(--brand)" opacity={0.8} />
           </g>
         ));

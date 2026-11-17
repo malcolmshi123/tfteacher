@@ -115,7 +115,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
       {/* findings + inspector */}
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_460px]">
         <section>
-          <div className="mb-3 flex items-baseline justify-between">
+          <div className="mb-3 flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between">
             <h2 className="text-[15px] font-medium">What decided this game</h2>
             <span className="text-[12px] text-[var(--muted)]">
               {(() => {
