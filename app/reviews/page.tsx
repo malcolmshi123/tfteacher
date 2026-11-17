@@ -73,11 +73,12 @@ export default async function ReviewsPage({ searchParams }: { searchParams: Prom
               );
             })}
         </nav>
-        <div className="mt-6 hidden grid-cols-[56px_220px_380px_minmax(0,1fr)_16px] gap-6 px-5 pb-2 text-[12px] text-[var(--ink-2)] md:grid">
+        <div className="mt-6 hidden grid-cols-[56px_220px_374px_minmax(0,1fr)_96px_16px] gap-6 px-5 pb-2 text-[12px] text-[var(--ink-2)] md:grid">
           <span>Place</span>
           <span>Comp</span>
           <span>Final board</span>
           <span>Biggest mistake</span>
+          <span className="text-right">Cost</span>
           <span />
         </div>
         <ul className="mt-4 space-y-3 md:mt-0">
@@ -87,7 +88,7 @@ export default async function ReviewsPage({ searchParams }: { searchParams: Prom
               <li key={game.id}>
                 <Link
                   href={`/review/${game.id}`}
-                  className="group grid grid-cols-[48px_minmax(0,1fr)] items-center gap-x-4 gap-y-3 rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-4 transition-colors hover:border-[var(--line-2)] hover:bg-[var(--panel-2)] md:grid-cols-[56px_220px_380px_minmax(0,1fr)_16px] md:items-center md:gap-6 md:px-5 md:py-4"
+                  className="group grid grid-cols-[48px_minmax(0,1fr)] items-center gap-x-4 gap-y-3 rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-4 transition-colors hover:border-[var(--line-2)] hover:bg-[var(--panel-2)] md:grid-cols-[56px_220px_374px_minmax(0,1fr)_96px_16px] md:items-center md:gap-6 md:px-5 md:py-4"
                 >
                   <PlaceBadge place={game.placement} size="lg" />
                   <div className="min-w-0">
@@ -103,10 +104,12 @@ export default async function ReviewsPage({ searchParams }: { searchParams: Prom
                     ))}
                   </div>
                   <div className="col-span-2 min-w-0 md:col-span-1">
-                    <div className="text-[14px] leading-snug text-[var(--ink)]">{top.title}</div>
+                    <div className="truncate text-[14px] leading-snug text-[var(--ink)]" title={top.title}>{top.title}</div>
+                  </div>
+                  <div className="col-span-2 md:col-span-1 md:text-right">
                     {top.cost && (
                       <span
-                        className="tnum mt-1.5 inline-block rounded-full px-2 py-0.5 text-[12px]"
+                        className="tnum inline-block rounded-full px-2 py-0.5 text-[12px]"
                         style={{ background: `color-mix(in oklab, ${costTone(top)} 13%, transparent)`, color: costTone(top) }}
                       >
                         {top.cost}
