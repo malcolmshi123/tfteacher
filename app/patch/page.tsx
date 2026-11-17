@@ -277,7 +277,7 @@ function NoteRow({ n, note }: { n: NoteLine; note?: string }) {
 function traitLine(core: string[]) {
   const n = new Map<string, number>();
   for (const u of core) for (const t of UNIT_BY_ID[u]?.traits ?? []) n.set(t, (n.get(t) ?? 0) + 1);
-  return [...n].filter(([, k]) => k >= 2).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([t, k]) => `${k} ${t}`).join(" · ");
+  return [...n].filter(([, k]) => k >= 2).sort((a, b) => b[1] - a[1]).map(([t, k]) => `${k} ${t}`).join(" · ");
 }
 
 function Delta({ n }: { n: NoteLine }) {
