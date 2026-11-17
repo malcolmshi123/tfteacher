@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { costTone, placeColor, type Finding, type Review } from "@/lib/review/engine";
+import { costTone, type Finding, type Review } from "@/lib/review/engine";
 import { AskPanel } from "./AskPanel";
 import { MobileRounds } from "./MobileRounds";
+import { PlaceBadge } from "@/components/PlaceBadge";
 import { CiteText } from "./CiteText";
 import { RoundInspector } from "./RoundInspector";
 import { Timeline } from "./Timeline";
@@ -50,7 +51,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
   }, [game, findings]);
 
   return (
-    <div className="mx-auto max-w-[1240px] px-4 pb-24 pt-6 md:px-6 md:pt-8" style={{ ["--place" as string]: placeColor(game.placement) }}>
+    <div className="mx-auto max-w-[1240px] px-4 pb-24 pt-6 md:px-6 md:pt-8">
       <Link href="/reviews" className="mb-5 inline-flex items-center gap-1.5 text-[13px] text-[var(--muted)] hover:text-[var(--ink)]">
         <span aria-hidden>‹</span> All reviews
       </Link>
@@ -58,7 +59,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div className="max-w-[920px]">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-[var(--muted)]">
-            <span className="tnum rounded-md bg-[color-mix(in_oklab,var(--place)_16%,var(--panel-2))] px-1.5 py-0.5 font-semibold text-[var(--place)]">{game.placement}</span>
+            <PlaceBadge place={game.placement} />
             <span>{game.queue}</span>
             <Dot />
             <span>{game.patch}</span>
@@ -78,12 +79,12 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
       </div>
 
       {/* stats */}
-      <dl className="mt-8 grid grid-cols-2 overflow-hidden rounded-t-2xl border border-[var(--line)] bg-[var(--panel)] md:grid-cols-4">
+      <dl className="mt-6 grid grid-cols-4 overflow-hidden rounded-t-2xl md:mt-8 border border-[var(--line)] bg-[var(--panel)] md:grid-cols-4">
         {review.stats.map((s, i) => (
-          <div key={s.label} className={`px-5 py-4 ${i % 2 ? "" : "border-r"} border-[var(--line)] md:border-r ${i === 3 ? "md:border-r-0" : ""} ${i < 2 ? "border-b md:border-b-0" : ""}`}>
-            <dt className="text-[12px] text-[var(--muted)]">{s.label}</dt>
-            <dd className="tnum mt-1 text-[26px] font-semibold tracking-tight">{s.value}</dd>
-            {s.note && <dd className="tnum text-[12px] text-[var(--muted)]">{s.note}</dd>}
+          <div key={s.label} className={`min-w-0 px-2.5 py-3 md:px-5 md:py-4 ${i === 3 ? "" : "border-r border-[var(--line)]"}`}>
+            <dt className="truncate text-[11px] text-[var(--muted)] md:text-[12px]">{s.label}</dt>
+            <dd className="tnum mt-1 whitespace-nowrap text-[17px] font-semibold tracking-tight md:text-[26px]">{s.value}</dd>
+            {s.note && <dd className="tnum hidden text-[12px] text-[var(--muted)] md:block">{s.note}</dd>}
           </div>
         ))}
       </dl>

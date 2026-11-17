@@ -1,9 +1,8 @@
 import { SiteFooter, SiteNav } from "@/components/SiteChrome";
 import { UnitToken } from "@/components/UnitToken";
 import { allGames } from "@/lib/game/games";
-import { placeColor } from "@/lib/review/engine";
-import { UNIT_BY_ID } from "@/lib/game/set";
-import { NOTES, PATCH, PATCH_SUMMARY, chipSize, changePct, radar, type CompVerdict, type NoteLine, type PatchPick } from "@/lib/patch/radar";
+import { PlaceBadge } from "@/components/PlaceBadge";
+import { NOTES, PATCH, PATCH_SUMMARY, chipSize, changePct, traitCounts, radar, type CompVerdict, type NoteLine, type PatchPick } from "@/lib/patch/radar";
 
 export const metadata = { title: "Patch Radar · TFTeacher" };
 
@@ -35,13 +34,7 @@ export default function PatchPage() {
         <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_300px] md:items-start">
           <div className="max-w-[720px]">
             <p className="text-[13px] text-[var(--muted)]">
-              <span className="inline-flex items-center gap-1.5">
-                Patch {PATCH.from}
-                <svg width="16" height="10" viewBox="0 0 16 10" aria-label="to">
-                  <path d="M1 5h13M10 1.5 14 5l-4 3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                {PATCH.to}
-              </span>{" "}
+              Patch {PATCH.from} <span aria-label="to">→</span> {PATCH.to}{" "}
               · live {PATCH.date}
             </p>
             <h1 className="mt-3 text-[28px] font-semibold leading-[1.15] tracking-[-0.02em] text-balance md:text-[36px]">
@@ -109,9 +102,8 @@ export default function PatchPage() {
                 </dt>
                 <dd className="flex flex-wrap gap-2">
                   {[...items].sort((a, b) => chipSize(b) - chipSize(a)).map((x) => (
-                    <span key={x.label} className="tnum inline-flex items-baseline gap-1.5 rounded-full border px-3 py-1 text-[var(--ink)]" style={{ borderColor: `color-mix(in oklab, ${c} 40%, var(--line))`, background: `color-mix(in oklab, ${c} 8%, transparent)` }}>
+                    <span key={x.label} className="rounded-full border px-3 py-1 text-[var(--ink)]" style={{ borderColor: `color-mix(in oklab, ${c} 40%, var(--line))`, background: `color-mix(in oklab, ${c} 8%, transparent)` }}>
                       {x.label}
-                      <span className="text-[12px]" style={{ color: c }}>{chipSize(x).toFixed(0)}%</span>
                     </span>
                   ))}
                 </dd>
@@ -228,8 +220,8 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
                     <td className="py-2 text-right text-[var(--ink-2)]">{was}</td>
                     <td className={`py-2 text-right ${now.length < 5 ? "text-[15px] font-medium text-[var(--ink-2)]" : "text-[17px] font-semibold text-[var(--ink)]"}`}>
                       {up !== undefined && (
-                        <span className="mr-1 text-[13px]" style={{ color: up ? "var(--good)" : "var(--hp)" }} aria-label={up ? "better" : "worse"}>
-                          {k === "Avg place" ? (up ? "↓" : "↑") : up ? "↑" : "↓"}
+                        <span className="mr-1 text-[10px]" style={{ color: up ? "var(--good)" : "var(--hp)" }} aria-label={up ? "better" : "worse"}>
+                          {k === "Avg place" ? (up ? "▼" : "▲") : up ? "▲" : "▼"}
                         </span>
                       )}
                       {is}
@@ -242,13 +234,7 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
                   <span className="block text-[12px] text-[var(--muted)]">Your {PATCH.to} games, newest first</span>
                   <span className="mt-2 flex flex-wrap gap-1.5">
                     {now.map((pl, k) => (
-                      <span
-                        key={k}
-                        className="tnum rounded-md px-2 py-1 text-[13px] font-semibold"
-                        style={{ color: placeColor(pl), background: `color-mix(in oklab, ${placeColor(pl)} 16%, transparent)` }}
-                      >
-                        {pl}
-                      </span>
+                      <PlaceBadge key={k} place={pl} />
                     ))}
                   </span>
                   {now.length < 5 && (
@@ -284,9 +270,7 @@ function NoteRow({ n, note }: { n: NoteLine; note?: string }) {
 
 // the traits a board runs at 2 or more units, biggest first
 function traitLine(core: string[]) {
-  const n = new Map<string, number>();
-  for (const u of core) for (const t of UNIT_BY_ID[u]?.traits ?? []) n.set(t, (n.get(t) ?? 0) + 1);
-  return [...n].filter(([, k]) => k >= 2).sort((a, b) => b[1] - a[1]).map(([t, k]) => `${k} ${t}`).join(" · ");
+  return [...traitCounts(core)].filter(([, k]) => k >= 2).sort((a, b) => b[1] - a[1]).map(([tr, k]) => `${k} ${tr}`).join(" · ");
 }
 
 function Delta({ n }: { n: NoteLine }) {
@@ -294,7 +278,7 @@ function Delta({ n }: { n: NoteLine }) {
   if (pct === undefined) return null;
   return (
     <span className="tnum w-24 shrink-0 text-right text-[13px] font-medium" style={{ color: n.direction === "buff" ? "var(--good)" : n.direction === "nerf" ? "var(--hp)" : "var(--ink-2)" }}>
-      {pct > 0 ? "↑" : "↓"} {Math.abs(pct).toFixed(1)}%
+      <span className="mr-0.5 text-[10px]">{pct > 0 ? "▲" : "▼"}</span>{Math.abs(pct).toFixed(1)}%
       {n.direction === "buff" && pct < 0 ? <span className="block text-[11px] font-normal text-[var(--muted)]">lower is better</span> : null}
     </span>
   );

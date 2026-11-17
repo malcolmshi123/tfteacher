@@ -72,11 +72,17 @@ export function UnitToken({
         )}
 
         {piece && piece.items.length > 0 && (
-          <span className="absolute left-1/2 flex -translate-x-1/2 gap-[2px]" style={{ bottom: 2 }}>
-            {piece.items.map((it, k) => (
-              <ItemIcon key={k} id={it} size={Math.max(11, Math.min(Math.round(size * 0.36), Math.floor((size - 2 * (piece.items.length - 1)) / piece.items.length)))} />
-            ))}
-          </span>
+          (() => {
+            const s = Math.max(11, Math.min(Math.round(size * 0.36), Math.floor((size - 3 * (piece.items.length - 1)) / piece.items.length)));
+            // the row's middle sits on the portrait's bottom edge, centered left to right
+            return (
+              <span className="absolute left-1/2 flex w-max -translate-x-1/2 gap-[3px]" style={{ bottom: -Math.round(s / 2) }}>
+                {piece.items.map((it, k) => (
+                  <ItemIcon key={k} id={it} size={s} />
+                ))}
+              </span>
+            );
+          })()
         )}
       </div>
       {showName && <span className="mt-0.5 block w-full truncate text-center text-[11px] leading-none text-[var(--ink-2)]" title={u.name}>{u.name}</span>}
@@ -94,7 +100,7 @@ export function ItemIcon({ id, size = 14 }: { id: string; size?: number }) {
       width={size}
       height={size}
       className="block rounded-[3px]"
-      style={{ width: size, height: size, boxShadow: "0 0 0 1.5px var(--bg)" }}
+      style={{ width: size, height: size, boxShadow: "0 0 0 1.5px var(--ink)" }}
     />
   );
 }

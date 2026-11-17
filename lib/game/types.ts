@@ -10,6 +10,7 @@ export interface UnitDef {
   name: string;
   cost: Cost;
   traits: string[];
+  traitWeight?: number; // counts as this many units toward its traits (Elder Dragon: 2)
 }
 
 export interface Piece {

@@ -81,7 +81,8 @@ export const NOTES: NoteLine[] = [
 // active trait counts for a board
 export function traitCounts(core: string[]): Map<string, number> {
   const n = new Map<string, number>();
-  for (const id of core) for (const tr of UNIT_BY_ID[id]?.traits ?? []) n.set(tr, (n.get(tr) ?? 0) + 1);
+  // some units count as 2 toward their traits (Elder Dragon)
+  for (const id of core) for (const tr of UNIT_BY_ID[id]?.traits ?? []) n.set(tr, (n.get(tr) ?? 0) + (UNIT_BY_ID[id]?.traitWeight ?? 1));
   return n;
 }
 

@@ -64,7 +64,7 @@ export const UNITS: UnitDef[] = [
   { id: "alune", name: "Alune", cost: 5, traits: ["Attuned", "Lunar", "Spellweaver"] },
   { id: "ashe", name: "Ashe", cost: 5, traits: ["Blossom", "Hunter"] },
   { id: "draven", name: "Draven", cost: 5, traits: ["Bounty Seeker"] },
-  { id: "elderdragon", name: "Elder Dragon", cost: 5, traits: ["Apex Predator", "Riftbeast"] },
+  { id: "elderdragon", name: "Elder Dragon", cost: 5, traits: ["Apex Predator", "Riftbeast"], traitWeight: 2 },
   { id: "gnar", name: "Gnar", cost: 5, traits: ["Elderwood", "Sprykin", "Brawler"] },
   { id: "ivern", name: "Ivern", cost: 5, traits: ["Greenfather"] },
   { id: "kennen", name: "Kennen", cost: 5, traits: ["Inferno", "Executioner"] },

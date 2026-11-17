@@ -4,7 +4,8 @@ import { SiteFooter, SiteNav } from "@/components/SiteChrome";
 import { HighlightSwatch, UnitToken } from "@/components/UnitToken";
 import { Timeline } from "@/components/review/Timeline";
 import { buildSampleGame } from "@/lib/game/sample";
-import { analyze, boardValue, shopMarks, placeColor } from "@/lib/review/engine";
+import { analyze, boardValue, shopMarks } from "@/lib/review/engine";
+import { PlaceBadge } from "@/components/PlaceBadge";
 import { UNIT_BY_ID } from "@/lib/game/set";
 import { MY_COMPS } from "@/lib/patch/radar";
 
@@ -62,7 +63,7 @@ export default function Home() {
             <div className="rounded-[20px] border border-[var(--line)] bg-[var(--panel)] p-4 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.7)] md:p-5">
               <div className="flex items-center justify-between px-1">
                 <div className="flex items-center gap-2.5">
-                  <span className="tnum grid h-8 min-w-8 place-items-center rounded-lg px-1.5 text-[15px] font-semibold" style={{ color: placeColor(review.game.placement), background: `color-mix(in oklab, ${placeColor(review.game.placement)} 16%, var(--panel-2))` }}>{review.game.placement}</span>
+                  <PlaceBadge place={review.game.placement} size="md" />
                   <div>
                     <div className="text-[13px] font-medium">Sample game · Ranked · {review.game.patch}</div>
                     <div className="text-[12px] text-[var(--muted)]">Recorded round by round</div>
@@ -106,7 +107,7 @@ export default function Home() {
             <div className="mt-10 grid gap-4 md:grid-cols-2 md:items-start">
               <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
                 <div className="text-[13px] font-medium text-[var(--muted)]">What match history shows</div>
-                <div className="mt-5 flex flex-wrap gap-x-2.5 gap-y-3">
+                <div className="mt-5 flex flex-wrap gap-y-5">
                   {last.board.map((p, i) => (
                     <UnitToken key={i} piece={p} size={50} />
                   ))}
@@ -114,7 +115,7 @@ export default function Home() {
                 <dl className="tnum mt-5 grid grid-cols-3 gap-3 text-[13px]">
                   <div>
                     <dt className="text-[var(--muted)]">Placement</dt>
-                    <dd className="text-[18px] font-semibold" style={{ color: placeColor(review.game.placement) }}>{review.game.placement}</dd>
+                    <dd className="mt-0.5"><PlaceBadge place={review.game.placement} /></dd>
                   </div>
                   <div>
                     <dt className="text-[var(--muted)]">Level</dt>
@@ -134,19 +135,20 @@ export default function Home() {
               </div>
               <div className="rounded-2xl border border-[var(--line-2)] bg-[var(--panel-2)] p-6">
                 <div className="text-[13px] font-medium text-[var(--brand)]">What TFTeacher sees at 4-1 alone</div>
-                <div className="mt-5 space-y-2">
+                <div className="mt-5 grid gap-5 sm:grid-cols-[auto_minmax(0,1fr)]">
+                <div className="space-y-2">
                   {r41.shops.map((shop, si) => (
                     <div key={si} className="flex items-center gap-3">
                       <span className="w-12 text-[11px] text-[var(--muted)]">{si === 0 ? "Free" : `Roll ${si}`}</span>
                       <div className="flex gap-2.5">
                         {shop.map((u, k) => (
-                          <UnitToken key={k} unitId={u} size={28} showName={false} state={slotState(si, k, u)} />
+                          <UnitToken key={k} unitId={u} size={42} showName={false} state={slotState(si, k, u)} />
                         ))}
                       </div>
                     </div>
                   ))}
                 </div>
-                <dl className="tnum mt-5 grid grid-cols-3 gap-3 text-[13px]">
+                <dl className="tnum grid content-start gap-4 text-[13px] sm:border-l sm:border-[var(--line)] sm:pl-5">
                   <div>
                     <dt className="text-[var(--muted)]">HP after combat</dt>
                     <dd className="text-[18px] font-semibold text-[var(--hp)]">{Math.max(0, r41.hp - r41.damageTaken)}</dd>
@@ -162,6 +164,7 @@ export default function Home() {
                     <dd className="text-[18px] font-semibold">{r41.rerolls}</dd>
                   </div>
                 </dl>
+                </div>
                 <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[12px] text-[var(--ink-2)] [&>span]:gap-2">
                   <span className="flex items-center gap-1.5"><HighlightSwatch state="bought" />Bought</span>
                   {anyMissed && <span className="flex items-center gap-1.5"><HighlightSwatch state="missed" />Missed</span>}
@@ -203,7 +206,7 @@ export default function Home() {
               visual={
                 <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--line)] bg-[var(--panel)] px-4 py-3 text-[13px]">
                   <span className="truncate text-[var(--ink)]">Died on {last.stage} holding {last.goldEnd} gold</span>
-                  <span className="tnum grid h-6 min-w-6 shrink-0 place-items-center rounded-md px-1 text-[13px] font-semibold" style={{ color: placeColor(review.game.placement), background: `color-mix(in oklab, ${placeColor(review.game.placement)} 16%, var(--panel-2))` }}>{review.game.placement}</span>
+                  <PlaceBadge place={review.game.placement} />
                 </div>
               }
             >
@@ -238,9 +241,9 @@ export default function Home() {
             </div>
             <div className="rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-6">
               <p className="text-[15px] leading-relaxed text-[var(--ink)]">
-                &ldquo;You entered <Cite round>4-3</Cite> at <Cite>{r43.hp} HP</Cite>, fought holding <Cite>{r43.goldEnd} gold</Cite> and lost{" "}
+                You entered <Cite round>4-3</Cite> at <Cite>{r43.hp} HP</Cite>, fought holding <Cite>{r43.goldEnd} gold</Cite> and lost{" "}
                 <Cite>{r43.damageTaken} HP</Cite>. Two rounds later you entered <Cite round>4-5</Cite> at <Cite>{r45.hp} HP</Cite> and still fought holding{" "}
-                <Cite>{r45.goldEnd} gold</Cite>.&rdquo;
+                <Cite>{r45.goldEnd} gold</Cite>.
               </p>
               <div className="mt-5 flex items-center gap-2 text-[12px] text-[var(--muted)]">
                 <span className="block h-1.5 w-1.5 rounded-full bg-[var(--good)]" />5 numbers and 2 rounds, all match the recording

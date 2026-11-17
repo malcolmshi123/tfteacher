@@ -395,8 +395,8 @@ export function analyze(game: GameRecord): Review {
   const story = bad;
 
   const headline = streakStory
-    ? `You placed ${place}: a loss streak left you at ${streakEndHp} HP after ${streak!.focus}, and you died on ${last.stage} holding ${last.goldEnd} gold.`
-    : `You placed ${place}: you ${story}.`;
+    ? `A loss streak left you at ${streakEndHp} HP after ${streak!.focus}, and you died on ${last.stage} holding ${last.goldEnd} gold.`
+    : `You ${story}.`;
 
   const totalRolls = R.reduce((a, r) => a + r.rerolls, 0);
   let summary = "";
