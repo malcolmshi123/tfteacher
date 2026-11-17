@@ -105,7 +105,7 @@ export function MobileRounds({
         {si >= 0 && <span className="tnum w-full text-[var(--gold)]">{series[si].goldEnd} of {series[si].gold} into combat at {selected}</span>}
       </div>
       <div className="relative">
-      <div ref={strip} className="-mx-3 mt-3 flex snap-x snap-mandatory scroll-pl-3 gap-1.5 overflow-x-auto px-3 pb-1 [scrollbar-width:none]" role="list" aria-label="Rounds">
+      <div ref={strip} className="-mx-3 mt-3 flex snap-x snap-mandatory scroll-pl-3 gap-1.5 overflow-x-auto px-3 pb-1 [mask-image:linear-gradient(to_right,transparent,black_14px,black_calc(100%-28px),transparent)] [scrollbar-width:none]" role="list" aria-label="Rounds">
         {series.map((p) => {
           const sel = p.stage === selected;
           const bar =

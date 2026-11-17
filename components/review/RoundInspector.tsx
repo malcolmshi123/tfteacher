@@ -67,7 +67,7 @@ export function RoundInspector({
 
       {takeaway && <p className="text-pretty border-b border-[var(--line)] px-4 py-3 text-[14px] leading-snug text-[var(--ink)] sm:px-5">{takeaway}</p>}
 
-      <dl className="grid grid-cols-2 border-b border-[var(--line)]">
+      <dl className="grid grid-cols-2 border-b border-[var(--line)] lg:grid-cols-4">
         <Stat k="HP after combat" v={`${Math.max(0, r.hp - r.damageTaken)}`} sub={pt.lobbyAlive >= 4 ? `lobby ${pt.lobbyHp}` : `${pt.lobbyAlive} opponents left`} tone={pt.lobbyAlive < 4 ? undefined : r.hp - r.damageTaken < pt.lobbyHp ? "hp" : "good"} />
         <Stat k="Gold" v={`${r.gold}`} sub={`${r.goldEnd} into combat`} />
         <Stat k="Level" v={`${r.level}`} sub={pt.lobbyAlive >= 4 ? `lobby ${pt.lobbyLevel}` : undefined} tone={pt.lobbyAlive < 4 ? undefined : r.level < pt.lobbyLevel ? "hp" : r.level > pt.lobbyLevel ? "good" : undefined} />
@@ -202,21 +202,17 @@ function NavBtn({ children, onClick, disabled, label }: { children: React.ReactN
 
 function Stat({ k, v, sub, tone }: { k: string; v: string; sub?: string; tone?: "hp" | "good" }) {
   return (
-    <div className="border-b border-r border-[var(--line)] px-4 py-3.5 even:border-r-0 sm:px-5 [&:nth-child(n+3)]:border-b-0">
-      <dt className="text-[12px] text-[var(--muted)]">{k}</dt>
-      <dd className="tnum mt-0.5 text-[20px] font-semibold tracking-tight">
+    <div className="min-w-0 border-b border-r border-[var(--line)] px-4 py-3.5 even:border-r-0 sm:px-5 lg:border-b-0 lg:px-3 lg:py-3 lg:even:border-r lg:last:border-r-0 [&:nth-child(n+3)]:border-b-0">
+      <dt className="truncate text-[12px] text-[var(--muted)] lg:text-[11px]">{k}</dt>
+      <dd className="tnum mt-0.5 flex items-baseline text-[20px] font-semibold tracking-tight">
+        {tone && (
+          <span className="mr-1 text-[10px]" style={{ color: tone === "hp" ? "var(--hp)" : "var(--good)" }} aria-label={tone === "hp" ? "below the lobby" : "above the lobby"}>
+            {tone === "hp" ? "▼" : "▲"}
+          </span>
+        )}
         {v}
       </dd>
-      {sub && (
-        <dd className="tnum text-[12px] text-[var(--muted)]">
-          {tone && (
-            <span className="mr-1" style={{ color: tone === "hp" ? "var(--hp)" : "var(--good)" }} aria-label={tone === "hp" ? "behind" : "ahead"}>
-              {tone === "hp" ? "▼" : "▲"}
-            </span>
-          )}
-          {sub}
-        </dd>
-      )}
+      {sub && <dd className="tnum truncate text-[12px] text-[var(--muted)] lg:text-[11px]">{sub}</dd>}
     </div>
   );
 }
