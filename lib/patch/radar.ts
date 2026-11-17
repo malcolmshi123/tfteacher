@@ -240,7 +240,7 @@ export function radar(comps = MY_COMPS, notes = NOTES): CompVerdict[] {
               // a unit with lines both ways is called mixed, naming what went each way
               const mixed = [...nerfed].filter((t) => buffs.some((b) => b.target === t));
               const mixedText = mixed
-                .map((t) => ` ${name(t)} is mixed: ${nerfs.filter((x) => x.target === t).map((x) => x.text.replace(`${name(t)} `, "")).join("; ")}, but ${buffs.filter((x) => x.target === t).map((x) => x.text.replace(`${name(t)} `, "")).join("; ")}.`)
+                .map((t) => ` ${name(t)} went both ways: its ${nerfs.filter((x) => x.target === t).map((x) => x.text.replace(`${name(t)} `, "")).join("; ")}, but its ${buffs.filter((x) => x.target === t).map((x) => x.text.replace(`${name(t)} `, "")).join("; ")}.`)
                 .join("");
               const pure = nerfs.filter((x) => !mixed.includes(x.target));
               return `${list(up)} got stronger.${mixedText}${pure.length ? ` One line went the other way: ${pure.map((x) => x.text).join("; ")}.` : ""}${nerfs.length ? "" : " Nothing in the comp was nerfed."}`;

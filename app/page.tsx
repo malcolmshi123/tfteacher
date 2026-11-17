@@ -55,7 +55,7 @@ export default function Home() {
                 See a sample review
               </Link>
             </div>
-            <p className="mt-4 text-[14px] text-[var(--ink-2)]">Free for 3 reviews a week. Works with any set.</p>
+            <p className="mt-4 text-[14px] text-[var(--ink-2)]">Free for 3 round-by-round reviews a week. Works with any set.</p>
           </div>
 
           {/* hero visual: a real slice of the sample review */}
@@ -256,7 +256,7 @@ export default function Home() {
           <div className="mx-auto flex max-w-[1240px] flex-col items-start gap-6 px-4 py-16 md:flex-row md:items-center md:justify-between md:px-6">
             <div>
               <h2 className="text-[24px] font-semibold tracking-tight">Your next game is the one to record.</h2>
-              <p className="mt-2 text-[15px] text-[var(--ink-2)]">3 free reviews a week. Pro is $5 a month for unlimited reviews.</p>
+              <p className="mt-2 text-[15px] text-[var(--ink-2)]">3 free round-by-round reviews a week. Pro is $5 a month for unlimited.</p>
             </div>
             <div className="flex gap-3">
               <Link href="/download" className="rounded-xl bg-[var(--brand)] px-5 py-3 text-[15px] font-semibold text-[#1a1306] hover:opacity-90">

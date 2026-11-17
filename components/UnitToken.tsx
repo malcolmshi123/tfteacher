@@ -41,11 +41,11 @@ export function UnitToken({
   const b = small ? 1.5 : 2;
   const items = piece?.items ?? extraItems ?? [];
   // item icons: a row no wider than the portrait, so neighbours never touch
-  const GAP = 2;
-  const itemSize = (n: number) => Math.min(Math.round(size * 0.36), Math.floor((size - GAP * (n - 1)) / n));
+  const GAP = 1;
+  const ITEM = Math.floor((size - GAP * 2) / 3);
   // a quarter of the icon sits on the portrait, three quarters below its bottom edge
   const below = (s: number) => Math.ceil(s * 0.75);
-  const reserve = piece || extraItems ? below(itemSize(3)) + 3 : 0;
+  const reserve = piece || extraItems ? below(ITEM) + 3 : 0;
   return (
     <div className="flex flex-col items-center gap-1.5" style={{ width: showName ? Math.max(size + 10, 76) : size, opacity: state === "dim" ? 0.55 : 1 }}>
       <div
@@ -82,7 +82,7 @@ export function UnitToken({
 
         {items.length > 0 &&
           (() => {
-            const s = itemSize(items.length);
+            const s = ITEM;
             return (
               <span className="absolute left-1/2 flex w-max -translate-x-1/2" style={{ gap: GAP, bottom: -below(s) }}>
                 {items.map((it, k) => (

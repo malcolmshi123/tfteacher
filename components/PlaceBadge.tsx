@@ -11,7 +11,7 @@ export function PlaceBadge({ place, size = "sm" }: { place: number; size?: keyof
   const c = placeColor(place);
   return (
     <span
-      className={`tnum inline-flex shrink-0 items-center justify-center border font-semibold leading-none ${SIZES[size]}`}
+      className={`tnum inline-flex shrink-0 items-center justify-center border-2 font-semibold leading-none ${SIZES[size]}`}
       style={{ color: c, borderColor: `color-mix(in oklab, ${c} 60%, transparent)`, background: `color-mix(in oklab, ${c} 14%, var(--panel-2))` }}
       aria-label={`Placed ${place}`}
     >

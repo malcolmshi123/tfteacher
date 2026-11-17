@@ -91,7 +91,7 @@ export function RoundInspector({
                 ...(r.xpBought ? [["XP", `${r.xpBought} buy${r.xpBought === 1 ? "" : "s"}`, `−${r.xpBought * 4}`]] : []),
                 ...(r.rerolls ? [["Rerolls", `${r.rerolls} roll${r.rerolls === 1 ? "" : "s"}`, `−${r.rerolls * 2}`]] : []),
                 ...(r.bought.length ? [["Units", summarize(r.bought), `−${r.bought.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0)}`]] : []),
-                ...(r.sold.length ? [["Sold", summarizeSold(r.sold), `+${r.soldGold}`]] : []),
+                ...(r.sold.length ? [["Sold", `${summarizeSold(r.sold)}, worth ${r.sold.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0)} on the board`, `+${r.soldGold}`]] : []),
                 ["Into combat", "", `${r.goldEnd}`],
               ].map(([k, what, v], i, all) => (
                 <div key={k} className={`grid grid-cols-[96px_minmax(0,1fr)_44px] items-baseline gap-3 py-2 ${i === 0 || i === all.length - 1 ? "font-medium text-[var(--ink)]" : "text-[var(--ink-2)]"}`}>

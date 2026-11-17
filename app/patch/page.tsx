@@ -34,7 +34,7 @@ export default function PatchPage() {
         <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_300px] md:items-start">
           <div className="max-w-[720px]">
             <p className="text-[13px] text-[var(--muted)]">
-              Patch {PATCH.from} <span aria-label="to">→</span> {PATCH.to}{" "}
+              Patch {PATCH.from} to {PATCH.to}{" "}
               · live {PATCH.date}
             </p>
             <h1 className="mt-3 text-[28px] font-semibold leading-[1.15] tracking-[-0.02em] text-balance md:text-[36px]">
@@ -146,11 +146,17 @@ function PickList({ title, tone, picks }: { title: string; tone: string; picks: 
 }
 
 function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
-  const t = v.verdict === "mixed" && v.score !== 0 ? { ...TONE.mixed, label: v.score < 0 ? "Mixed, leans nerfed" : "Mixed, leans buffed" } : TONE[v.verdict];
+  const both = v.lines.some((l) => l.direction === "nerf") && v.lines.some((l) => l.direction === "buff");
+  const t =
+    v.verdict === "mixed" && v.score !== 0
+      ? { ...TONE.mixed, label: v.score < 0 ? "Mixed, leans nerfed" : "Mixed, leans buffed" }
+      : both && (v.verdict === "stronger" || v.verdict === "weaker")
+        ? { ...TONE[v.verdict], label: `${TONE[v.verdict].label} overall` }
+        : TONE[v.verdict];
   return (
     <article className="overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--panel)]">
-      <header className="flex flex-col gap-5 border-b border-[var(--line)] p-6 lg:flex-row lg:items-center lg:justify-between">
-        <div className="min-w-0 lg:flex-1">
+      <header className="flex flex-col gap-5 border-b border-[var(--line)] p-6 lg:flex-row lg:items-center lg:gap-14">
+        <div className="min-w-0 lg:flex-none">
           <div className="flex items-center gap-2 text-[13px] font-medium" style={{ color: t.color }}>
             <span className="block h-2 w-2 rounded-full" style={{ background: t.color }} />
             {t.label}
@@ -162,7 +168,7 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
             <span className="rounded-md bg-[color-mix(in_oklab,var(--good)_13%,transparent)] px-2 py-0.5 text-[var(--good)]">{(() => { const k = v.lines.filter((l) => l.direction === "buff").length; return `${k} buff${k === 1 ? "" : "s"}`; })()}</span>
           </p>
         </div>
-        <div className="flex flex-wrap gap-x-2.5 gap-y-4 lg:max-w-[560px] lg:shrink-0 lg:justify-end">
+        <div className="flex min-w-0 flex-wrap gap-x-2.5 gap-y-4">
           {v.comp.core.map((u) => (
             <UnitToken key={u} unitId={u} size={44} showName={false} items={v.comp.items?.[u] ?? []} />
           ))}
@@ -177,8 +183,8 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
           const hidden = v.lines.filter((l) => hide.has(l.id)).length;
           return (
             <>
-              <p className="max-w-[620px] text-[17px] font-semibold leading-snug text-[var(--ink)]">{lead}</p>
-              {rest && <p className="mt-2 max-w-[620px] text-[14px] leading-relaxed text-[var(--ink-2)]">{rest}</p>}
+              <p className="text-[17px] font-semibold leading-snug text-[var(--ink)]">{lead}</p>
+              {rest && <p className="mt-2 text-[14px] leading-relaxed text-[var(--ink-2)]">{rest}</p>}
               {hidden > 0 && <p className="mt-2 text-[13px] text-[var(--muted)]">Also counts {hidden} shared change{hidden === 1 ? "" : "s"} listed below the cards.</p>}
             </>
           );
