@@ -9,7 +9,19 @@ export type Severity = "high" | "medium" | "low";
 
 export interface Cite {
   stage: string;
+  to?: string; // a range of rounds: "2-3 to 4-1"
   label: string;
+}
+
+// Placement colors as tactics.tools draws them: 1st gold, 2nd purple, 3rd blue, 4th green, 5th to 8th grey.
+export function placeColor(place: number): string {
+  return ["#f1c555", "#dc38c3", "#6eccff", "#37d488"][place - 1] ?? "#bbbbbb";
+}
+
+// Player damage after a loss is the stage's base damage plus 1 per enemy unit still standing.
+export const STAGE_DAMAGE = [0, 0, 2, 5, 7, 9, 11, 17];
+export function unitsLostBy(stage: string, damage: number): number {
+  return damage - (STAGE_DAMAGE[Number(stage.split("-")[0])] ?? 0);
 }
 
 export interface Finding {
@@ -194,7 +206,7 @@ export function analyze(game: GameRecord): Review {
         cites: [
           { stage: first, label: `${span[0].hp} HP before combat` },
           { stage: lastS, label: `${endHp} HP after combat` },
-          { stage: first, label: `to ${lastS}: +${earned} streak gold in all` },
+          { stage: first, to: lastS, label: `+${earned} streak gold` },
         ],
         hpCost: hpLost,
       });

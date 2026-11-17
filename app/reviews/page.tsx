@@ -3,7 +3,7 @@ import { SiteFooter, SiteNav } from "@/components/SiteChrome";
 import { UnitToken } from "@/components/UnitToken";
 import { allGames } from "@/lib/game/games";
 import { MY_COMPS } from "@/lib/patch/radar";
-import { analyze, costTone, ordinal } from "@/lib/review/engine";
+import { analyze, costTone, placeColor } from "@/lib/review/engine";
 
 export const metadata = { title: "Reviews · TFTeacher" };
 
@@ -83,13 +83,12 @@ export default async function ReviewsPage({ searchParams }: { searchParams: Prom
           <span>Place</span>
           <span>Comp</span>
           <span>Final board</span>
-          <span>Costliest mistake</span>
+          <span>Biggest mistake</span>
           <span />
         </div>
         <ul className="mt-4 space-y-3 md:mt-0">
           {rows.map(({ game, comp, top, board }) => {
-            const good = game.placement <= 4;
-            const color = good ? "var(--good)" : "var(--hp)";
+            const color = placeColor(game.placement);
             const when = new Date(game.playedAt);
             return (
               <li key={game.id}>
@@ -101,10 +100,7 @@ export default async function ReviewsPage({ searchParams }: { searchParams: Prom
                     className="tnum flex h-12 w-12 items-center justify-center rounded-xl font-semibold md:h-14 md:w-14"
                     style={{ background: `color-mix(in oklab, ${color} 16%, var(--panel-2))`, color }}
                   >
-                    <span className="text-[22px] leading-none">
-                      {game.placement}
-                      <span className="ml-px text-[13px] font-medium">{ordinal(game.placement).slice(String(game.placement).length)}</span>
-                    </span>
+                    <span className="text-[24px] leading-none">{game.placement}</span>
                   </span>
                   <div className="min-w-0">
                     <div className="truncate text-[16px] font-semibold">{COMP_NAME[comp]}</div>
@@ -115,7 +111,7 @@ export default async function ReviewsPage({ searchParams }: { searchParams: Prom
                   </div>
                   <div className="col-span-2 flex flex-wrap gap-1.5 pt-1 md:col-span-1 md:pt-0">
                     {board.map((p, i) => (
-                      <UnitToken key={i} piece={{ ...p, items: [] }} size={30} showName={false} />
+                      <UnitToken key={i} piece={p} size={30} showName={false} />
                     ))}
                   </div>
                   <div className="col-span-2 min-w-0 md:col-span-1">
@@ -154,7 +150,7 @@ function Trend({ places }: { places: number[] }) {
       <line x1={0} x2={W} y1={y(4.5)} y2={y(4.5)} stroke="var(--line-2)" strokeDasharray="2 3" />
       <polyline points={places.map((p, i) => `${x(i)},${y(p)}`).join(" ")} fill="none" stroke="var(--ink-2)" strokeWidth={1.5} />
       {places.map((p, i) => (
-        <circle key={i} cx={x(i)} cy={y(p)} r={3} fill={p <= 4 ? "var(--good)" : "var(--hp)"} />
+        <circle key={i} cx={x(i)} cy={y(p)} r={3} fill={placeColor(p)} />
       ))}
     </svg>
   );

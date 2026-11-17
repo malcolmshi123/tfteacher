@@ -1,9 +1,10 @@
 import Link from "next/link";
+import { CiteText } from "@/components/review/CiteText";
 import { SiteFooter, SiteNav } from "@/components/SiteChrome";
 import { HighlightSwatch, UnitToken } from "@/components/UnitToken";
 import { Timeline } from "@/components/review/Timeline";
 import { buildSampleGame } from "@/lib/game/sample";
-import { analyze, boardValue, shopMarks } from "@/lib/review/engine";
+import { analyze, boardValue, shopMarks, placeColor } from "@/lib/review/engine";
 import { UNIT_BY_ID } from "@/lib/game/set";
 import { MY_COMPS } from "@/lib/patch/radar";
 
@@ -21,19 +22,6 @@ export default function Home() {
     return marks.bought.has(key) ? "bought" : marks.missed.has(key) ? "missed" : flex.has(u) ? "flex" : "dim";
   };
   const anyMissed = marks.missed.size > 0;
-  // which unit was missed, and the copies you already held when it showed up
-  const missedNote = (() => {
-    const key = [...marks.missed][0];
-    if (!key) return "";
-    const [si, k] = key.split(":").map(Number);
-    const u = r41.shops[si]?.[k];
-    if (!u) return "";
-    const onBoard = r41.board.filter((p) => p.unit === u && p.star === 1).length;
-    const onBench = r41.bench.filter((p) => p.unit === u && p.star === 1).length;
-    if (onBoard + onBench !== 2) return "";
-    const where = onBoard && onBench ? "one on your board and one on the bench" : onBoard ? "two on your board" : "two on the bench";
-    return `Missed: the ${UNIT_BY_ID[u].name} in Roll ${si}. You had ${where}, so it was a 2-star.`;
-  })();
   const xpCost = r41.xpBought * 4;
   const rollCost = r41.rerolls * 2;
   const buyCost = r41.bought.reduce((a, u) => a + UNIT_BY_ID[u].cost, 0);
@@ -74,7 +62,7 @@ export default function Home() {
             <div className="rounded-[20px] border border-[var(--line)] bg-[var(--panel)] p-4 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.7)] md:p-5">
               <div className="flex items-center justify-between px-1">
                 <div className="flex items-center gap-2.5">
-                  <span className="tnum grid h-8 min-w-8 place-items-center rounded-lg bg-[color-mix(in_oklab,var(--hp)_16%,var(--panel-2))] px-1.5 text-[13px] font-semibold text-[var(--hp)]">{review.game.placement}th</span>
+                  <span className="tnum grid h-8 min-w-8 place-items-center rounded-lg px-1.5 text-[15px] font-semibold" style={{ color: placeColor(review.game.placement), background: `color-mix(in oklab, ${placeColor(review.game.placement)} 16%, var(--panel-2))` }}>{review.game.placement}</span>
                   <div>
                     <div className="text-[13px] font-medium">Sample game · Ranked · {review.game.patch}</div>
                     <div className="text-[12px] text-[var(--muted)]">Recorded round by round</div>
@@ -94,7 +82,7 @@ export default function Home() {
                     <div className="mt-2.5 flex flex-wrap gap-1.5">
                       {top.cites.map((c, i) => (
                         <span key={i} className="tnum rounded-md border border-[var(--line)] bg-[var(--bg)] px-2 py-0.5 text-[12px] text-[var(--ink-2)]">
-                          <span className="font-medium text-[var(--ink)]">{c.stage}</span> {c.label}
+                          <CiteText c={c} />
                         </span>
                       ))}
                     </div>
@@ -126,7 +114,7 @@ export default function Home() {
                 <dl className="tnum mt-5 grid grid-cols-3 gap-3 text-[13px]">
                   <div>
                     <dt className="text-[var(--muted)]">Placement</dt>
-                    <dd className="text-[18px] font-semibold">{review.game.placement}th</dd>
+                    <dd className="text-[18px] font-semibold" style={{ color: placeColor(review.game.placement) }}>{review.game.placement}</dd>
                   </div>
                   <div>
                     <dt className="text-[var(--muted)]">Level</dt>
@@ -160,8 +148,8 @@ export default function Home() {
                 </div>
                 <dl className="tnum mt-5 grid grid-cols-3 gap-3 text-[13px]">
                   <div>
-                    <dt className="text-[var(--muted)]">HP entering</dt>
-                    <dd className="text-[18px] font-semibold text-[var(--hp)]">{r41.hp}</dd>
+                    <dt className="text-[var(--muted)]">HP after combat</dt>
+                    <dd className="text-[18px] font-semibold text-[var(--hp)]">{Math.max(0, r41.hp - r41.damageTaken)}</dd>
                   </div>
                   <div>
                     <dt className="text-[var(--muted)]">Gold</dt>
@@ -179,7 +167,6 @@ export default function Home() {
                   {anyMissed && <span className="flex items-center gap-1.5"><HighlightSwatch state="missed" />Missed</span>}
                   <span className="flex items-center gap-1.5"><HighlightSwatch state="flex" />Flex option</span>
                 </div>
-                {missedNote && <p className="mt-3 text-[13px] leading-relaxed text-[var(--ink-2)]">{missedNote}</p>}
                 <p className="tnum mt-3 text-[13px] text-[var(--muted)]">
                   {r41.gold} gold: {xpCost > 0 && <>{xpCost} on XP, </>}{rollCost} on {r41.rerolls} rerolls, {buyCost} on {r41.bought.length} unit buys, plus {soldFor} for selling{" "}
                   {soldNames}. {r41.goldEnd} left.
@@ -216,7 +203,7 @@ export default function Home() {
               visual={
                 <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--line)] bg-[var(--panel)] px-4 py-3 text-[13px]">
                   <span className="truncate text-[var(--ink)]">Died on {last.stage} holding {last.goldEnd} gold</span>
-                  <span className="tnum shrink-0 rounded-full bg-[color-mix(in_oklab,var(--hp)_13%,transparent)] px-2 py-0.5 text-[12px] text-[var(--hp)]">{review.game.placement}th</span>
+                  <span className="tnum grid h-6 min-w-6 shrink-0 place-items-center rounded-md px-1 text-[13px] font-semibold" style={{ color: placeColor(review.game.placement), background: `color-mix(in oklab, ${placeColor(review.game.placement)} 16%, var(--panel-2))` }}>{review.game.placement}</span>
                 </div>
               }
             >

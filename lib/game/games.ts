@@ -67,7 +67,11 @@ function build(plan: Plan): GameRecord {
   const fix = target - dmg.reduce((a, b) => a + b, 0);
   dmg[dmg.indexOf(Math.max(...dmg))] += fix;
   const dmgAt = new Map(losses.map(({ r }, k) => [r.stage, dmg[k]]));
-  if (dies) dmgAt.set(pvp[pvp.length - 1].stage, plan.lastHp);
+  // the killing blow still follows the formula: stage damage plus at least 2 units
+  if (dies) {
+    const s = pvp[pvp.length - 1].stage;
+    dmgAt.set(s, Math.max(plan.lastHp, [0, 0, 2, 5, 7, 9, 11, 17][Number(s[0])] + 2));
+  }
 
   let phase: Phase = { board: "" };
   let fight = 0;
@@ -146,7 +150,7 @@ const PLANS: Plan[] = [
       "4-5": { board: "ornn:2 leblanc:2 khazix:2:hoj,rabadon hecarim:2:warmog diana:2 fiddlesticks:1 soraka:1", bench: "khazix:1 hecarim:1", items: "vest" },
       "4-7": { board: "ornn:2 leblanc:2 khazix:2:hoj,rabadon hecarim:2:warmog diana:2 fiddlesticks:1 soraka:1", bench: "khazix:1 hecarim:1", items: "vest,cloak" },
       "5-1": { board: "ornn:2 leblanc:2 khazix:2:hoj,rabadon hecarim:2:warmog,gargoyle diana:2 fiddlesticks:1 soraka:1", bench: "khazix:1 hecarim:1" },
-      "5-3": { board: "ornn:2 leblanc:2 khazix:2:hoj,rabadon hecarim:2:warmog,gargoyle diana:2 fiddlesticks:1 soraka:1 ezreal:1", bench: "khazix:1 hecarim:1" },
+      "5-3": { board: "ornn:2 leblanc:2 khazix:2:hoj,rabadon,jeweled hecarim:2:warmog,gargoyle,spirit diana:2 fiddlesticks:1 soraka:1 ezreal:1", bench: "khazix:1 hecarim:1" },
     },
     levels: { "2-1": 4, "2-5": 5, "3-1": 6, "4-1": 7, "5-3": 8 },
     rolls: { "4-1": 12, "4-5": 18, "5-1": 34, "5-3": 2, "5-5": 0, "5-6": 0 },
@@ -202,7 +206,7 @@ const PLANS: Plan[] = [
       "4-1": { board: "ornn:2 alistar:2 leblanc:2 khazix:1:hoj,rabadon hecarim:1:warmog diana:1 fiddlesticks:1", bench: "khazix:1 hecarim:1", items: "vest" },
       "4-4": { board: "ornn:2 alistar:2 leblanc:2 khazix:1:hoj,rabadon hecarim:1:warmog diana:1 fiddlesticks:1", bench: "khazix:1 hecarim:1", items: "vest,cloak" },
       "4-5": { board: "ornn:2 alistar:2 leblanc:2 khazix:2:hoj,rabadon hecarim:2:warmog,gargoyle diana:1 fiddlesticks:1", bench: "diana:1" },
-      "5-1": { board: "ornn:2 leblanc:2 khazix:2:hoj,rabadon hecarim:2:warmog,gargoyle diana:1 fiddlesticks:1 soraka:1", bench: "diana:1" },
+      "5-1": { board: "ornn:2 leblanc:2 khazix:2:hoj,hoj,rabadon hecarim:2:warmog,gargoyle,spirit diana:1 fiddlesticks:1 soraka:1", bench: "diana:1" },
     },
     levels: { "2-1": 4, "2-5": 5, "3-1": 6, "4-1": 7 },
     rolls: { "4-1": 40, "4-5": 30, "5-1": 30, "5-3": 26, "5-5": 20 },

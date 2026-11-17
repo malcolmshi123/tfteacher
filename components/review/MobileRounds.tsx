@@ -137,8 +137,8 @@ export function MobileRounds({
       <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 px-1 text-[13px] text-[var(--muted)]">
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--good)]" />Won</span>
         <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--hp)]" />Lost</span>
-        <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--line-2)]" />Monster round</span>
-        <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full border border-dashed border-[var(--ink-2)]" />Shared draft</span>
+        <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full bg-[var(--line-2)]" />PvE</span>
+        <span className="flex items-center gap-1.5"><span className="block h-1.5 w-3 rounded-full border border-dashed border-[var(--ink-2)]" />Carousel</span>
         <span className="w-full text-[var(--ink-2)]">Numbers on chips are HP after combat. Tap one to open it.</span>
       </p>
     </div>

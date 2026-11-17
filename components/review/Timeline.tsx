@@ -196,7 +196,6 @@ export function Timeline({
         p.stage === selected ? (
           <g key="sel">
             <rect x={cx(i) - step / 2 + 1} y={HP_TOP - 2} width={step - 2} height={STRIP_TOP + STRIP_H - HP_TOP + 6} fill="var(--ink)" opacity={0.08} rx={3} />
-            <path d={`M${cx(i) - 5},${HP_TOP - 12} L${cx(i) + 5},${HP_TOP - 12} L${cx(i)},${HP_TOP - 5} Z`} fill="var(--ink)" />
           </g>
         ) : null,
       )}

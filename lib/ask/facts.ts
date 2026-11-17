@@ -1,3 +1,4 @@
+import { unitsLostBy } from "../review/engine";
 import { ITEMS, UNIT_BY_ID } from "../game/set";
 import type { Review } from "../review/engine";
 
@@ -48,7 +49,7 @@ export function buildFacts(review: Review): Fact[] {
     const p = series[i];
     const after = Math.max(0, r.hp - r.damageTaken);
     const result =
-      r.kind === "carousel" ? "shared draft round" : r.kind === "pve" ? `monster round, ${r.outcome}` : r.outcome === "win" ? `won vs ${r.opponent}` : `lost to ${r.opponent}, took ${r.damageTaken} damage`;
+      r.kind === "carousel" ? "carousel" : r.kind === "pve" ? `PvE round, ${r.outcome}` : r.outcome === "win" ? "won" : `lost by ${unitsLostBy(r.stage, r.damageTaken)} units, took ${r.damageTaken} damage`;
     out.push(
       fact(
         `r-${r.stage}`,

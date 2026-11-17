@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { allGames, gameById } from "../lib/game/games";
 import { MY_COMPS } from "../lib/patch/radar";
-import { analyze } from "../lib/review/engine";
+import { analyze, unitsLostBy } from "../lib/review/engine";
 import { buildFacts } from "../lib/ask/facts";
 import { checkAnswer } from "../lib/ask/check";
 
@@ -18,6 +18,14 @@ describe.each(allGames().map((g) => [g.game.id, g] as const))("game %s", (_id, {
       }
     }
   });
+  it("takes stage damage plus 1 per surviving enemy unit on every loss", () => {
+    for (const r of game.rounds) if (r.kind === "pvp" && r.outcome === "loss") {
+      const n = unitsLostBy(r.stage, r.damageTaken);
+      expect(n, r.stage).toBeGreaterThanOrEqual(1);
+      expect(n, r.stage).toBeLessThanOrEqual(10);
+    }
+  });
+
   it("never fields more units than its level", () => {
     for (const r of R) expect(r.board.length, r.stage).toBeLessThanOrEqual(r.level);
   });

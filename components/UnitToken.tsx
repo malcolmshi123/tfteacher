@@ -72,7 +72,7 @@ export function UnitToken({
         )}
 
         {piece && piece.items.length > 0 && (
-          <span className="absolute left-1/2 flex -translate-x-1/2 gap-[2px]" style={{ bottom: -Math.round(size * 0.16) }}>
+          <span className="absolute left-1/2 flex -translate-x-1/2 gap-[2px]" style={{ bottom: 2 }}>
             {piece.items.map((it, k) => (
               <ItemIcon key={k} id={it} size={Math.max(11, Math.min(Math.round(size * 0.36), Math.floor((size - 2 * (piece.items.length - 1)) / piece.items.length)))} />
             ))}

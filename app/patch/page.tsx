@@ -1,6 +1,7 @@
 import { SiteFooter, SiteNav } from "@/components/SiteChrome";
 import { UnitToken } from "@/components/UnitToken";
 import { allGames } from "@/lib/game/games";
+import { placeColor } from "@/lib/review/engine";
 import { UNIT_BY_ID } from "@/lib/game/set";
 import { NOTES, PATCH, PATCH_SUMMARY, changePct, radar, type CompVerdict, type NoteLine, type PatchPick } from "@/lib/patch/radar";
 
@@ -34,7 +35,14 @@ export default function PatchPage() {
         <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_300px] md:items-start">
           <div className="max-w-[720px]">
             <p className="text-[13px] text-[var(--muted)]">
-              Patch {PATCH.from} to {PATCH.to} · live {PATCH.date}
+              <span className="inline-flex items-center gap-1.5">
+                Patch {PATCH.from}
+                <svg width="16" height="10" viewBox="0 0 16 10" aria-label="to">
+                  <path d="M1 5h13M10 1.5 14 5l-4 3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                {PATCH.to}
+              </span>{" "}
+              · live {PATCH.date}
             </p>
             <h1 className="mt-3 text-[28px] font-semibold leading-[1.15] tracking-[-0.02em] text-balance md:text-[36px]">
               {headline}
@@ -149,7 +157,7 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
   return (
     <article className="overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--panel)]">
       <header className="flex flex-col gap-5 border-b border-[var(--line)] p-6 lg:flex-row lg:items-center lg:justify-between">
-        <div className="lg:w-[340px] lg:shrink-0">
+        <div className="min-w-0 lg:flex-1">
           <div className="flex items-center gap-2 text-[13px] font-medium" style={{ color: t.color }}>
             <span className="block h-2 w-2 rounded-full" style={{ background: t.color }} />
             {t.label}
@@ -161,7 +169,7 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
             <span className="rounded-md bg-[color-mix(in_oklab,var(--good)_13%,transparent)] px-2 py-0.5 text-[var(--good)]">{(() => { const k = v.lines.filter((l) => l.direction === "buff").length; return `${k} buff${k === 1 ? "" : "s"}`; })()}</span>
           </p>
         </div>
-        <div className="flex flex-wrap gap-x-1 gap-y-3">
+        <div className="flex flex-wrap gap-x-1 gap-y-3 lg:shrink-0">
           {v.comp.core.map((u) => (
             <UnitToken key={u} unitId={u} size={44} />
           ))}
@@ -218,12 +226,12 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
                     <td className="py-2 text-[var(--ink-2)]">{k}</td>
                     <td className="py-2 text-right text-[var(--ink-2)]">{was}</td>
                     <td className={`py-2 text-right ${now.length < 5 ? "text-[15px] font-medium text-[var(--ink-2)]" : "text-[17px] font-semibold text-[var(--ink)]"}`}>
-                      {is}
                       {up !== undefined && (
-                        <span className="ml-1.5 text-[12px] font-medium" style={{ color: now.length < 5 ? "var(--muted)" : up ? "var(--good)" : "var(--hp)" }}>
-                          {up ? "better" : "worse"}
+                        <span className="mr-1 text-[13px]" style={{ color: now.length < 5 ? "var(--muted)" : up ? "var(--good)" : "var(--hp)" }} aria-label={up ? "better" : "worse"}>
+                          {k === "Avg place" ? (up ? "↓" : "↑") : up ? "↑" : "↓"}
                         </span>
                       )}
+                      {is}
                     </td>
                   </tr>
                 ))}
@@ -236,7 +244,7 @@ function CompCard({ v, hide }: { v: CompVerdict; hide: Set<string> }) {
                       <span
                         key={k}
                         className="tnum rounded-md px-2 py-1 text-[13px] font-semibold"
-                        style={{ color: pl <= 4 ? "var(--good)" : "var(--hp)", background: `color-mix(in oklab, ${pl <= 4 ? "var(--good)" : "var(--hp)"} 14%, transparent)` }}
+                        style={{ color: placeColor(pl), background: `color-mix(in oklab, ${placeColor(pl)} 16%, transparent)` }}
                       >
                         {pl}
                       </span>
@@ -285,7 +293,7 @@ function Delta({ n }: { n: NoteLine }) {
   if (pct === undefined) return null;
   return (
     <span className="tnum w-24 shrink-0 text-right text-[13px] font-medium" style={{ color: n.direction === "buff" ? "var(--good)" : n.direction === "nerf" ? "var(--hp)" : "var(--ink-2)" }}>
-      {Math.abs(pct).toFixed(1)}% {pct > 0 ? "higher" : "lower"}
+      {pct > 0 ? "↑" : "↓"} {Math.abs(pct).toFixed(1)}%
       {n.direction === "buff" && pct < 0 ? <span className="block text-[11px] font-normal text-[var(--muted)]">lower is better</span> : null}
     </span>
   );

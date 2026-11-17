@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { costTone, ordinal, type Finding, type Review } from "@/lib/review/engine";
+import { costTone, placeColor, type Finding, type Review } from "@/lib/review/engine";
 import { AskPanel } from "./AskPanel";
 import { MobileRounds } from "./MobileRounds";
+import { CiteText } from "./CiteText";
 import { RoundInspector } from "./RoundInspector";
 import { Timeline } from "./Timeline";
 
@@ -49,7 +50,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
   }, [game, findings]);
 
   return (
-    <div className="mx-auto max-w-[1240px] px-4 pb-24 pt-6 md:px-6 md:pt-8" style={{ ["--place" as string]: game.placement <= 4 ? "var(--good)" : "var(--hp)" }}>
+    <div className="mx-auto max-w-[1240px] px-4 pb-24 pt-6 md:px-6 md:pt-8" style={{ ["--place" as string]: placeColor(game.placement) }}>
       <Link href="/reviews" className="mb-5 inline-flex items-center gap-1.5 text-[13px] text-[var(--muted)] hover:text-[var(--ink)]">
         <span aria-hidden>‹</span> All reviews
       </Link>
@@ -57,7 +58,7 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div className="max-w-[920px]">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-[var(--muted)]">
-            <span className="tnum rounded-md bg-[color-mix(in_oklab,var(--place)_16%,var(--panel-2))] px-1.5 py-0.5 font-semibold text-[var(--place)]">{ordinal(game.placement)} of 8</span>
+            <span className="tnum rounded-md bg-[color-mix(in_oklab,var(--place)_16%,var(--panel-2))] px-1.5 py-0.5 font-semibold text-[var(--place)]">{game.placement}</span>
             <span>{game.queue}</span>
             <Dot />
             <span>{game.patch}</span>
@@ -95,9 +96,9 @@ export function ReviewView({ review, initialRound }: { review: Review; initialRo
             <span className="text-[var(--muted)]">Round result</span>
             <Key color="var(--good)">Won</Key>
             <Key color="var(--hp)">Lost</Key>
-            <Key color="var(--line-2)" solid>Monster round</Key>
+            <Key color="var(--line-2)" solid>PvE</Key>
             <Key color="transparent" dashed>
-              Shared draft
+              Carousel
             </Key>
             <span className="ml-auto flex items-center gap-1.5">
               <span className="block h-3 w-4 border-t-[3px] border-[var(--brand)] bg-[color-mix(in_oklab,var(--brand)_10%,transparent)]" />
@@ -185,7 +186,7 @@ function FindingCard({ f, active, lead, onClick, onCite, children }: { f: Findin
           </div>
           <p className={`mt-2 ${lead ? "text-[15px]" : "text-[14px]"} leading-relaxed text-[var(--ink-2)]`}>{f.detail}</p>
           {quiet && (
-            <span className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-[var(--line-2)] px-2.5 py-1 text-[13px] text-[var(--ink-2)] transition-colors group-hover:border-[var(--ink-2)] group-hover:text-[var(--ink)]">
+            <span className="mt-3 inline-flex items-center gap-1.5 text-[13px] text-[var(--ink-2)] transition-colors group-hover:text-[var(--ink)]">
               {f.positive ? "Show rounds" : "Show rounds and fix"}
               <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden>
                 <path d="M2.5 3.8 5 6.3l2.5-2.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -229,8 +230,9 @@ function FindingCard({ f, active, lead, onClick, onCite, children }: { f: Findin
                 }}
                 className="tnum inline-flex items-center gap-1.5 rounded-md border border-[var(--line)] bg-[var(--bg)] px-2 py-1 text-[12px] text-[var(--ink-2)] transition-colors hover:border-[var(--line-2)] hover:text-[var(--ink)]"
               >
-                <span className="font-medium text-[var(--ink)]">{c.stage}</span>
-                {c.label}
+                <span>
+                  <CiteText c={c} />
+                </span>
               </button>
             ))}
           </div>}

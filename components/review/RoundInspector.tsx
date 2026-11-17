@@ -3,7 +3,7 @@
 import { HighlightSwatch, ItemChip, UnitToken } from "@/components/UnitToken";
 import { UNIT_BY_ID } from "@/lib/game/set";
 import type { GameRecord } from "@/lib/game/types";
-import { costTone, shopMarks, type Finding, type SeriesPoint } from "@/lib/review/engine";
+import { costTone, shopMarks, unitsLostBy, type Finding, type SeriesPoint } from "@/lib/review/engine";
 
 export function RoundInspector({
   game,
@@ -38,16 +38,17 @@ export function RoundInspector({
           ? `Spent ${r.xpBought * 4} gold on XP${r.level < pt.lobbyLevel ? ", still a level behind the lobby" : ""}.`
           : here.find((f) => !f.positive)?.title;
 
+  const by = unitsLostBy(r.stage, r.damageTaken);
   const result =
     r.kind === "carousel"
-      ? "Shared draft"
+      ? "Carousel"
       : r.kind === "pve"
-        ? "Monster round"
+        ? "PvE"
         : r.outcome === "win"
-          ? `Won vs ${r.opponent}`
+          ? "Won"
           : idx === game.rounds.length - 1 && r.hp - r.damageTaken <= 0
-            ? `Died, took ${r.damageTaken}`
-            : `Lost to ${r.opponent}, took ${r.damageTaken}`;
+            ? `Died, lost by ${by} unit${by === 1 ? "" : "s"}`
+            : `Lost by ${by} unit${by === 1 ? "" : "s"}`;
 
   return (
     <div className={bare ? "" : "rounded-2xl border border-[var(--line)] bg-[var(--panel)]"}>
@@ -67,7 +68,7 @@ export function RoundInspector({
       {takeaway && <p className="text-pretty border-b border-[var(--line)] px-4 py-3 text-[14px] leading-snug text-[var(--ink)] sm:px-5">{takeaway}</p>}
 
       <dl className="grid grid-cols-2 border-b border-[var(--line)]">
-        <Stat k="HP entering" v={`${r.hp}`} sub={pt.lobbyAliveEntering >= 4 ? `lobby ${pt.lobbyHpEntering}` : `${pt.lobbyAliveEntering} opponents left`} tone={pt.lobbyAliveEntering < 4 ? undefined : r.hp < pt.lobbyHpEntering ? "hp" : "good"} />
+        <Stat k="HP after combat" v={`${Math.max(0, r.hp - r.damageTaken)}`} sub={pt.lobbyAlive >= 4 ? `lobby ${pt.lobbyHp}` : `${pt.lobbyAlive} opponents left`} tone={pt.lobbyAlive < 4 ? undefined : r.hp - r.damageTaken < pt.lobbyHp ? "hp" : "good"} />
         <Stat k="Gold" v={`${r.gold}`} sub={`${r.goldEnd} into combat`} />
         <Stat k="Level" v={`${r.level}`} sub={`lobby ${pt.lobbyLevel}`} tone={r.level < pt.lobbyLevel ? "hp" : r.level > pt.lobbyLevel ? "good" : undefined} />
         <Stat k="Board" v={`${pt.boardValue}`} sub={`lobby ${pt.lobbyBoardValue}`} tone={pt.boardValue < pt.lobbyBoardValue ? "hp" : "good"} />
@@ -152,7 +153,7 @@ export function RoundInspector({
             </div>
             <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-[var(--muted)]">
               {marks.bought.size > 0 && <Legend state="bought">Bought</Legend>}
-              {marks.missed.size > 0 && <Legend state="missed">Missed: one more copy made a 2-star</Legend>}
+              {marks.missed.size > 0 && <Legend state="missed">Missed</Legend>}
             </p>
           </Section>
         )}
